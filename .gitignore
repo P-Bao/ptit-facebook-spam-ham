@@ -1,0 +1,33 @@
+# Bỏ qua thư mục data (dataset lớn, lưu trên HuggingFace)
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Môi trường ảo
+.venv/
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Argilla local (Docker Compose)
+my-argilla/
