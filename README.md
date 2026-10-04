@@ -5,7 +5,7 @@
 
 ---
 
-## 📌 Mô tả bài toán
+## Mô tả bài toán
 
 Xây dựng hệ thống phân loại tự động bình luận trong các **Facebook group của sinh viên PTIT** thành hai nhóm:
 
@@ -16,7 +16,7 @@ Xây dựng hệ thống phân loại tự động bình luận trong các **Fac
 
 ---
 
-## 🗂️ Cấu trúc dự án
+## Cấu trúc dự án
 
 ```
 .
@@ -29,11 +29,9 @@ Xây dựng hệ thống phân loại tự động bình luận trong các **Fac
 └── README.md
 ```
 
-> **Lưu ý:** Thư mục `data/` **không** được commit vào repo. Xem phần [Dữ liệu](#-dữ-liệu) để biết cách tải về.
-
 ---
 
-## 🕷️ Thu thập dữ liệu (Crawl)
+## Thu thập dữ liệu (Crawl)
 
 Dữ liệu bình luận thô được thu thập từ các **Facebook group của sinh viên PTIT** bằng công cụ:
 
@@ -56,7 +54,7 @@ Dataset đã được gán nhãn (spam/ham) được lưu công khai tại:
 | spam | ~3 209 (≈ 10%) |
 | Cột chính | `id`, `label`, `cleaned_text`, `text`, `comment_type`, `reaction_count` |
 
-> ⚠️ Dataset là **gated** — bạn cần tài khoản Hugging Face và được phê duyệt truy cập trước khi tải về.
+> Dataset là **gated** — bạn cần tài khoản Hugging Face và được phê duyệt truy cập trước khi tải về.
 
 ### Cách tải dataset (dùng trong notebook)
 
@@ -73,7 +71,7 @@ csv_path = hf_hub_download(
 
 ---
 
-## 🔄 Quy trình xử lý & gán nhãn
+## Quy trình xử lý & gán nhãn
 
 ```
 Crawl thô (facebook_post_comment_scraper)
@@ -99,7 +97,7 @@ spam-ham-comments.ipynb          ← Trích chọn đặc trưng + huấn luyệ
 
 ---
 
-## 🧪 Phương pháp & Kết quả
+## Phương pháp & kết quả
 
 ### Bước 2 — Tiền xử lý dữ liệu
 
@@ -133,11 +131,11 @@ Chia tập: **80% train / 20% test** (stratified theo nhãn).
 | Word2Vec | Naive Bayes | 79.74% | 24.73% | 49.69% | 33.02% |
 | Word2Vec | SVM | 92.78% | 86.06% | 33.64% | 48.38% |
 
-> 📌 **Nhận xét:** TF-IDF + SVM đạt accuracy cao nhất (93.06%). Do tập dữ liệu mất cân bằng (~90% ham), các mô hình có xu hướng nhận diện tốt ham nhưng còn hạn chế ở recall của spam.
+> **Nhận xét:** TF-IDF + SVM đạt accuracy cao nhất (93.06%). Do tập dữ liệu mất cân bằng (~90% ham), các mô hình có xu hướng nhận diện tốt ham nhưng còn hạn chế ở recall của spam.
 
 ---
 
-## ⚙️ Cài đặt
+## Cài đặt
 
 ```bash
 pip install argilla pandas tqdm openai gensim underthesea scikit-learn matplotlib huggingface_hub
@@ -145,14 +143,33 @@ pip install argilla pandas tqdm openai gensim underthesea scikit-learn matplotli
 
 ### Chạy Argilla (Docker)
 
+Thư mục `my-argilla/` không được commit vào repo này. Tải về từ HuggingFace Spaces:
+
+> 🤗 **[p-storm/my-argilla](https://huggingface.co/spaces/p-storm/my-argilla/tree/main)**
+
 ```bash
-# Xem thư mục my-argilla/ (không commit vào repo)
+# 1. Cài Hugging Face CLI (nếu chưa có)
+pip install huggingface_hub
+
+# 2. Tải toàn bộ thư mục my-argilla/ về
+huggingface-cli download p-storm/my-argilla \
+    --repo-type space \
+    --local-dir my-argilla
+
+# Hoặc dùng Python:
+# from huggingface_hub import snapshot_download
+# snapshot_download(repo_id="p-storm/my-argilla", repo_type="space", local_dir="my-argilla")
+
+# 3. Khởi động Argilla
+cd my-argilla
 docker compose up -d
 ```
 
+Sau khi container khởi động, giao diện Argilla sẽ chạy tại `http://localhost:6900`.
+
 ---
 
-## 📚 Tài liệu tham khảo
+## Tài liệu tham khảo
 
 - Crawler: [facebook_post_comment_scraper](https://github.com/mohdtalal3/facebook_post_comment_scraper)
 - Dataset: [p-storm/ptit-facebook-comments-spamham](https://huggingface.co/datasets/p-storm/ptit-facebook-comments-spamham)
