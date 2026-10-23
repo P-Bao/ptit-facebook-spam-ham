@@ -1,179 +1,179 @@
 # Phát hiện Spam/Ham — Bình luận Facebook PTIT
 
 > **Bài tập lớn** — Môn: *Phân tích & Khai phá Dữ liệu Văn bản*  
-> **Yêu cầu thực hiện:** 2b — Phân loại Spam/Ham trên bình luận của sinh viên PTIT tại các Facebook group.
+> **Yêu cầu thực hiện:** Phân loại Spam/Ham trên bình luận của sinh viên PTIT tại các Facebook group.  
+> **Phiên bản:** v2.0 (Đã tích hợp dữ liệu Phase 2 & cập nhật mô hình).
 
 ---
 
-## Mô tả bài toán
+## 📌 1. Mô tả bài toán
 
-Xây dựng hệ thống phân loại tự động bình luận trong các **Facebook group của sinh viên PTIT** thành hai nhóm:
+Hệ thống phân loại tự động bình luận trong các **Facebook group của sinh viên PTIT** thành hai lớp:
 
-| Nhãn | Ý nghĩa |
-|------|---------|
-| **ham** | Bình luận bình thường, chân thực (hỏi đáp, chia sẻ kinh nghiệm, thảo luận học tập) |
-| **spam** | Bình luận rác (quảng cáo, rao vặt, chào hàng khóa học/sản phẩm, chứa link lạ hoặc số điện thoại đáng ngờ, copy-paste hàng loạt, nội dung lừa đảo/không liên quan) |
+| Nhãn | Ý nghĩa | Ví dụ đặc trưng |
+|------|---------|-----------------|
+| **ham** | Bình luận bình thường, chân thực, hợp lệ | Thảo luận môn học, hỏi lịch thi, xin tài liệu, trao đổi đời sống sinh viên... |
+| **spam** | Bình luận rác, không liên quan, độc hại | Rao vặt, quảng cáo khóa học/dịch vụ ngoài trường, seeding link lạ, số điện thoại lừa đảo, cày cmt hàng loạt... |
 
 ---
 
-## Cấu trúc dự án
+## 🗂️ 2. Cấu trúc thư mục dự án
 
 ```
 .
-├── clean_data_facebook_spamham.py   # Bước 1b: Tiền xử lý & làm sạch dữ liệu thô
-├── upload_to_argilla.py             # Bước 2a: Tải dữ liệu đã làm sạch lên Argilla để gán nhãn
-├── ai_assisted_spam_ham.py          # Bước 2b: Gợi ý nhãn tự động bằng AI (OpenRouter/GLM)
-├── auto_accept_labels.py            # Bước 2c: Tự động chấp nhận nhãn độ tin cậy cao
-├── download_labeled_data.py         # Bước 2d: Tải dữ liệu đã gán nhãn từ Argilla về CSV
-├── spam-ham-comments.ipynb          # Bước 3–5: Trích chọn đặc trưng, huấn luyện & đánh giá mô hình
-└── README.md
+├── data/
+│   ├── comments_labeled_export.csv       # Phase 1: Dữ liệu gán nhãn gốc (31,931 dòng)
+│   ├── groups_data_phase2.json           # Phase 2: Dữ liệu crawl mới dạng JSON lồng nhau
+│   ├── comments_phase2.csv               # Phase 2: Dữ liệu phẳng hoá sang định dạng chuẩn
+│   ├── comments_phase2_cleaned.csv       # Phase 2: Dữ liệu sau khi làm sạch văn bản
+│   ├── comments_labeled_phase2.csv       # Phase 2: Dữ liệu sau khi gán nhãn (4,197 dòng)
+│   └── comments_labeled_merged.csv       # Dữ liệu cuối gộp Phase 1 + Phase 2 (36,128 dòng)
+│
+├── convert_phase2_json.py                # Bước 0: Làm phẳng JSON Phase 2 thành CSV chuẩn
+├── clean_data_facebook_spamham.py        # Bước 1: Làm sạch HTML, URL, chuẩn hóa text tiếng Việt
+├── upload_to_argilla.py                  # Bước 2a: Tải dữ liệu lên Argilla gán nhãn
+├── ai_assisted_spam_ham.py               # Bước 2b: Gợi ý nhãn tự động bằng LLM (OpenRouter / GLM)
+├── auto_accept_labels.py                 # Bước 2c: Tự động chốt nhãn có độ tin cậy cao (≥ 0.75)
+├── download_labeled_data.py              # Bước 2d: Tải dữ liệu đã gán nhãn từ Argilla về CSV
+├── merge_labeled_data.py                 # Bước 2e: Gộp Phase 1 + Phase 2, khử trùng, gán nguồn
+│
+├── spam-ham-comments-v2.ipynb            # Bước 3–5: Trích chọn đặc trưng, Train, Test & Đánh giá (v2)
+├── spam-ham-comments.ipynb               # Notebook phiên bản cũ (chỉ Phase 1)
+├── BAO_CAO_DU_AN.md                      # Báo cáo tổng quan chi tiết của dự án
+└── README.md                             # Tài liệu hướng dẫn dự án
 ```
 
 ---
 
-## Thu thập dữ liệu (Crawl)
+## 📊 3. Dữ liệu (Dataset)
 
-Dữ liệu bình luận thô được thu thập từ các **Facebook group của sinh viên PTIT** bằng công cụ:
+Dữ liệu được thu thập từ các group Facebook sinh viên PTIT qua 2 giai đoạn (Phase 1 và Phase 2):
 
-> **[mohdtalal3/facebook\_post\_comment\_scraper](https://github.com/mohdtalal3/facebook_post_comment_scraper)**
+| Giai đoạn | Số lượng | Ham | Spam | Tỷ lệ Spam | Mô tả |
+|-----------|----------|-----|------|------------|-------|
+| **Phase 1** | 31,931 | 28,722 (89.95%) | 3,209 (10.05%) | 10.05% | Dữ liệu nền tảng ban đầu |
+| **Phase 2 (mới)** | 4,197 | 3,414 (81.34%) | 783 (18.66%) | 18.66% | Crawl bổ sung, lọc trùng với Phase 1 |
+| **TỔNG (Merged)** | **36,128** | **32,136 (88.95%)** | **3,992 (11.05%)** | **11.05%** | Tập dữ liệu hợp nhất huấn luyện v2 |
 
-Công cụ này sử dụng Selenium để đăng nhập Facebook, duyệt qua các bài đăng trong group và trích xuất bình luận + reply cùng thông tin đính kèm (loại bình luận, số reaction…).
+- Dataset Phase 1 lưu trữ trên Hugging Face: [p-storm/ptit-facebook-comments-spamham](https://huggingface.co/datasets/p-storm/ptit-facebook-comments-spamham).
+- Cột dữ liệu chính: `id`, `label`, `cleaned_text`, `text`, `comment_type`, `reaction_count`, `source`.
 
 ---
 
-## 📦 Dữ liệu
+## ⚙️ 4. Quy trình xử lý toàn diện (End-to-End Pipeline)
 
-Dataset đã được gán nhãn (spam/ham) được lưu công khai tại:
-
-> 🤗 **[p-storm/ptit-facebook-comments-spamham](https://huggingface.co/datasets/p-storm/ptit-facebook-comments-spamham)**
-
-| Thông tin | Giá trị |
-|-----------|---------|
-| Tổng số bình luận | ~31 931 |
-| ham | ~28 722 (≈ 90%) |
-| spam | ~3 209 (≈ 10%) |
-| Cột chính | `id`, `label`, `cleaned_text`, `text`, `comment_type`, `reaction_count` |
-
-> Dataset là **gated** — bạn cần tài khoản Hugging Face và được phê duyệt truy cập trước khi tải về.
-
-### Cách tải dataset (dùng trong notebook)
-
-```python
-from huggingface_hub import hf_hub_download
-
-csv_path = hf_hub_download(
-    repo_id="p-storm/ptit-facebook-comments-spamham",
-    filename="comments_labeled_export.csv",
-    repo_type="dataset",
-    token="<HF_TOKEN_CỦA_BẠN>",
-)
+```
+[Dữ liệu thô Facebook Group]
+      │
+      ├─────────────────────── Phase 1 (CSV)
+      │
+      └─────────────────────── Phase 2 (JSON)
+                                  │
+                                  ▼
+[Bước 0] convert_phase2_json.py (Làm phẳng post → comments → replies)
+      │
+      ▼
+[Bước 1] clean_data_facebook_spamham.py (Loại bỏ URL, emoji, HTML, chuẩn hóa ký tự)
+      │
+      ▼
+[Bước 2a] upload_to_argilla.py (Đưa dữ liệu lên nền tảng Argilla)
+      │
+      ▼
+[Bước 2b] ai_assisted_spam_ham.py (Gợi ý nhãn tự động với mô hình ngôn ngữ lớn GLM)
+      │
+      ▼
+[Bước 2c] auto_accept_labels.py (Chốt nhãn confidence ≥ 0.75 & rà soát nhãn nghi vấn)
+      │
+      ▼
+[Bước 2d] download_labeled_data.py (Xuất kết quả nhãn Phase 2)
+      │
+      ▼
+[Bước 2e] merge_labeled_data.py (Gộp P1 + P2 → data/comments_labeled_merged.csv)
+      │
+      ▼
+[Bước 3-5] spam-ham-comments-v2.ipynb
+      ├── Trích chọn đặc trưng: BoW, TF-IDF, Word2Vec (underthesea)
+      ├── Phân chia dữ liệu: 80% Train (28,901 mẫu) / 20% Test (7,227 mẫu - Stratified)
+      ├── Huấn luyện mô hình: MultinomialNB, GaussianNB, LinearSVC
+      └── Đánh giá, so sánh trước/sau tích hợp & cải tiến xử lý mất cân bằng
 ```
 
 ---
 
-## Quy trình xử lý & gán nhãn
+## 🧪 5. Kết quả thực nghiệm (v2 sau khi tích hợp)
 
-```
-Crawl thô (facebook_post_comment_scraper)
-        │
-        ▼
-clean_data_facebook_spamham.py   ← Làm sạch HTML, chuẩn hóa văn bản
-        │
-        ▼
-upload_to_argilla.py             ← Upload lên Argilla (self-hosted, Docker)
-        │
-        ▼
-ai_assisted_spam_ham.py          ← Gợi ý nhãn bằng LLM (OpenRouter)
-        │
-        ▼
-auto_accept_labels.py            ← Tự động chấp nhận nhãn có độ tin cậy cao
-        │
-        ▼
-download_labeled_data.py         ← Export CSV đã gán nhãn
-        │
-        ▼
-spam-ham-comments.ipynb          ← Trích chọn đặc trưng + huấn luyện mô hình
-```
+Đánh giá trên tập kiểm tra gộp (**Test Set: 7,227 mẫu**, gồm 6,428 ham và 799 spam):
+
+### 5.1. Bảng so sánh 6 tổ hợp mô hình
+
+| Phương pháp biểu diễn | Thuật toán phân loại | Accuracy | Precision (Spam) | Recall (Spam) | **F1-Score (Spam)** |
+|----------------------|----------------------|:--------:|:----------------:|:-------------:|:-------------------:|
+| **BoW** | Naive Bayes (MultinomialNB) | 92.21% | 68.10% | 55.57% | 61.20% |
+| **BoW** | Support Vector Machine (LinearSVC) | 93.33% | 81.51% | 51.31% | 62.98% |
+| **TF-IDF** | Naive Bayes (MultinomialNB) | 93.01% | **89.30%** | 41.80% | 56.95% |
+| **TF-IDF** | **Support Vector Machine (LinearSVC)** | **93.48%** | 84.60% | 50.19% | **63.00%** |
+| **Word2Vec** | Naive Bayes (GaussianNB) | 84.18% | 36.65% | **59.07%** | 45.23% |
+| **Word2Vec** | Support Vector Machine (LinearSVC) | 93.22% | 85.52% | 46.56% | 60.29% |
+
+> 🏆 **Mô hình tốt nhất:** **TF-IDF + LinearSVC** đạt hiệu quả cân bằng và tối ưu nhất toàn diện với **Accuracy 93.48%** và **F1-Score (Spam) 63.00%** (Precision 84.60%).
 
 ---
 
-## Phương pháp & kết quả
+### 5.2. So sánh trước vs sau khi tích hợp Phase 2
 
-### Bước 2 — Tiền xử lý dữ liệu
+Đánh giá trên cùng tập kiểm tra gộp (Test gộp):
 
-- Loại bỏ HTML entities, URL, ký tự đặc biệt.
-- Chuẩn hóa Unicode (dấu tiếng Việt).
-- Tách từ tiếng Việt bằng **[underthesea](https://github.com/undertheseanlp/underthesea)**.
+| Tổ hợp mô hình | F1-Score (Trước - Train P1) | **F1-Score (Sau - Train P1+P2)** | Recall (Trước) | **Recall (Sau)** |
+|----------------|:---------------------------:|:--------------------------------:|:--------------:|:----------------:|
+| BoW + Naive Bayes | 60.65% | **61.20%** | 52.94% | **55.57%** |
+| BoW + SVM | 54.29% | **62.98%** | 41.55% | **51.31%** |
+| TF-IDF + Naive Bayes | 39.96% | **56.95%** | 25.91% | **41.80%** |
+| **TF-IDF + SVM** | 50.77% | **63.00%** (+12.23%) | 37.30% | **50.19%** (+12.89%) |
+| Word2Vec + Naive Bayes | 33.55% | **43.95%** | 48.19% | **57.32%** |
+| Word2Vec + SVM | 42.34% | **60.51%** (+18.17%) | 28.54% | **47.18%** (+18.64%) |
 
-### Bước 3 — Trích chọn đặc trưng
-
-| Phương pháp | Mô tả |
-|-------------|-------|
-| **BoW** (Bag-of-Words) | `CountVectorizer`, max 5 000 từ |
-| **TF-IDF** | `TfidfVectorizer`, max 5 000 từ |
-| **Word2Vec** | Huấn luyện trên tập train, biểu diễn câu bằng vector trung bình |
-
-### Bước 4 — Mô hình phân loại
-
-- **Naive Bayes** — `MultinomialNB` (BoW/TF-IDF), `GaussianNB` (Word2Vec)
-- **SVM** — `LinearSVC`
-
-Chia tập: **80% train / 20% test** (stratified theo nhãn).
-
-### Bước 5 — Kết quả đánh giá
-
-| Đặc trưng | Thuật toán | Accuracy | Precision (spam) | Recall (spam) | F1 (spam) |
-|-----------|-----------|----------|-----------------|---------------|-----------|
-| BoW | Naive Bayes | 92.23% | 66.67% | 45.48% | 54.07% |
-| BoW | SVM | 92.86% | 77.03% | 41.28% | 53.75% |
-| TF-IDF | Naive Bayes | 92.48% | 87.50% | 29.44% | 44.06% |
-| **TF-IDF** | **SVM** | **93.06%** | **80.99%** | **40.50%** | **53.99%** |
-| Word2Vec | Naive Bayes | 79.74% | 24.73% | 49.69% | 33.02% |
-| Word2Vec | SVM | 92.78% | 86.06% | 33.64% | 48.38% |
-
-> **Nhận xét:** TF-IDF + SVM đạt accuracy cao nhất (93.06%). Do tập dữ liệu mất cân bằng (~90% ham), các mô hình có xu hướng nhận diện tốt ham nhưng còn hạn chế ở recall của spam.
+> 📈 **Kết luận:** Việc bổ sung 4,197 mẫu dữ liệu mới ở Phase 2 giúp khả năng nhận diện spam (Recall) tăng mạnh từ **~37% lên trên 50%**, F1-score của LinearSVC tăng vượt trội từ **50.77% lên 63.00%**, chứng minh tính hiệu quả rõ rệt của quy trình crawl & tích hợp thêm dữ liệu.
 
 ---
 
-## Cài đặt
+### 5.3. Tận dụng Metadata & Xử lý mất cân bằng lớp
 
+- **Kết hợp Metadata:** Kết hợp đặc trưng văn bản TF-IDF với `comment_type` và `reaction_count` giúp tăng nhẹ F1 từ **63.00% lên 63.31%**.
+- **Điều chỉnh trọng số & ngưỡng:** Cấu hình `class_weight='balanced'` trên LinearSVC giúp đẩy Recall của Spam lên tới **83.60%** (rất hữu ích trong các hệ thống ưu tiên bắt triệt để spam và chấp nhận kiểm duyệt phụ).
+
+---
+
+## 🚀 6. Hướng dẫn chạy
+
+### 6.1. Chạy trên máy cá nhân (Local)
+
+Môi trường ảo `.venv` trong dự án đã cài đặt sẵn đầy đủ các thư viện (`underthesea`, `gensim`, `scikit-learn`, `pandas`, `matplotlib`, `nbconvert`, `ipykernel`...).
+
+**Cách 1: Chạy trực quan trong VS Code / Cursor / IDE**
+1. Mở file [spam-ham-comments-v2.ipynb](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/spam-ham-comments-v2.ipynb).
+2. Góc trên bên phải, chọn Kernel: **Python Environments...** → chọn `.venv` của dự án.
+3. Bấm **Run All**.
+
+**Cách 2: Chạy tự động qua dòng lệnh (Headless CLI)**
 ```bash
-pip install argilla pandas tqdm openai gensim underthesea scikit-learn matplotlib huggingface_hub
+# Thực thi toàn bộ notebook và lưu kết quả
+./.venv/bin/jupyter nbconvert --to notebook --execute spam-ham-comments-v2.ipynb --output spam-ham-comments-v2-executed.ipynb
 ```
-
-### Chạy Argilla (Docker)
-
-Thư mục `my-argilla/` không được commit vào repo này. Tải về từ HuggingFace Spaces:
-
-> 🤗 **[p-storm/my-argilla](https://huggingface.co/spaces/p-storm/my-argilla/tree/main)**
-
-```bash
-# 1. Cài Hugging Face CLI (nếu chưa có)
-pip install huggingface_hub
-
-# 2. Tải toàn bộ thư mục my-argilla/ về
-huggingface-cli download p-storm/my-argilla \
-    --repo-type space \
-    --local-dir my-argilla
-
-# Hoặc dùng Python:
-# from huggingface_hub import snapshot_download
-# snapshot_download(repo_id="p-storm/my-argilla", repo_type="space", local_dir="my-argilla")
-
-# 3. Khởi động Argilla
-cd my-argilla
-docker compose up -d
-```
-
-Sau khi container khởi động, giao diện Argilla sẽ chạy tại `http://localhost:6900`.
 
 ---
 
-## Tài liệu tham khảo
+### 6.2. Chạy trên Kaggle (Tùy chọn)
 
-- Crawler: [facebook_post_comment_scraper](https://github.com/mohdtalal3/facebook_post_comment_scraper)
-- Dataset: [p-storm/ptit-facebook-comments-spamham](https://huggingface.co/datasets/p-storm/ptit-facebook-comments-spamham)
-- Tách từ tiếng Việt: [underthesea](https://github.com/undertheseanlp/underthesea)
-- Gán nhãn: [Argilla](https://argilla.io/)
-- scikit-learn: [sklearn.feature_extraction.text](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction)
-- Gensim Word2Vec: [gensim.models.Word2Vec](https://radimrehurek.com/gensim/models/word2vec.html)
+1. Tạo Notebook mới trên Kaggle: **File → Import Notebook** → Chọn `spam-ham-comments-v2.ipynb`.
+2. Tải dữ liệu: **Add Input → Upload** file `data/comments_labeled_merged.csv` (hoặc cấu hình `HF_TOKEN` trong *Add-ons → Secrets*).
+3. Cấu hình phần cứng: Accelerator = **None (CPU)**, Internet = **On**.
+4. Chọn **Run All**.
+
+---
+
+## 📚 7. Tài liệu tham khảo
+
+- Crawler Facebook: [facebook_post_comment_scraper](https://github.com/mohdtalal3/facebook_post_comment_scraper)
+- Công cụ tách từ tiếng Việt: [underthesea](https://github.com/undertheseanlp/underthesea)
+- Nền tảng quản lý gán nhãn: [Argilla](https://argilla.io/)
+- Thư viện Học máy & NLP: [scikit-learn](https://scikit-learn.org/), [gensim Word2Vec](https://radimrehurek.com/gensim/)

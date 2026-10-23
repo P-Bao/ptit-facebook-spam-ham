@@ -29,5 +29,8 @@ env/
 .DS_Store
 Thumbs.db
 
+# Báo cáo chi tiết (nội bộ)
+BAO_CAO_DU_AN.md
+
 # Argilla local (Docker Compose)
 my-argilla/
