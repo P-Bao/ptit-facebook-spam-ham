@@ -33,5 +33,10 @@ Thumbs.db
 BAO_CAO_DU_AN.md
 DANH_GIA_DU_AN_THEO_DE_BAI.md
 
+# Archives & Exports
+*.zip
+*.html
+*.pdf
+
 # Argilla local (Docker Compose)
 my-argilla/
