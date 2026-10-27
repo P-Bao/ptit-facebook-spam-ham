@@ -206,8 +206,8 @@ def main():
         print(f"[*] Đang nối metadata từ: {csv_lookup}...")
         df_lookup = pd.read_csv(csv_lookup)
 
-        # Ánh xạ id 'cmt_{idx}' -> dòng thứ idx trong CSV gốc
-        df["_idx"] = df["id"].astype(str).str.replace(r"^cmt_", "", regex=True)
+        # Ánh xạ id 'cmt_{idx}' hoặc 'p2_cmt_{idx}' -> dòng thứ idx trong CSV gốc
+        df["_idx"] = df["id"].astype(str).str.replace(r"^(?:p2_)?cmt_", "", regex=True)
         df["_idx"] = pd.to_numeric(df["_idx"], errors="coerce")
         df = df.dropna(subset=["_idx"])
         df["_idx"] = df["_idx"].astype(int)

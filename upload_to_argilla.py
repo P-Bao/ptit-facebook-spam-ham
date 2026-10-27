@@ -83,6 +83,12 @@ def parse_args():
         default=DEFAULT_API_KEY,
         help=f"API Key của tài khoản quản trị (mặc định: {DEFAULT_API_KEY})",
     )
+    parser.add_argument(
+        "--id-prefix",
+        type=str,
+        default="cmt_",
+        help="Tiền tố ID cho bản ghi trên Argilla (mặc định: 'cmt_', dùng 'p2_cmt_' cho Phase 2)",
+    )
     return parser.parse_args()
 
 
@@ -180,7 +186,7 @@ def main():
         reaction_count = str(row["reaction_count"]).strip() if pd.notna(row.get("reaction_count")) else ""
 
         record_data = {
-            "id": f"cmt_{idx}",
+            "id": f"{args.id_prefix}{idx}",
             "cleaned_text": text_display,
             "metadata": {
                 "comment_type": comment_type,
