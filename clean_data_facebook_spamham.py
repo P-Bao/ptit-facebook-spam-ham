@@ -181,13 +181,21 @@ def clean_facebook_comments(
         fieldnames.append("cleaned_text")
 
     cleaned = []
+    skipped_empty = 0
     for row in merged:
         text = row.get("text", "") or ""
-        clean_text = preprocess(text)
-        if _RE_URL.search(clean_text):
+        # 1. Đếm thống kê URL và SĐT trên văn bản gốc TRƯỚC khi thay bằng token
+        if _RE_URL.search(text):
             stats["url"] += 1
-        if _RE_PHONE_VN.search(clean_text):
+        if _RE_PHONE_VN.search(text):
             stats["phone"] += 1
+
+        clean_text = preprocess(text)
+        # 2. Loại bỏ các dòng sau khi làm sạch không chứa bất kỳ chữ cái hoặc chữ số nào (vd: ".")
+        if not re.search(r"[0-9a-zA-ZÀ-ỹ]", clean_text):
+            skipped_empty += 1
+            continue
+
         new_row = dict(row)
         new_row["cleaned_text"] = clean_text
         cleaned.append(new_row)
@@ -197,8 +205,9 @@ def clean_facebook_comments(
     for name, raw, kept in stats["per_file"]:
         print(f"  - File: {name:<22} | thô: {raw:>6} | giữ: {kept:>6}")
     print(f"  - Tổng dòng thô:            {stats['total']:>6}")
-    print(f"  - Gộp + khử trùng:          {len(cleaned):>6} ({len(cleaned)/stats['total']*100:.1f}%)" if stats['total'] else "")
     print(f"  - Bỏ (dòng trùng lặp):      {stats['dedup']:>6}")
+    print(f"  - Bỏ (rỗng/chỉ dấu câu):    {skipped_empty:>6}")
+    print(f"  - Còn lại sau làm sạch:     {len(cleaned):>6} ({len(cleaned)/stats['total']*100:.1f}%)" if stats['total'] else "")
     print(f"  - Có chứa URL:              {stats['url']:>6}")
     print(f"  - Có chứa SĐT:              {stats['phone']:>6}")
     print(f"  -> Đã lưu CSV: {output_csv}")

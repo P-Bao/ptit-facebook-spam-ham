@@ -301,7 +301,8 @@ def predict_batch_with_glm(batch_items, api_key: str, model: str, base_url: str,
                         if isinstance(p, dict) and "id" in p and "label" in p:
                             lbl = str(p.get("label", "")).strip().lower()
                             if lbl in VALID_LABELS:
-                                conf = float(p.get("confidence", 0.95))
+                                # Mặc định 0.5 nếu LLM không trả về confidence để buộc duyệt thủ công
+                                conf = float(p.get("confidence", 0.5))
                                 valid_results[str(p["id"])] = {
                                     "label": lbl,
                                     "confidence": min(max(conf, 0.5), 1.0),

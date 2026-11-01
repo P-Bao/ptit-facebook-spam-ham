@@ -54,7 +54,8 @@ def load_phase2(path: Path) -> pd.DataFrame:
     for col in COLUMNS:
         if col not in df.columns:
             df[col] = pd.NA
-    df["id"] = "p2_" + df["id"].astype(str)
+    # Chỉ thêm tiền tố "p2_" nếu id chưa bắt đầu bằng "p2_"
+    df["id"] = df["id"].astype(str).apply(lambda x: x if x.startswith("p2_") else f"p2_{x}")
     return df[COLUMNS]
 
 

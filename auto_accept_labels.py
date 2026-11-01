@@ -57,7 +57,8 @@ def parse_args():
         help=f"File cache dự đoán (mặc định: {DEFAULT_CACHE_PATH})",
     )
     parser.add_argument(
-        "--csv-in",
+        "--csv-in", "--csv",
+        dest="csv_in",
         type=str,
         default=str(DEFAULT_CSV_PATH),
         help=f"File CSV gốc đã làm sạch (mặc định: {DEFAULT_CSV_PATH})",
