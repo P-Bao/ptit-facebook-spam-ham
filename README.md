@@ -2,7 +2,7 @@
 
 > **Bài tập lớn** — Môn: *Phân tích & Khai phá Dữ liệu Văn bản*  
 > **Yêu cầu thực hiện:** Phân loại Spam/Ham trên bình luận của sinh viên PTIT tại các Facebook group.  
-> **Phiên bản:** v2.0 (Đã tích hợp dữ liệu Phase 2 & cập nhật mô hình).
+> **Phiên bản:** v3.0 (Học máy thuần — không dùng quy tắc, dữ liệu nhãn v7).
 
 ---
 
@@ -37,10 +37,7 @@ Hệ thống phân loại tự động bình luận trong các **Facebook group 
 ├── download_labeled_data.py              # Bước 2d: Tải dữ liệu đã gán nhãn từ Argilla về CSV
 ├── merge_labeled_data.py                 # Bước 2e: Gộp Phase 1 + Phase 2, khử trùng, gán nguồn
 │
-├── spam-ham-comments-v2.ipynb            # Bước 3–5: Trích chọn đặc trưng, Train, Test & Đánh giá (v2)
-├── spam-ham-comments.ipynb               # Notebook phiên bản cũ (chỉ Phase 1)
-├── .env.example                          # File mẫu cấu hình biến môi trường (LLM API, Argilla, HuggingFace)
-├── BAO_CAO_DU_AN.md                      # Báo cáo tổng quan chi tiết của dự án
+├── spam-ham-comments.ipynb               # Bước 3–5: Trích chọn đặc trưng, Train, Test & Đánh giá
 └── README.md                             # Tài liệu hướng dẫn dự án
 ```
 
@@ -54,10 +51,12 @@ Dữ liệu được thu thập từ các group Facebook sinh viên PTIT qua 2 g
 |-----------|----------|-----|------|------------|-------|
 | **Phase 1** | 31,931 | 28,722 (89.95%) | 3,209 (10.05%) | 10.05% | Dữ liệu nền tảng ban đầu |
 | **Phase 2 (mới)** | 6,302 | 5,197 (82.47%) | 1,105 (17.53%) | 17.53% | Crawl bổ sung, lọc trùng với Phase 1 |
-| **TỔNG (Merged)** | **38,233** | **33,919 (88.72%)** | **4,314 (11.28%)** | **11.28%** | Tập dữ liệu hợp nhất huấn luyện v2 |
+| **TỔNG (Merged)** | **38,233** | **33,919 (88.72%)** | **4,314 (11.28%)** | **11.28%** | Tập dữ liệu hợp nhất |
 
-- Dataset Phase 1 lưu trữ trên Hugging Face: [p-storm/ptit-facebook-comments-spamham](https://huggingface.co/datasets/p-storm/ptit-facebook-comments-spamham).
-- Cột dữ liệu chính: `id`, `label`, `cleaned_text`, `text`, `comment_type`, `reaction_count`, `source`.
+- Dataset lưu trữ trên Hugging Face: [p-storm/ptit-facebook-comments-spamham](https://huggingface.co/datasets/p-storm/ptit-facebook-comments-spamham).
+- Notebook huấn luyện dùng file nhãn mới nhất **`labeled_v7.csv`** (38,233 bình luận, nhãn đã rà soát lại): **ham 32,907 (86.1%) — spam 5,326 (13.9%)**.
+- Cột dữ liệu chính: `id`, `label`, `cleaned_text`, `text`, `comment_type`, `reaction_count`.
+- Dataset là **gated** — cần tài khoản HF được phê duyệt và token `HF_TOKEN` (biến môi trường hoặc Kaggle Secrets).
 
 ---
 
@@ -92,82 +91,50 @@ Dữ liệu được thu thập từ các group Facebook sinh viên PTIT qua 2 g
 [Bước 2e] merge_labeled_data.py (Gộp P1 + P2 → data/comments_labeled_merged.csv)
       │
       ▼
-[Bước 3-5] spam-ham-comments-v2.ipynb
-      ├── Trích chọn đặc trưng: BoW, TF-IDF, Word2Vec (underthesea)
-      ├── Phân chia dữ liệu: 80% Train (30,585 mẫu) / 20% Test (7,648 mẫu - Stratified)
-      ├── Huấn luyện mô hình: MultinomialNB, GaussianNB, LinearSVC
-      └── Đánh giá, so sánh trước/sau tích hợp & cải tiến xử lý mất cân bằng
+[Bước 3-5] spam-ham-comments.ipynb
+      ├── Tiền xử lý: ẩn danh tên (user_name), chuẩn hóa Unicode, gom emoji (emoji_token), tách từ underthesea
+      ├── Trích chọn đặc trưng: BoW, TF-IDF (n-gram 1–2)
+      ├── Phân chia dữ liệu: 80% Train (30,753) / 20% Test (7,480) — theo hash văn bản, chống rò rỉ trùng lặp
+      ├── Huấn luyện: MultinomialNB, LinearSVC (GridSearchCV 5 fold, tối ưu F1 lớp spam)
+      └── Đánh giá: Accuracy/Precision/Recall/F1, PR-AUC, bootstrap CI 95%, phân tích lỗi
 ```
 
 ---
 
-## 🧪 5. Kết quả thực nghiệm (v2 sau khi tích hợp)
+## 🧪 5. Kết quả thực nghiệm (notebook hiện tại — nhãn v7)
 
-Đánh giá trên tập kiểm tra gộp (**Test Set: 7,648 mẫu**, gồm 6,785 ham và 863 spam):
+Toàn bộ lựa chọn (tiền xử lý, siêu tham số, mô hình) đều dựa trên **cross-validation trong tập train**; tập test (7,480 mẫu: 6,524 ham, 956 spam) chỉ dùng để đánh giá lần cuối.
 
-### 5.1. Bảng so sánh 6 tổ hợp mô hình
+### 5.1. Bảng so sánh 4 tổ hợp mô hình (tiền xử lý chính: giữ stop words)
 
-| Phương pháp biểu diễn | Thuật toán phân loại | Accuracy | Precision (Spam) | Recall (Spam) | **F1-Score (Spam)** |
-|----------------------|----------------------|:--------:|:----------------:|:-------------:|:-------------------:|
-| **BoW** | Naive Bayes (MultinomialNB) | 92.39% | 69.38% | 58.29% | 63.35% |
-| **BoW** | **Support Vector Machine (LinearSVC)** | 93.45% | 82.21% | **53.53%** | **64.84%** |
-| **TF-IDF** | Naive Bayes (MultinomialNB) | 93.06% | **89.34%** | 43.68% | 58.68% |
-| **TF-IDF** | Support Vector Machine (LinearSVC) | **93.49%** | 84.50% | 51.80% | 64.22% |
-| **Word2Vec** | Naive Bayes (GaussianNB) | 84.65% | 38.01% | 57.13% | 45.65% |
-| **Word2Vec** | Support Vector Machine (LinearSVC) | 93.34% | 84.98% | 49.83% | 62.82% |
+| Đặc trưng | Thuật toán | Accuracy | Precision (Spam) | Recall (Spam) | **F1 (Spam)** | PR-AUC |
+|-----------|------------|:--------:|:----------------:|:-------------:|:-------------:|:------:|
+| BoW | Naive Bayes (MultinomialNB) | 91.47% | 72.46% | 53.66% | 61.66% | 0.762 |
+| BoW | SVM (LinearSVC, balanced) | 90.55% | 59.48% | 81.69% | 68.84% | 0.782 |
+| TF-IDF | Naive Bayes (MultinomialNB) | 93.76% | **86.99%** | 60.15% | 71.12% | 0.841 |
+| **TF-IDF** | **SVM (LinearSVC, balanced)** | **94.40%** | 74.84% | **84.62%** | **79.43%** | **0.863** |
 
-> 🏆 **Mô hình tốt nhất:** **BoW + LinearSVC** đạt F1-Score lớp Spam cao nhất (**64.84%**, Precision 82.21%, Recall 53.53%), sát nút là **TF-IDF + LinearSVC** đạt Accuracy cao nhất (**93.49%**) và F1-Score **64.22%** (Precision 84.50%).
+> 🏆 **Mô hình tốt nhất:** **TF-IDF + LinearSVC** (C = 0.1, n-gram 1–2) — F1 79.43%, khoảng tin cậy bootstrap 95%: [77.4%, 81.5%], PR-AUC 0.863. Hai thuật toán chọn hai điểm cân bằng khác nhau: **Naive Bayes** ưu tiên Precision (86.99% — rất ít báo nhầm), **SVM** ưu tiên Recall (84.62% — bắt được nhiều spam hơn).
 
----
+### 5.2. Thí nghiệm đối chứng loại stop words (Ablation Study)
 
-### 5.2. So sánh trước vs sau khi tích hợp Phase 2
+Chạy song song 2 biến thể tiền xử lý × 4 tổ hợp mô hình (8 thí nghiệm). Cross-validation chọn **giữ stop words** (F1-CV trung bình 0.698 so với 0.675 của biến thể loại):
 
-Đánh giá trên cùng tập kiểm tra gộp (Test gộp: 7,648 mẫu):
+| Đặc trưng | Thuật toán | F1 (giữ stop words) | F1 (loại stop words) |
+|-----------|------------|:-------------------:|:--------------------:|
+| BoW | Naive Bayes | 61.66% | 59.75% |
+| BoW | SVM | 68.84% | 68.35% |
+| TF-IDF | Naive Bayes | 71.12% | 70.07% |
+| TF-IDF | SVM | 79.43% | 77.67% |
 
-| Tổ hợp mô hình | F1-Score (Trước - Train P1) | **F1-Score (Sau - Train P1+P2)** | Recall (Trước) | **Recall (Sau)** |
-|----------------|:---------------------------:|:--------------------------------:|:--------------:|:----------------:|
-| BoW + Naive Bayes | 61.03% | **63.35%** (+2.32%) | 53.07% | **58.29%** (+5.22%) |
-| **BoW + SVM** | 54.23% | **64.84%** (+10.61%) | 41.25% | **53.53%** (+12.28%) |
-| TF-IDF + Naive Bayes | 39.35% | **58.68%** (+19.33%) | 25.38% | **43.68%** (+18.30%) |
-| **TF-IDF + SVM** | 50.59% | **64.22%** (+13.63%) | 37.20% | **51.80%** (+14.60%) |
-| Word2Vec + Naive Bayes | 33.25% | **45.88%** (+12.63%) | 47.51% | **57.36%** (+9.85%) |
-| Word2Vec + SVM | 42.60% | **61.75%** (+19.15%) | 28.51% | **48.55%** (+20.04%) |
+> 💡 Trong bình luận mạng xã hội, các hư từ (`ạ`, `à`, `mà`, `nhé`...) là đặc trưng phong cách của bình luận ham; loại bỏ stop words làm **giảm** F1 ở cả 4 tổ hợp (−0.5 đến −1.9 điểm phần trăm).
 
-> 📈 **Kết luận:** Việc bổ sung 6,302 mẫu dữ liệu mới ở Phase 2 giúp khả năng nhận diện spam (Recall) tăng mạnh từ **~37% lên trên 52–58%**, F1-score của LinearSVC tăng vượt trội từ **50.59% lên 64.22%** (TF-IDF) và **54.23% lên 64.84%** (BoW). Đặc biệt, khi kiểm tra trên tập dữ liệu mới (Test P2), F1-Score tăng từ **40.92% lên 87.41%**, chứng minh mô hình đã học thành công các mẫu spam mới xuất hiện.
+### 5.3. Phân tích lỗi (mô hình tốt nhất: TF-IDF + SVM)
 
----
+- **False Positives (ham bị báo spam):** phần lớn là bình luận chỉ gồm tên người/username hoặc rất ngắn (vd. `Nguyễn Văn An`) — nhiều spam trong dữ liệu được gán nhãn theo **hình thức** nên mô hình học được tín hiệu "chỉ có tên".
+- **False Negatives (spam bị bỏ sót):** spam viết như hội thoại bình thường, không có link/SĐT/token đặc trưng (vd. `36k thì lấy`) — đây là trần của cách tiếp cận bag-of-words.
 
-### 5.3. Tận dụng Metadata & Xử lý mất cân bằng lớp
-
-- **Kết hợp Metadata:** Kết hợp đặc trưng văn bản TF-IDF với `comment_type` và `reaction_count` giúp tăng nhẹ Accuracy từ 93.49% lên 93.51% và F1 từ **64.22% lên 64.32%**.
-- **Điều chỉnh trọng số (Class Weight):** Cấu hình `class_weight='balanced'` trên LinearSVC giúp đẩy Recall của Spam lên tới **84.59%** (bắt gần 85% spam trong thực tế).
-- **Tối ưu ngưỡng (Threshold Tuning):** Tối ưu ngưỡng phân loại giúp **BoW + Naive Bayes (ngưỡng 0.751)** tăng F1-Score từ 63.35% lên **64.38%** (đạt F1 cao nhất trong nhóm mô hình Naive Bayes và cao nhất ở Mục 7, tiệm cận mức **64.84%** của **BoW + LinearSVC** ở Mục 4) với Precision 78.96% và Recall 54.35%.
-
----
-
-### 5.4. Thí nghiệm đối chứng Stop words, N-gram (Ablation Study) & Phân tích lỗi (Error Analysis)
-
-Nhằm đối chiếu toàn diện với yêu cầu đề bài môn học về kỹ thuật *"loại bỏ stop words"* và *"mở rộng N-gram"*, dự án đã triển khai thêm các thực nghiệm đối chứng chuyên sâu tại Mục 9 của [spam-ham-comments-v2.ipynb](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/spam-ham-comments-v2.ipynb):
-
-#### a. Bảng đối chứng tiền xử lý Stop words & Mở rộng N-gram (với LinearSVC trên 7,648 mẫu Test)
-
-| Cấu hình đặc trưng | Accuracy | Precision (Spam) | Recall (Spam) | **F1-Score (Spam)** |
-|-------------------|:--------:|:----------------:|:-------------:|:-------------------:|
-| **TF-IDF Unigram (Baseline - Giữ stop words)** | 93.49% | 84.50% | 51.80% | **64.22%** |
-| **TF-IDF Unigram (Loại bỏ 30 stop words tiếng Việt)** | 93.50% | 84.92% | 51.56% | **64.17%** |
-| **TF-IDF Unigram (Bảo toàn từ đơn 1 ký tự: `ạ`, `k`, `b`...)** | **93.57%** | 84.93% | **52.26%** | **64.71%** 🏆 |
-| **TF-IDF Bigram (1, 2) + Sublinear TF Scaling** | 93.54% | **85.96%** | 51.10% | **64.10%** |
-
-> 💡 **Phát hiện học thuật quan trọng:**
-> - Trong dữ liệu bình luận mạng xã hội của sinh viên PTIT, các hư từ thường gặp (như *"là, của, cho, với, để, mà..."*) mang tính chất ngữ phong tự nhiên (stylometric features). Việc loại bỏ stop words truyền thống không làm tăng F1 (giảm nhẹ từ 64.22% xuống 64.17%).
-> - Ngược lại, cấu hình bảo toàn các từ viết tắt / từ cảm thán 1 ký tự (`ạ`, `k`, `b`, `v`...) giúp mô hình đạt F1 cao nhất (**64.71%**) vì đây là đặc trưng ngữ dụng điển hình của sinh viên chân thực khi tương tác trong group trường.
-> - Cấu hình N-gram (1, 2) giúp đẩy Precision lên mức cao nhất (**85.96%**), bắt các cụm từ quảng cáo lặp lại rất chuẩn xác.
-
-#### b. Phân tích lỗi định tính (Qualitative Error Analysis)
-
-Khảo sát trực tiếp dự đoán của mô hình tốt nhất trên tập Test (7,648 mẫu):
-- **False Positives (Ham bị chặn nhầm là Spam - 82 mẫu, ~1.2% tập Ham):** Đa số là các bài đăng tuyển cộng tác viên, mời tham gia câu lạc bộ sinh viên hoặc hỏi han lịch đăng ký tín chỉ có chứa các cụm từ nhạy cảm như *"inbox", "đăng ký", "liên hệ", "link"*.
-- **False Negatives (Spam bị lọt lưới thành Ham - 416 mẫu):** Chủ yếu là các dạng spam tinh vi: câu dẫn dụ ngắn không kèm liên kết (seeding kín như *"ib mình chỉ cho"*, *"quan tâm hộp kín"*), spam sử dụng teencode biến dạng hoặc hình thức lừa đảo mới phát sinh chưa có trong từ điển huấn luyện.
+Mô hình tốt nhất được lưu vào `spam_ham_ml_only.joblib` kèm hàm dự đoán ngay trong notebook.
 
 ---
 
@@ -175,29 +142,17 @@ Khảo sát trực tiếp dự đoán của mô hình tốt nhất trên tập T
 
 Trong đợt rà soát và nâng cấp toàn diện vừa qua, hệ thống đã được tinh chỉnh chuyên sâu trên cả 4 phân hệ chính nhằm đảm bảo tính toàn vẹn dữ liệu, tính tái lập thực nghiệm và đáp ứng xuất sắc các tiêu chí học phần:
 
-### 6.1. Phân hệ Tiền xử lý & Làm sạch dữ liệu ([clean_data_facebook_spamham.py](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/clean_data_facebook_spamham.py))
+### 6.1. Phân hệ Tiền xử lý & Làm sạch dữ liệu (`clean_data_facebook_spamham.py`)
 - **Đo lường chính xác URL & Số điện thoại:** Di chuyển kiểm tra Regex `_RE_URL` và `_RE_PHONE_VN` lên trước bước biến đổi văn bản để thống kê trực tiếp trên văn bản gốc. Trước đây, thống kê trên văn bản đã clean dẫn đến việc đếm sai lệch/bỏ sót số lượng bình luận có chứa URL hoặc SĐT.
 - **Loại bỏ bình luận rỗng và ký tự nhiễu:** Bổ sung điều kiện kiểm tra `re.search(r"[0-9a-zA-ZÀ-ỹ]", clean_text)` để tự động loại bỏ các bình luận sau khi tiền xử lý chỉ còn lại dấu chấm, dấu câu, icon lỗi hoặc khoảng trắng rỗng, loại trừ hoàn toàn các mẫu nhiễu khỏi tập dữ liệu huấn luyện.
 - **Minh bạch hóa nhật ký thống kê:** Tách bạch rõ ràng số lượng dòng thô, số dòng trùng lặp loại bỏ (`dedup`), số dòng rỗng bị loại bỏ (`skipped_empty`) và số lượng mẫu hợp lệ thực tế được lưu vào CSV.
 
 ### 6.2. Phân hệ Gán nhãn & Quản trị dữ liệu Argilla
-- **Phân tách ID dữ liệu nhiều giai đoạn ([upload_to_argilla.py](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/upload_to_argilla.py)):** Bổ sung tham số CLI `--id-prefix` (mặc định: `cmt_`, tùy biến `p2_cmt_` cho Phase 2), ngăn ngừa xung đột đè nhãn bản ghi khi tải dữ liệu bổ sung lên máy chủ Argilla.
-- **Cơ chế an toàn khi gán nhãn bằng LLM ([ai_assisted_spam_ham.py](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/ai_assisted_spam_ham.py)):** Thay đổi giá trị confidence mặc định từ `0.95` thành `0.5` khi mô hình AI (OpenRouter / GLM) không trả về trường độ tin cậy. Điều này ngăn việc tự động duyệt nhãn thiếu căn cứ, ép bản ghi vào luồng rà soát thủ công an toàn (Human-in-the-loop).
-- **Đồng bộ hóa tham số CLI ([auto_accept_labels.py](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/auto_accept_labels.py)):** Bổ sung alias `--csv` song song với `--csv-in`, giúp lệnh gọi CLI hoàn toàn tương thích và đồng nhất với tài liệu hướng dẫn.
-- **Sửa lỗi trích xuất ID & Regex ([download_labeled_data.py](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/download_labeled_data.py)):** Cập nhật Regex ánh xạ sang `r"^(?:p2_)?cmt_"`. Khắc phục triệt để lỗi parse sai ID thành `NaN` khiến dữ liệu Phase 2 bị mất mát khi xuất nhãn từ Argilla và nối metadata với CSV gốc.
-- **Đảm bảo tính bất biến khi gộp tập nhãn ([merge_labeled_data.py](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/merge_labeled_data.py)):** Áp dụng logic kiểm tra `apply(lambda x: x if x.startswith("p2_") else f"p2_{x}")`, tránh triệt để lỗi nhân đôi tiền tố `p2_p2_` khi script gộp dữ liệu được thực thi lặp lại nhiều lần.
-
-### 6.3. Phân hệ Huấn luyện mô hình & Sổ tay thực nghiệm ([spam-ham-comments-v2.ipynb](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/spam-ham-comments-v2.ipynb))
-- **Đảm bảo tính tái lập 100% của Word2Vec (Reproducibility):** Cố định tham số `workers=1` (kết hợp `seed=RANDOM_STATE`) tại cả Cell 18 và hàm `evaluate_features` ở Cell 30. Khắc phục triệt để hiện tượng bất định luồng (thread race condition) trên CPU đa nhân trong thư viện `gensim`, đảm bảo các lần huấn luyện độc lập luôn cho ra kết quả F1 và trọng số vector hoàn toàn trùng khớp (kiểm thử 2 lần độc lập đều đạt F1 = 0.6215).
-- **Nâng cấp tương thích Pandas 2.x & 3.x:** Chuyển đổi phương thức `p1_train_idx.append(p2_train_idx)` (đã bị loại bỏ trong Pandas mới) sang `p1_train_idx.union(p2_train_idx, sort=False)`, giúp toàn bộ pipeline phân chia Train/Test vận hành trơn tru và không sinh cảnh báo.
-- **Mở rộng dải quét tối ưu ngưỡng phân loại (Threshold Tuning):** Mở rộng dải phân vị quét trong hàm `best_threshold` từ `np.linspace(0.5, 0.995, 200)` thành `np.linspace(0.1, 0.995, 200)`, giải quyết hiện tượng bỏ sót ngưỡng tối ưu khi phân bố điểm số xác suất bị lệch do áp dụng `class_weight='balanced'`.
-- **Bổ sung Mục 9 — Thí nghiệm đối chứng & Phân tích lỗi:**
-  - Thực hiện đối chứng tiền xử lý Stop words, từ đơn 1 ký tự và N-gram (1, 2) đáp ứng trọn vẹn yêu cầu phương pháp luận của đề bài.
-  - Xây dựng bảng trích xuất và hiển thị trực quan các mẫu nhầm lẫn thực tế (False Positives và False Negatives) hỗ trợ công tác phân tích sai số chuyên sâu.
-
-### 6.4. Đồng bộ hóa Báo cáo & Tài liệu kỹ thuật
-- **Đính chính số liệu so sánh:** Phân định rõ ràng giữa mô hình đạt F1 cao nhất toàn bộ đồ án (**BoW + LinearSVC: 64.84%** ở Mục 4) và mô hình Naive Bayes tối ưu ngưỡng tốt nhất (**BoW + Naive Bayes: 64.38%** ở Mục 7).
-- **Tài liệu hóa kiểm thử thực nghiệm:** Cung cấp đầy đủ bằng chứng đối soát, bảng số liệu Ablation Study và phân tích mẫu lỗi định tính trong [README.md](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/README.md).
+- **Phân tách ID dữ liệu nhiều giai đoạn (`upload_to_argilla.py`):** Bổ sung tham số CLI `--id-prefix` (mặc định: `cmt_`, tùy biến `p2_cmt_` cho Phase 2), ngăn ngừa xung đột đè nhãn bản ghi khi tải dữ liệu bổ sung lên máy chủ Argilla.
+- **Cơ chế an toàn khi gán nhãn bằng LLM (`ai_assisted_spam_ham.py`):** Thay đổi giá trị confidence mặc định từ `0.95` thành `0.5` khi mô hình AI (OpenRouter / GLM) không trả về trường độ tin cậy. Điều này ngăn việc tự động duyệt nhãn thiếu căn cứ, ép bản ghi vào luồng rà soát thủ công an toàn (Human-in-the-loop).
+- **Đồng bộ hóa tham số CLI (`auto_accept_labels.py`):** Bổ sung alias `--csv` song song với `--csv-in`, giúp lệnh gọi CLI hoàn toàn tương thích và đồng nhất với tài liệu hướng dẫn.
+- **Sửa lỗi trích xuất ID & Regex (`download_labeled_data.py`):** Cập nhật Regex ánh xạ sang `r"^(?:p2_)?cmt_"`. Khắc phục triệt để lỗi parse sai ID thành `NaN` khiến dữ liệu Phase 2 bị mất mát khi xuất nhãn từ Argilla và nối metadata với CSV gốc.
+- **Đảm bảo tính bất biến khi gộp tập nhãn (`merge_labeled_data.py`):** Áp dụng logic kiểm tra `apply(lambda x: x if x.startswith("p2_") else f"p2_{x}")`, tránh triệt để lỗi nhân đôi tiền tố `p2_p2_` khi script gộp dữ liệu được thực thi lặp lại nhiều lần.
 
 ---
 
@@ -205,25 +160,27 @@ Trong đợt rà soát và nâng cấp toàn diện vừa qua, hệ thống đã
 
 ### 7.1. Chạy trên máy cá nhân (Local)
 
-Môi trường ảo `.venv` trong dự án đã cài đặt sẵn đầy đủ các thư viện (`underthesea`, `gensim`, `scikit-learn`, `pandas`, `matplotlib`, `nbconvert`, `ipykernel`...).
+Môi trường ảo `.venv` trong dự án đã cài đặt sẵn đầy đủ các thư viện (`underthesea`, `huggingface_hub`, `scikit-learn`, `pandas`, `matplotlib`, `joblib`, `nbconvert`, `ipykernel`...).
+
+Notebook tải dataset từ Hugging Face — cần biến môi trường `HF_TOKEN` (hoặc `SPAMHAM_CSV` trỏ tới file CSV đã tải sẵn).
 
 **Cách 1: Chạy trực quan trong VS Code / Cursor / IDE**
-1. Mở file [spam-ham-comments-v2.ipynb](file:///Users/cuongvuthanh/Documents/ptit-facebook-spam-ham/spam-ham-comments-v2.ipynb).
+1. Mở file `spam-ham-comments.ipynb`.
 2. Góc trên bên phải, chọn Kernel: **Python Environments...** → chọn `.venv` của dự án.
 3. Bấm **Run All**.
 
 **Cách 2: Chạy tự động qua dòng lệnh (Headless CLI)**
 ```bash
 # Thực thi toàn bộ notebook và lưu kết quả
-./.venv/bin/jupyter nbconvert --to notebook --execute spam-ham-comments-v2.ipynb --output spam-ham-comments-v2-executed.ipynb
+./.venv/bin/jupyter nbconvert --to notebook --execute spam-ham-comments.ipynb --output spam-ham-comments-executed.ipynb
 ```
 
 ---
 
 ### 7.2. Chạy trên Kaggle (Tùy chọn)
 
-1. Tạo Notebook mới trên Kaggle: **File → Import Notebook** → Chọn `spam-ham-comments-v2.ipynb`.
-2. Tải dữ liệu: **Add Input → Upload** file `data/comments_labeled_merged.csv` (hoặc cấu hình `HF_TOKEN` trong *Add-ons → Secrets*).
+1. Tạo Notebook mới trên Kaggle: **File → Import Notebook** → Chọn `spam-ham-comments.ipynb`.
+2. Cấu hình `HF_TOKEN` trong *Add-ons → Secrets* — notebook tự tải `labeled_v7.csv` từ Hugging Face.
 3. Cấu hình phần cứng: Accelerator = **None (CPU)**, Internet = **On**.
 4. Chọn **Run All**.
 
@@ -234,4 +191,4 @@ Môi trường ảo `.venv` trong dự án đã cài đặt sẵn đầy đủ c
 - Crawler Facebook: [facebook_post_comment_scraper](https://github.com/mohdtalal3/facebook_post_comment_scraper)
 - Công cụ tách từ tiếng Việt: [underthesea](https://github.com/undertheseanlp/underthesea)
 - Nền tảng quản lý gán nhãn: [Argilla](https://argilla.io/)
-- Thư viện Học máy & NLP: [scikit-learn](https://scikit-learn.org/), [gensim Word2Vec](https://radimrehurek.com/gensim/)
+- Thư viện Học máy & NLP: [scikit-learn](https://scikit-learn.org/), [joblib](https://joblib.readthedocs.io/)
