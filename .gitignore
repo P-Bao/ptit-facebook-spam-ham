@@ -40,3 +40,9 @@ DANH_GIA_DU_AN_THEO_DE_BAI.md
 
 # Argilla local (Docker Compose)
 my-argilla/
+
+# Trained models & Cache
+*.joblib
+spam_ham_ml_only.joblib
+namedb_cache/
+
