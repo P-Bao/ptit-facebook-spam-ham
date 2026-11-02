@@ -39,6 +39,7 @@ Hệ thống phân loại tự động bình luận trong các **Facebook group 
 │
 ├── spam-ham-comments-v2.ipynb            # Bước 3–5: Trích chọn đặc trưng, Train, Test & Đánh giá (v2)
 ├── spam-ham-comments.ipynb               # Notebook phiên bản cũ (chỉ Phase 1)
+├── .env.example                          # File mẫu cấu hình biến môi trường (LLM API, Argilla, HuggingFace)
 ├── BAO_CAO_DU_AN.md                      # Báo cáo tổng quan chi tiết của dự án
 └── README.md                             # Tài liệu hướng dẫn dự án
 ```
