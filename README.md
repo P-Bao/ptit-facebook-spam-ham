@@ -38,8 +38,7 @@ Hệ thống phân loại tự động bình luận trong các **Facebook group 
 ├── merge_labeled_data.py                 # Bước 2e: Gộp Phase 1 + Phase 2, khử trùng, gán nguồn
 │
 ├── spam_features.py                      # Bước 3: Transformer FastTextVectorizer (Skip-gram + Subword)
-├── spam-ham-comments-v2.ipynb            # Bước 3–5: Trích chọn đặc trưng (BoW, TF-IDF, FastText), Train, Test & Đánh giá
-├── spam-ham-comments.ipynb               # Bản đồng bộ notebook chính
+├── spam-ham-comments.ipynb               # Bước 3–5: Trích chọn đặc trưng (BoW, TF-IDF, FastText), Train, Test & Đánh giá
 └── README.md                             # Tài liệu hướng dẫn dự án
 ```
 
@@ -93,7 +92,7 @@ Dữ liệu được thu thập từ các group Facebook sinh viên PTIT qua 2 g
 [Bước 2e] merge_labeled_data.py (Gộp P1 + P2 → data/comments_labeled_merged.csv)
       │
       ▼
-[Bước 3-5] spam-ham-comments-v2.ipynb (và spam-ham-comments.ipynb)
+[Bước 3-5] spam-ham-comments.ipynb
       ├── Tiền xử lý: ẩn danh tên (user_name), chuẩn hóa Unicode, gom emoji (emoji_token), tách từ underthesea
       ├── Trích chọn đặc trưng: BoW, TF-IDF (n-gram 1–2), Word Embeddings (FastText Skip-gram 100 chiều, subword 3–5)
       ├── Phân chia dữ liệu: 80% Train (30,753) / 20% Test (7,480) — theo hash văn bản, chống rò rỉ trùng lặp

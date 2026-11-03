@@ -29,10 +29,12 @@ env/
 .DS_Store
 Thumbs.db
 
-# Báo cáo chi tiết (nội bộ)
+# Báo cáo chi tiết & Kế hoạch (nội bộ)
 BAO_CAO_DU_AN.md
 DANH_GIA_DU_AN_THEO_DE_BAI.md
+KE_HOACH_TICH_HOP_DATA_VA_KAGGLE.md
 TEAM_ASSIGNMENTS.md
+spam-ham-comments-v2.ipynb
 # Archives & Exports
 *.zip
 *.html
