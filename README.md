@@ -37,7 +37,9 @@ Hệ thống phân loại tự động bình luận trong các **Facebook group 
 ├── download_labeled_data.py              # Bước 2d: Tải dữ liệu đã gán nhãn từ Argilla về CSV
 ├── merge_labeled_data.py                 # Bước 2e: Gộp Phase 1 + Phase 2, khử trùng, gán nguồn
 │
-├── spam-ham-comments.ipynb               # Bước 3–5: Trích chọn đặc trưng, Train, Test & Đánh giá
+├── spam_features.py                      # Bước 3: Transformer FastTextVectorizer (Skip-gram + Subword)
+├── spam-ham-comments-v2.ipynb            # Bước 3–5: Trích chọn đặc trưng (BoW, TF-IDF, FastText), Train, Test & Đánh giá
+├── spam-ham-comments.ipynb               # Bản đồng bộ notebook chính
 └── README.md                             # Tài liệu hướng dẫn dự án
 ```
 
@@ -91,48 +93,56 @@ Dữ liệu được thu thập từ các group Facebook sinh viên PTIT qua 2 g
 [Bước 2e] merge_labeled_data.py (Gộp P1 + P2 → data/comments_labeled_merged.csv)
       │
       ▼
-[Bước 3-5] spam-ham-comments.ipynb
+[Bước 3-5] spam-ham-comments-v2.ipynb (và spam-ham-comments.ipynb)
       ├── Tiền xử lý: ẩn danh tên (user_name), chuẩn hóa Unicode, gom emoji (emoji_token), tách từ underthesea
-      ├── Trích chọn đặc trưng: BoW, TF-IDF (n-gram 1–2)
+      ├── Trích chọn đặc trưng: BoW, TF-IDF (n-gram 1–2), Word Embeddings (FastText Skip-gram 100 chiều, subword 3–5)
       ├── Phân chia dữ liệu: 80% Train (30,753) / 20% Test (7,480) — theo hash văn bản, chống rò rỉ trùng lặp
-      ├── Huấn luyện: MultinomialNB, LinearSVC (GridSearchCV 5 fold, tối ưu F1 lớp spam)
-      └── Đánh giá: Accuracy/Precision/Recall/F1, PR-AUC, bootstrap CI 95%, phân tích lỗi
+      ├── Huấn luyện: MultinomialNB / GaussianNB, LinearSVC (GridSearchCV 5 fold, tối ưu F1 lớp spam)
+      └── Đánh giá: Accuracy/Precision/Recall/F1, PR-AUC, bootstrap CI 95%, kiểm chứng OOV/ngữ nghĩa, phân tích lỗi
 ```
 
 ---
 
-## 🧪 5. Kết quả thực nghiệm (notebook hiện tại — nhãn v7)
+## 🧪 5. Kết quả thực nghiệm (nhãn v7 — 3 đặc trưng × 2 thuật toán)
 
 Toàn bộ lựa chọn (tiền xử lý, siêu tham số, mô hình) đều dựa trên **cross-validation trong tập train**; tập test (7,480 mẫu: 6,524 ham, 956 spam) chỉ dùng để đánh giá lần cuối.
 
-### 5.1. Bảng so sánh 4 tổ hợp mô hình (tiền xử lý chính: giữ stop words)
+### 5.1. Bảng so sánh 6 tổ hợp mô hình (tiền xử lý chính: giữ stop words)
 
 | Đặc trưng | Thuật toán | Accuracy | Precision (Spam) | Recall (Spam) | **F1 (Spam)** | PR-AUC |
 |-----------|------------|:--------:|:----------------:|:-------------:|:-------------:|:------:|
 | BoW | Naive Bayes (MultinomialNB) | 91.47% | 72.46% | 53.66% | 61.66% | 0.762 |
 | BoW | SVM (LinearSVC, balanced) | 90.55% | 59.48% | 81.69% | 68.84% | 0.782 |
 | TF-IDF | Naive Bayes (MultinomialNB) | 93.76% | **86.99%** | 60.15% | 71.12% | 0.841 |
-| **TF-IDF** | **SVM (LinearSVC, balanced)** | **94.40%** | 74.84% | **84.62%** | **79.43%** | **0.863** |
+| **TF-IDF** | **SVM (LinearSVC, balanced)** | **94.40%** | 74.84% | 84.62% | **79.43%** | **0.863** |
+| Word Embeddings (FastText) | Naive Bayes (GaussianNB) | 86.76% | 48.72% | 67.68% | 56.65% | 0.462 |
+| Word Embeddings (FastText) | SVM (LinearSVC, balanced) | 89.73% | 56.44% | **86.19%** | 68.21% | 0.812 |
 
-> 🏆 **Mô hình tốt nhất:** **TF-IDF + LinearSVC** (C = 0.1, n-gram 1–2) — F1 79.43%, khoảng tin cậy bootstrap 95%: [77.4%, 81.5%], PR-AUC 0.863. Hai thuật toán chọn hai điểm cân bằng khác nhau: **Naive Bayes** ưu tiên Precision (86.99% — rất ít báo nhầm), **SVM** ưu tiên Recall (84.62% — bắt được nhiều spam hơn).
+> 🏆 **Mô hình tốt nhất:** **TF-IDF + LinearSVC** (C = 0.1, n-gram 1–2) — F1 79.43%, khoảng tin cậy bootstrap 95%: [77.4%, 81.5%], PR-AUC 0.863. Ba tổ hợp dẫn đầu đại diện cho ba ưu tiên vận hành khác nhau:
+> - **TF-IDF + Naive Bayes:** ưu tiên **Precision** (86.99% — rất ít báo nhầm).
+> - **TF-IDF + SVM:** cân bằng tốt nhất giữa Precision và Recall (**F1 = 79.43%**, **PR-AUC = 0.863**).
+> - **FastText + SVM:** đạt **Recall cao nhất (86.19%**, bắt được 824/956 spam) và **PR-AUC = 0.812** (vượt BoW + SVM) nhờ biểu diễn ngữ nghĩa liên tục và n-gram ký tự (subword) xử lý tốt teencode/từ viết sai (`inboxxx` → `inbox`, `inb0x` → `inb`), bắt thêm được **50 mẫu spam hội thoại** mà TF-IDF bỏ sót.
 
 ### 5.2. Thí nghiệm đối chứng loại stop words (Ablation Study)
 
-Chạy song song 2 biến thể tiền xử lý × 4 tổ hợp mô hình (8 thí nghiệm). Cross-validation chọn **giữ stop words** (F1-CV trung bình 0.698 so với 0.675 của biến thể loại):
+Chạy song song 2 biến thể tiền xử lý × 6 tổ hợp mô hình (12 thí nghiệm). Cross-validation chọn **giữ stop words** (F1-CV trung bình 6 tổ hợp đạt 0.676 so với 0.652 của biến thể loại):
 
-| Đặc trưng | Thuật toán | F1 (giữ stop words) | F1 (loại stop words) |
-|-----------|------------|:-------------------:|:--------------------:|
-| BoW | Naive Bayes | 61.66% | 59.75% |
-| BoW | SVM | 68.84% | 68.35% |
-| TF-IDF | Naive Bayes | 71.12% | 70.07% |
-| TF-IDF | SVM | 79.43% | 77.67% |
+| Đặc trưng | Thuật toán | F1 (giữ stop words) | F1 (loại stop words) | Δ F1 (loại − giữ) |
+|-----------|------------|:-------------------:|:--------------------:|:-----------------:|
+| BoW | Naive Bayes | 61.66% | 59.75% | −1.91% |
+| BoW | SVM | 68.84% | 68.35% | −0.49% |
+| TF-IDF | Naive Bayes | 71.12% | 70.07% | −1.05% |
+| TF-IDF | SVM | **79.43%** | 77.67% | −1.76% |
+| FastText | Naive Bayes | 56.65% | 54.85% | −1.81% |
+| FastText | SVM | 68.21% | 67.19% | −1.02% |
 
-> 💡 Trong bình luận mạng xã hội, các hư từ (`ạ`, `à`, `mà`, `nhé`...) là đặc trưng phong cách của bình luận ham; loại bỏ stop words làm **giảm** F1 ở cả 4 tổ hợp (−0.5 đến −1.9 điểm phần trăm).
+> 💡 Trong bình luận mạng xã hội, các hư từ (`ạ`, `à`, `mà`, `nhé`...) là đặc trưng phong cách của bình luận ham; loại bỏ stop words làm **giảm** F1 ở cả 6 tổ hợp (−0.49 đến −1.91 điểm phần trăm).
 
-### 5.3. Phân tích lỗi (mô hình tốt nhất: TF-IDF + SVM)
+### 5.3. Phân tích lỗi & Đối chiếu TF-IDF (Từ khóa) vs FastText (Ngữ nghĩa)
 
 - **False Positives (ham bị báo spam):** phần lớn là bình luận chỉ gồm tên người/username hoặc rất ngắn (vd. `Nguyễn Văn An`) — nhiều spam trong dữ liệu được gán nhãn theo **hình thức** nên mô hình học được tín hiệu "chỉ có tên".
-- **False Negatives (spam bị bỏ sót):** spam viết như hội thoại bình thường, không có link/SĐT/token đặc trưng (vd. `36k thì lấy`) — đây là trần của cách tiếp cận bag-of-words.
+- **False Negatives (spam bị bỏ sót bởi TF-IDF nhưng FastText bắt được — 50 mẫu):** spam viết như hội thoại ngắn gọn hoặc biến thể teencode (`Cách truờng 400m ib`, `Ib tớ ạ, tớ làm 10k1 unit ạ`, `Nguyễn Xuân Bảo Nam 100k mua k b`). Nhờ học vector ngữ nghĩa và subword n-gram, FastText nhận diện được ngữ cảnh chào mời dù không có `urltoken`/`phonetoken`.
+- **Hạn chế của FastText pooling:** phép lấy trung bình vector các từ trong câu làm "pha loãng" tín hiệu khi câu dài chỉ chứa 1 từ khóa spam đơn lẻ, khiến Precision của FastText + SVM (56.44%) thấp hơn TF-IDF + SVM (74.84%).
 
 Mô hình tốt nhất được lưu vào `spam_ham_ml_only.joblib` kèm hàm dự đoán ngay trong notebook.
 
