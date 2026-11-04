@@ -29,12 +29,17 @@ env/
 .DS_Store
 Thumbs.db
 
-# Báo cáo chi tiết & Kế hoạch (nội bộ)
-BAO_CAO_DU_AN.md
-DANH_GIA_DU_AN_THEO_DE_BAI.md
-KE_HOACH_TICH_HOP_DATA_VA_KAGGLE.md
-TEAM_ASSIGNMENTS.md
-spam-ham-comments-v2.ipynb
+# Dữ liệu chạy, môi trường và bản nháp cục bộ
+.work/
+artifacts/
+.pytest_cache/
+**/.ipynb_checkpoints/
+notebooks/spam_features.py
+notebooks/spam_preprocessing.py
+notebooks/spam_training.py
+/spam_features.py
+/spam_preprocessing.py
+/spam_training.py
 # Archives & Exports
 *.zip
 *.html

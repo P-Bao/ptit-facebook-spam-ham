@@ -1,3 +1,5 @@
+> Tài liệu lịch sử trước chỉnh sửa. Xem README ở gốc repo và docs/changes/ cho trạng thái mới.
+
 # Kế hoạch chốt notebook nộp bài Spam/Ham PTIT
 
 Ngày: **04/11/2026**. Căn cứ mã nguồn hiện tại: Git HEAD `efc4fba`.

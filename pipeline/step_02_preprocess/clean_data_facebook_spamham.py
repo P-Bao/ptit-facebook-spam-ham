@@ -37,7 +37,7 @@ if hasattr(sys.stderr, "reconfigure"):
 # ─────────────────────────────────────────────────────────────────────────────
 # CẤU HÌNH ĐƯỜNG DẪN & THAM SỐ MẶC ĐỊNH
 # ─────────────────────────────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data"
 
 DEFAULT_INPUT_FILES = [

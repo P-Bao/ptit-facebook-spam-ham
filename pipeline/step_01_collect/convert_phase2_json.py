@@ -28,12 +28,12 @@ import sys
 from pathlib import Path
 
 # Dùng lại đúng hàm làm sạch của pipeline cũ để so khớp trùng lặp với Phase 1
-from clean_data_facebook_spamham import preprocess
+from pipeline.step_02_preprocess.clean_data_facebook_spamham import preprocess
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data"
 
 DEFAULT_INPUT_JSON = DATA_DIR / "groups_data_phase2.json"
@@ -145,7 +145,7 @@ def main():
     print(f"  - Còn lại:                     {len(rows):>6}")
     print(f"  -> Đã lưu CSV: {output_csv}")
     print("\n Tiếp theo:")
-    print(f"   python clean_data_facebook_spamham.py -i {output_csv} -o data/comments_phase2_cleaned.csv")
+    print(f"   python -m pipeline.step_02_preprocess.clean_data_facebook_spamham -i {output_csv} -o data/comments_phase2_cleaned.csv")
 
 
 if __name__ == "__main__":

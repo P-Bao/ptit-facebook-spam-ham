@@ -2,7 +2,7 @@
 merge_labeled_data.py
 ---------------------
 Bước 2e: Gộp dữ liệu đã gán nhãn Phase 1 (cũ) và Phase 2 (mới) thành 1 file CSV
-cho notebook spam-ham-comments-v2.ipynb.
+cho notebook notebooks/spam-ham-comments.ipynb.
 
 Đầu vào:
   - data/comments_labeled_export.csv   (Phase 1, giữ NGUYÊN VẸN, đúng thứ tự dòng)
@@ -29,7 +29,7 @@ import pandas as pd
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data"
 
 DEFAULT_PHASE1_CSV = DATA_DIR / "comments_labeled_export.csv"
@@ -45,18 +45,35 @@ def load_phase2(path: Path) -> pd.DataFrame:
 
     # File từ auto_accept_labels.py --skip-argilla: nhãn nằm ở cột official_label, không có cột id
     if "label" not in df.columns and "official_label" in df.columns:
-        df["id"] = [f"cmt_{i}" for i in range(len(df))]
+        if "id" not in df:
+            df["id"] = [f"cmt_{i}" for i in range(len(df))]
         df["label"] = df["official_label"]
 
+    if not {"label", "cleaned_text", "id"}.issubset(df.columns):
+        raise ValueError("Phase 2 thiếu label/official_label, cleaned_text hoặc id")
     df["label"] = df["label"].astype(str).str.strip().str.lower()
     df = df[df["label"].isin(VALID_LABELS)].copy()
 
     for col in COLUMNS:
         if col not in df.columns:
             df[col] = pd.NA
+    if df["id"].isna().any() or df["id"].astype(str).str.strip().eq("").any():
+        raise ValueError("Phase 2 có ID rỗng; không chuyển thành p2_nan")
     # Chỉ thêm tiền tố "p2_" nếu id chưa bắt đầu bằng "p2_"
     df["id"] = df["id"].astype(str).apply(lambda x: x if x.startswith("p2_") else f"p2_{x}")
+    validate_labeled(df, "Phase 2")
     return df[COLUMNS]
+
+
+def validate_labeled(df, name):
+    if not {"id", "label", "cleaned_text"}.issubset(df.columns):
+        raise ValueError(f"{name} thiếu cột bắt buộc")
+    if df["id"].isna().any() or df["id"].astype(str).str.strip().eq("").any() or df["id"].duplicated().any():
+        raise ValueError(f"{name} có ID rỗng/trùng")
+    if not df["label"].isin(VALID_LABELS).all():
+        raise ValueError(f"{name} có nhãn không hợp lệ")
+    if df["cleaned_text"].isna().any() or df["cleaned_text"].astype(str).str.strip().eq("").any():
+        raise ValueError(f"{name} có cleaned_text rỗng")
 
 
 def norm(series: pd.Series) -> pd.Series:
@@ -97,6 +114,7 @@ def main():
     print("=" * 65)
 
     df1 = pd.read_csv(p1_path)
+    validate_labeled(df1, "Phase 1")
     for col in COLUMNS:
         if col not in df1.columns:
             df1[col] = pd.NA
@@ -113,6 +131,7 @@ def main():
     df2["source"] = "phase2"
 
     merged = pd.concat([df1, df2], ignore_index=True)
+    validate_labeled(merged, "Tập gộp")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     merged.to_csv(out_path, index=False, encoding="utf-8-sig")
 

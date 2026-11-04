@@ -6,7 +6,7 @@ từ Argilla Server (container 'my-argilla') về file CSV cục bộ,
 để phục vụ huấn luyện mô hình phát hiện Spam/Ham.
 
 Pipeline trước đó:
-    crawl_group_comments.py
+    Dữ liệu crawl bên ngoài repo (công cụ thực dùng chưa xác nhận)
         -> clean_data_facebook_spamham.py   (data/comments_cleaned.csv)
         -> upload_to_argilla.py             (dataset 'comments_spamham')
         -> ai_assisted_spam_ham.py          (gợi ý nhãn bằng GLM)
@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 import argilla as rg
+from .label_utils import join_metadata
 
 # Tắt cảnh báo không cần thiết từ Argilla SDK
 warnings.filterwarnings("ignore", category=UserWarning, module="argilla")
@@ -32,7 +33,7 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT_CSV = BASE_DIR / "data" / "comments_labeled_export.csv"
 DEFAULT_CSV_LOOKUP = BASE_DIR / "data" / "comments_cleaned.csv"
 DEFAULT_ARGILLA_URL = "http://localhost:6900"
@@ -99,7 +100,7 @@ def parse_args():
 
 
 def extract_submitted_response(rec):
-    """Lấy response có trạng thái 'submitted' từ một bản ghi (ưu tiên response mới nhất)."""
+    """Lấy response có trạng thái 'submitted' từ một bản ghi (lấy phần tử cuối trong danh sách; không suy diễn thứ tự thời gian)."""
     submitted = [
         r for r in getattr(rec, "responses", []) or [] if getattr(r, "status", "") == "submitted"
     ]
@@ -189,7 +190,7 @@ def main():
 
     print(f"[*] Sau khi lọc{' (label=' + args.label + ')' if args.label else ''}: {len(rows):,} bản ghi hợp lệ.")
 
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(rows, columns=["id", "cleaned_text", "label"] + (["ai_confidence"] if args.include_suggestion else []))
     label_counts = df["label"].value_counts()
     print("-" * 50)
     for lbl, cnt in label_counts.items():
@@ -206,20 +207,7 @@ def main():
         print(f"[*] Đang nối metadata từ: {csv_lookup}...")
         df_lookup = pd.read_csv(csv_lookup)
 
-        # Ánh xạ id 'cmt_{idx}' hoặc 'p2_cmt_{idx}' -> dòng thứ idx trong CSV gốc
-        df["_idx"] = df["id"].astype(str).str.replace(r"^(?:p2_)?cmt_", "", regex=True)
-        df["_idx"] = pd.to_numeric(df["_idx"], errors="coerce")
-        df = df.dropna(subset=["_idx"])
-        df["_idx"] = df["_idx"].astype(int)
-
-        df_lookup["_idx"] = df_lookup.index
-
-        for col in ["text", "comment_type", "reaction_count"]:
-            if col in df_lookup.columns:
-                meta_map = df_lookup.set_index("_idx")[col]
-                df[col] = df["_idx"].map(meta_map)
-
-        df = df.drop(columns=["_idx"])
+        df = join_metadata(df, df_lookup)
         print("[+] Đã nối metadata thành công.")
     elif csv_lookup:
         print(f"[!] Không tìm thấy file {csv_lookup}. Chỉ xuất dữ liệu có trên Argilla.")

@@ -11,6 +11,7 @@ import warnings
 from pathlib import Path
 import pandas as pd
 import argilla as rg
+from .label_utils import record_ids
 
 # Tắt cảnh báo không cần thiết từ Argilla SDK và Requests
 warnings.filterwarnings("ignore", category=UserWarning, module="argilla")
@@ -29,7 +30,7 @@ DEFAULT_API_URL = "http://localhost:6900"
 DEFAULT_API_KEY = "admin.apikey"
 DEFAULT_WORKSPACE = "argilla"
 DEFAULT_DATASET_NAME = "comments_spamham"
-DEFAULT_CSV_PATH = Path(__file__).resolve().parent / "data" / "comments_cleaned.csv"
+DEFAULT_CSV_PATH = Path(__file__).resolve().parents[2] / "data" / "comments_cleaned.csv"
 
 DEFAULT_LABELS = ["spam", "ham"]
 DEFAULT_GUIDELINES = """
@@ -173,6 +174,7 @@ def main():
 
     # 3. Chuẩn bị danh sách bản ghi (Records)
     records = []
+    csv_ids = record_ids(df, args.id_prefix)
     for idx, row in df.iterrows():
         # Ưu tiên cleaned_text, nếu rỗng thì lấy text gốc
         text_clean = str(row["cleaned_text"]).strip() if pd.notna(row.get("cleaned_text")) else ""
@@ -186,7 +188,7 @@ def main():
         reaction_count = str(row["reaction_count"]).strip() if pd.notna(row.get("reaction_count")) else ""
 
         record_data = {
-            "id": f"{args.id_prefix}{idx}",
+            "id": csv_ids[idx],
             "cleaned_text": text_display,
             "metadata": {
                 "comment_type": comment_type,

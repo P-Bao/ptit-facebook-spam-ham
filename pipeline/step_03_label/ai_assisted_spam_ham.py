@@ -26,6 +26,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 import argilla as rg
+from .label_utils import record_ids
 
 # Tắt cảnh báo không cần thiết
 warnings.filterwarnings("ignore", category=UserWarning, module="argilla")
@@ -40,7 +41,7 @@ if hasattr(sys.stderr, "reconfigure"):
 # ─────────────────────────────────────────────────────────────────────────────
 # CẤU HÌNH MẶC ĐỊNH
 # ─────────────────────────────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_CSV_PATH = BASE_DIR / "data" / "comments_cleaned.csv"
 DEFAULT_CACHE_PATH = BASE_DIR / "data" / "predictions_glm_cache.json"
 
@@ -179,15 +180,16 @@ def parse_args():
     parser.add_argument(
         "--argilla-url",
         type=str,
-        default=DEFAULT_ARGILLA_URL,
+        default=env_argilla_url,
         help=f"URL server Argilla (mặc định: {DEFAULT_ARGILLA_URL})",
     )
     parser.add_argument(
         "--argilla-key",
         type=str,
-        default=DEFAULT_ARGILLA_KEY,
+        default=env_argilla_key,
         help=f"Argilla API Key (mặc định: {DEFAULT_ARGILLA_KEY})",
     )
+    parser.add_argument("--id-prefix", default="cmt_", help="Tiền tố ID khi CSV chưa có id")
     return parser.parse_args()
 
 
@@ -300,7 +302,7 @@ def predict_batch_with_glm(batch_items, api_key: str, model: str, base_url: str,
                     for p in parsed:
                         if isinstance(p, dict) and "id" in p and "label" in p:
                             lbl = str(p.get("label", "")).strip().lower()
-                            if lbl in VALID_LABELS:
+                            if lbl in VALID_LABELS and str(p["id"]) in {str(x["id"]) for x in batch_items}:
                                 # Mặc định 0.5 nếu LLM không trả về confidence để buộc duyệt thủ công
                                 conf = float(p.get("confidence", 0.5))
                                 valid_results[str(p["id"])] = {
@@ -430,17 +432,19 @@ def main():
         print("       OPENAI_API_KEY=sk-or-v1-xxx")
         print("       MODEL_ID=z-ai/glm-4.7-flash")
         print("       DATASET=http://localhost:6900/dataset/<id_dataset_spam_ham_cua_ban>")
-        print("  2. Hoặc truyền tham số: python ai_assisted_glm.py --api-key sk-xxx")
+        print("  2. Hoặc truyền tham số: python -m pipeline.step_03_label.ai_assisted_spam_ham --api-key <key>")
         sys.exit(1)
 
-    # 1. Kết nối Argilla và lấy Dataset
-    print(f"[*] Đang kết nối tới Argilla tại {args.argilla_url}...")
-    try:
-        client = rg.Argilla(api_url=args.argilla_url, api_key=args.argilla_key)
-        dataset = setup_argilla_dataset(client, args.dataset, reset=args.reset_dataset)
-    except Exception as e:
-        print(f"[ERROR] Không thể kết nối tới Argilla: {e}")
-        sys.exit(1)
+    # 1. Chỉ kết nối Argilla khi có yêu cầu upload.
+    client, dataset = None, None
+    if args.upload:
+        print(f"[*] Đang kết nối tới Argilla tại {args.argilla_url}...")
+        try:
+            client = rg.Argilla(api_url=args.argilla_url, api_key=args.argilla_key)
+            dataset = setup_argilla_dataset(client, args.dataset, reset=args.reset_dataset)
+        except Exception as e:
+            print(f"[ERROR] Không thể kết nối tới Argilla: {e}")
+            sys.exit(1)
 
     cache_path = Path(args.cache)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -451,7 +455,7 @@ def main():
     all_data_map = {}
     items_to_process = []
 
-    existing_records = list(dataset.records)
+    existing_records = list(dataset.records) if dataset is not None else []
     total_existing = len(existing_records)
 
     if total_existing > 0:
@@ -477,7 +481,7 @@ def main():
                     if s.question_name == "label":
                         predictions_cache[rid] = {
                             "label": s.value,
-                            "confidence": s.score or 1.0,
+                            "confidence": s.score if s.score is not None else 0.5,
                         }
     else:
         # Nếu dataset trên Argilla còn trống, nạp từ CSV
@@ -491,9 +495,10 @@ def main():
             df = df.head(args.limit)
         print(f"[+] Số bản ghi đọc từ CSV: {len(df):,}")
 
+        csv_ids = record_ids(df, args.id_prefix)
         for idx, row in df.iterrows():
             # ID sinh theo chỉ số dòng, khớp với ID bản ghi đã upload (cmt_0, cmt_1, ...)
-            rid = f"cmt_{idx}"
+            rid = csv_ids[idx]
 
             text_clean = str(row["cleaned_text"]).strip() if pd.notna(row.get("cleaned_text")) else ""
             text_raw = str(row["text"]).strip() if pd.notna(row.get("text")) else ""

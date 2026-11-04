@@ -7,7 +7,7 @@ from gensim.models import FastText
 class FastTextVectorizer(BaseEstimator, TransformerMixin):
     """Học FastText (skip-gram + subword) trên tập train, biểu diễn câu bằng mean / TF-IDF-weighted mean."""
     def __init__(self, vector_size=100, window=5, min_count=2, epochs=10, sg=1,
-                 min_n=3, max_n=5, bucket=100_000, pooling="tfidf", seed=42, workers=4):
+                 min_n=3, max_n=5, bucket=100_000, pooling="tfidf", seed=42, workers=1):
         self.vector_size = vector_size
         self.window = window
         self.min_count = min_count
@@ -21,6 +21,8 @@ class FastTextVectorizer(BaseEstimator, TransformerMixin):
         self.workers = workers
 
     def fit(self, X, y=None):
+        if self.pooling not in {"mean", "tfidf"}:
+            raise ValueError("pooling phải là 'mean' hoặc 'tfidf'")
         docs = [str(s).split() for s in X]
         model = FastText(
             sentences=docs, vector_size=self.vector_size, window=self.window,

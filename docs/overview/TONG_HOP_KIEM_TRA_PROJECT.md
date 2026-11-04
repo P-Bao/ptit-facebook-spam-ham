@@ -1,3 +1,5 @@
+> Tài liệu lịch sử trước chỉnh sửa. Xem README ở gốc repo và docs/changes/ cho trạng thái mới.
+
 # Tổng hợp và kiểm tra project phân loại Spam/Ham bình luận Facebook PTIT
 
 **Ngày kiểm tra:** 03/11/2026.  
@@ -61,7 +63,7 @@ Không nên gọi việc dùng GLM gán nhãn là đã có một thí nghiệm p
 
 ## 2. Đề bài thực sự yêu cầu những gì?
 
-Đã đọc trực tiếp [ảnh đề bài](<ảnh đề bài.png>). Nội dung liên quan đến nhóm này như sau.
+Đã đọc trực tiếp [ảnh đề bài](<../assignment/de_bai.png>). Nội dung liên quan đến nhóm này như sau.
 
 ### 2.1. Chọn nguồn dữ liệu và dạng phân loại
 
