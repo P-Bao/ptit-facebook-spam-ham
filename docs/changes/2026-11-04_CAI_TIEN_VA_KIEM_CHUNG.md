@@ -1,5 +1,10 @@
 # Chỉnh sửa, sắp xếp và kiểm chứng project — 04/11/2026
 
+Đây là nhật ký lượt đầu, trước khi nhận mã crawler và dữ liệu Drive. Phần nguồn và
+số cell/test hiện tại được cập nhật trong
+[nhật ký bổ sung nguồn](2026-11-04_BO_SUNG_NGUON_THU_THAP.md); bằng chứng chạy lượt
+đầu lưu tại `results/history/62219ff/`.
+
 ## Kết quả bàn giao
 
 - Notebook chính: `notebooks/spam-ham-comments.ipynb`.

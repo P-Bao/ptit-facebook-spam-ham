@@ -149,6 +149,7 @@ def save_csv(records: list, fieldnames: list, output_csv: Path):
 def clean_facebook_comments(
     input_files: list,
     output_csv: Path = DEFAULT_OUTPUT_CSV,
+    keep_punctuation_only: bool = False,
 ):
     stats = {"per_file": [], "total": 0, "dedup": 0, "url": 0, "phone": 0}
 
@@ -192,7 +193,7 @@ def clean_facebook_comments(
 
         clean_text = preprocess(text)
         # 2. Loại bỏ các dòng sau khi làm sạch không chứa bất kỳ chữ cái hoặc chữ số nào (vd: ".")
-        if not re.search(r"[0-9a-zA-ZÀ-ỹ]", clean_text):
+        if not keep_punctuation_only and not re.search(r"[0-9a-zA-ZÀ-ỹ]", clean_text):
             skipped_empty += 1
             continue
 
@@ -233,6 +234,10 @@ def parse_args():
         default=str(DEFAULT_OUTPUT_CSV),
         help=f"Đường dẫn lưu file CSV sạch (mặc định: {DEFAULT_OUTPUT_CSV})",
     )
+    parser.add_argument(
+        "--keep-punctuation-only", action="store_true",
+        help="Tái hiện snapshot cũ: giữ cả dòng chỉ dấu câu/emoji sau khi clean; cần giữ thứ tự ID khi đối soát cache cũ",
+    )
     return parser.parse_args()
 
 
@@ -247,6 +252,7 @@ if __name__ == "__main__":
     clean_facebook_comments(
         input_files=[Path(p) for p in args.input],
         output_csv=Path(args.output),
+        keep_punctuation_only=args.keep_punctuation_only,
     )
 
     print("\n" + "=" * 65)

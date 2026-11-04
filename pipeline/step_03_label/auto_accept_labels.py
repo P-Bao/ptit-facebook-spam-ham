@@ -231,6 +231,9 @@ def main():
             print(f"\n[*] Đang tạo file CSV tổng hợp tại {args.export_csv}...")
             df = csv_frame.copy()
             df["id"] = csv_ids
+            if "cleaned_text" in df and "text" in df:
+                display_text = df["cleaned_text"].fillna("").astype(str)
+                df["cleaned_text"] = display_text.where(display_text.str.strip().ne(""), df["text"].fillna("").astype(str))
             labels = []
             confidences = []
             is_auto = []

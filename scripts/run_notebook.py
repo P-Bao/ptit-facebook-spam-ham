@@ -1,6 +1,7 @@
 """Chạy bản sao chỉ có notebook ở thư mục riêng; không cần module pipeline đi kèm."""
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -61,6 +62,8 @@ def main():
                   "notebook": str(source.relative_to(root)), "isolated_execution": True,
                   "python": sys.version.split()[0],
                   "executed_code_cells": sum(c.cell_type == "code" and c.execution_count is not None for c in notebook.cells)}
+        result["executed_code_sha256"] = hashlib.sha256(json.dumps(
+            [c.source for c in notebook.cells if c.cell_type == "code"], ensure_ascii=False).encode()).hexdigest()
         (work / "execution_status.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     if success and args.inplace:
         shutil.copy2(copied, source)

@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "tested_at_utc": "2026-11-04T16:11:53.582140+00:00",
+  "seconds": 21.0,
+  "exact_notebook_loader_executed": true,
+  "initially_empty_source_cache": true,
+  "downloaded_files": 7,
+  "all_hashes_validated": true,
+  "source_audit_assertions_passed": true,
+  "facebook_requests": false,
+  "training_executed": false
+}

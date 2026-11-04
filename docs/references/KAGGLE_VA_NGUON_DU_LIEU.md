@@ -46,7 +46,15 @@ Argilla. Đây là thông tin bên công bố ghi. Card còn tên file/số mẫ
 (`labeled_spam_ham.csv`, ~32.000 và ~7.700); không dùng thay số đếm v7. Tên tác giả
 trích dẫn trong card cần nhóm xác nhận trước khi đưa vào báo cáo.
 
-## Để trống theo yêu cầu nhóm
+## Ghi nhận ban đầu và bằng chứng bổ sung
+
+**Cập nhật cùng ngày:** thành viên đã bàn giao mã crawler và thư mục Drive. Nguồn
+mới được đối soát tại [CRAWLER_VA_DU_LIEU_DRIVE.md](CRAWLER_VA_DU_LIEU_DRIVE.md),
+thay cho trạng thái chưa biết ở bảng lịch sử dưới đây. Đã xác định được 5 group,
+timestamp và chuỗi xử lý của raw Phase 2. Chưa có raw/log Phase 1, phiên bản/lệnh
+crawl chốt, tỷ lệ người duyệt và lịch sử 1.366 nhãn khác giữa Drive và v7.
+
+Bảng dưới lưu thông tin **trước khi nhận bộ bàn giao**, không phải kết luận hiện tại:
 
 | Thông tin | Nội dung đã được xác nhận |
 |---|---|
@@ -62,6 +70,6 @@ cầu làm lại dữ liệu chỉ để lấp chỗ trống. Nếu không có t
 hoặc lược bỏ chi tiết không có căn cứ khi trình bày.
 
 README cũ dẫn `https://github.com/mohdtalal3/facebook_post_comment_scraper` ở phần
-tham khảo, chưa có bằng chứng nhóm đã dùng đúng crawler này. Có thể hỏi người phụ
+tham khảo; tại thời điểm kiểm tra ban đầu chưa có mã bàn giao để đối chiếu. Có thể hỏi người phụ
 trách thu thập (phân công ghi Bảo) và người chốt nhãn v7; phân công không phải log
 chứng minh ai đã chạy công cụ nào.

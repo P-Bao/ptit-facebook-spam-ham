@@ -1,9 +1,9 @@
 {
   "success": true,
-  "seconds": 1576.33,
+  "seconds": 1529.5,
   "notebook": "notebooks\\spam-ham-comments.ipynb",
   "isolated_execution": true,
   "python": "3.12.14",
-  "executed_code_cells": 22,
-  "executed_code_sha256": "e44c77800eeede665e44974310267a559f094cf8ca80c4544472ea3980b572e9"
+  "executed_code_cells": 27,
+  "executed_code_sha256": "dceae1c9256a70703d0ab6680ecf564db0aad2227474fa6984c1e8af6c07d7a4"
 }

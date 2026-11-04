@@ -5,5 +5,16 @@
   "retrieved_client_date": "2026-11-04",
   "source_sha256": "11ec9468313cb1f7293250829a8d6fa42e70e2daeda57ca9c5b77643c19fd1bc",
   "hf_gated_at_retrieval": false,
-  "dataset_sha256": "7305d712996da3ff0dce1ea4142844b7629e9880bcac47ee38934f0b6e6cfbee"
+  "dataset_sha256": "7305d712996da3ff0dce1ea4142844b7629e9880bcac47ee38934f0b6e6cfbee",
+  "drive_folder_url": "https://drive.google.com/drive/folders/1_htgS4zywI0soGbKY0gSboAtQexlm1j9",
+  "drive_files": 7,
+  "source_audit": "results/source_audit/audit.json",
+  "source_audit_sha256": "55e36b6d68b71326bd7f2eeaebc617c2527ce630b134872bc1a18d0575cb5810",
+  "raw_phase2_posts": 2170,
+  "raw_phase2_groups": 5,
+  "raw_comments_and_replies": 13833,
+  "drive_merged_vs_v7_label_changes": 1366,
+  "phase1_raw_available": false,
+  "v7_label_revision_log_available": false,
+  "exact_notebook_download_cell_tested": true
 }

@@ -49,7 +49,11 @@ def join_metadata(labeled, lookup):
     matched = lookup.iloc[indices.astype(int)].reset_index(drop=True)
     if "cleaned_text" in matched and "cleaned_text" in result:
         norm = lambda s: unicodedata.normalize("NFC", str(s)).strip()
-        if not (result["cleaned_text"].map(norm).to_numpy() == matched["cleaned_text"].map(norm).to_numpy()).all():
+        expected_display = matched["cleaned_text"].fillna("").astype(str)
+        if "text" in matched:
+            # Uploader dùng raw text khi cleaner để rỗng (ví dụ bình luận chỉ emoji).
+            expected_display = expected_display.where(expected_display.str.strip().ne(""), matched["text"].fillna("").astype(str))
+        if not (result["cleaned_text"].map(norm).to_numpy() == expected_display.map(norm).to_numpy()).all():
             raise ValueError("ID nối được nhưng cleaned_text khác CSV lookup; từ chối ghép nhầm văn bản.")
     for column in ["text", "comment_type", "reaction_count"]:
         if column in matched:

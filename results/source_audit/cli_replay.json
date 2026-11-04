@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "commands_executed": [
+    "pipeline.step_01_collect.convert_phase2_json",
+    "pipeline.step_02_preprocess.clean_data_facebook_spamham",
+    "pipeline.step_03_label.auto_accept_labels",
+    "pipeline.step_04_merge.merge_labeled_data"
+  ],
+  "checks": {
+    "flat.csv": true,
+    "legacy_clean.csv": true,
+    "merged.csv": true,
+    "joined_6303_official_records_match_source": true,
+    "auto_accepted_rows": 6302,
+    "cached_export_matches_official_subset": true
+  },
+  "facebook_argilla_llm_calls": false,
+  "training_labels_modified": false,
+  "note": "Uses provided official Phase 2 for merge; does not recreate its one extra ID or v7 label revisions."
+}
