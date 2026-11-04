@@ -5,6 +5,7 @@
 - [Kiểm chứng crawler và dữ liệu Drive](docs/references/CRAWLER_VA_DU_LIEU_DRIVE.md)
 - [Cách đọc notebook, phân biệt pipeline, nộp/demo](docs/guides/HUONG_DAN_NOTEBOOK_VA_NOP_BAI.md)
 - [Thay đổi bổ sung nguồn thu thập](docs/changes/2026-11-04_BO_SUNG_NGUON_THU_THAP.md)
+- [Giải đáp, nguồn file và cấu trúc trình bày đề xuất](docs/plans/2026-11-05_GIAI_DAP_VA_SO_DO_TAI_CAU_TRUC.md)
 
 Notebook chính: **[notebooks/spam-ham-comments.ipynb](notebooks/spam-ham-comments.ipynb)**.
 
