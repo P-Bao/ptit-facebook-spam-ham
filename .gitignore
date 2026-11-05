@@ -37,6 +37,19 @@ TEAM_ASSIGNMENTS.md
 GIAI_THICH_TIEN_XU_LY_CUONG.md
 GIAI_THICH_CHI_TIET_NGUOI_1.md
 spam-ham-comments-v2.ipynb
+# Dữ liệu chạy, môi trường và bản nháp cục bộ
+.work/
+artifacts/
+.pytest_cache/
+**/.ipynb_checkpoints/
+# Media/phiên chạy do thư viện crawler tạo; giữ mã nền và .env.example
+group_post/
+page_post/
+simple_post/
+external/facebook_scraper/state*.json
+external/facebook_scraper/*.log
+external/facebook_scraper/*.pid
+external/facebook_scraper/*.tmp
 # Archives & Exports
 *.zip
 *.html

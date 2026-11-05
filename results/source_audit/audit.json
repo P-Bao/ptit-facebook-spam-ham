@@ -1,0 +1,605 @@
+{
+  "files": [
+    {
+      "name": "groups_data_phase2.json",
+      "bytes": 4517021,
+      "sha256": "3452faa5fd37037c7eaaa56f82af512e4ab8d85a952ce4db7fa16c62a657e4a6"
+    },
+    {
+      "name": "comments_phase2.csv",
+      "bytes": 1741144,
+      "sha256": "f57ba35438d3cc071dccf1bfea6ddad101f7fef26a7837c154f713b37d75a826"
+    },
+    {
+      "name": "comments_phase2_cleaned.csv",
+      "bytes": 2247778,
+      "sha256": "927e3a7c65fe6416258faa444bc76f0c2f778f38c270364411bfbc233890ea7b"
+    },
+    {
+      "name": "predictions_glm_cache_phase2.json",
+      "bytes": 421019,
+      "sha256": "48e345447158141cb84f9663f65947bd1e112a614951406ed5734768038f711e"
+    },
+    {
+      "name": "comments_labeled_phase2.csv",
+      "bytes": 888162,
+      "sha256": "b42b866c5b44fb9358b7f33c15cc40e812c704de60edd71e124341236aadbd79"
+    },
+    {
+      "name": "comments_labeled_export.csv",
+      "bytes": 4904757,
+      "sha256": "5cad1e8918e8a8bb9106422f7a1778083da8407f6d1ad24b32fc76c82dd7a343"
+    },
+    {
+      "name": "comments_labeled_merged.csv",
+      "bytes": 6047423,
+      "sha256": "da6c2fc94eb6ec5b8e9d9faad2811ce6ac8e5234b263d43bd189dcd2350c7eb1"
+    }
+  ],
+  "training_sha256": "7305d712996da3ff0dce1ea4142844b7629e9880bcac47ee38934f0b6e6cfbee",
+  "raw": {
+    "posts": 2170,
+    "groups": 5,
+    "comments": 9438,
+    "replies": 4395,
+    "duplicate_post_ids": 0,
+    "posts_reporting_comments_but_empty": 16,
+    "created_at": {
+      "min": "2025-05-17 23:40:45",
+      "max": "2026-09-27 12:55:52",
+      "note": "Giá trị trong snapshot; không tự gán múi giờ hoặc suy ra lệnh crawl đã dùng"
+    },
+    "scraped_at": {
+      "min": "2026-09-27 10:06:57",
+      "max": "2026-09-27 14:31:22",
+      "note": "Giá trị trong snapshot; không tự gán múi giờ hoặc suy ra lệnh crawl đã dùng"
+    }
+  },
+  "groups": [
+    {
+      "group_id": "1130813927934700",
+      "names_in_snapshot": [
+        "D26 (2008) PTIT - Học viện Công nghệ Bưu chính Viễn thông"
+      ],
+      "url_from_id": "https://www.facebook.com/groups/1130813927934700/",
+      "posts": 500,
+      "comments": 1104,
+      "replies": 557,
+      "listed_in_handoff_config": true,
+      "configured_name": "D26 (2008) PTIT"
+    },
+    {
+      "group_id": "1210825580901941",
+      "names_in_snapshot": [
+        "PTIT Confessions - Sinh Viên Học Viện Công Nghệ Bưu Chính Viễn Thông ✅"
+      ],
+      "url_from_id": "https://www.facebook.com/groups/1210825580901941/",
+      "posts": 500,
+      "comments": 1813,
+      "replies": 1262,
+      "listed_in_handoff_config": true,
+      "configured_name": "PTIT Confessions"
+    },
+    {
+      "group_id": "1605563914144178",
+      "names_in_snapshot": [
+        "D26 Học Viện Công Nghệ Bưu Chính Viễn Thông (2K8 PTIT)"
+      ],
+      "url_from_id": "https://www.facebook.com/groups/1605563914144178/",
+      "posts": 500,
+      "comments": 3283,
+      "replies": 1385,
+      "listed_in_handoff_config": true,
+      "configured_name": "D26 Học Viện Công Nghệ Bưu Chính Viễn Thông (2K8 PTIT)"
+    },
+    {
+      "group_id": "450310163844833",
+      "names_in_snapshot": [
+        "Cộng đồng sinh viên PTIT"
+      ],
+      "url_from_id": "https://www.facebook.com/groups/450310163844833/",
+      "posts": 500,
+      "comments": 2927,
+      "replies": 918,
+      "listed_in_handoff_config": true,
+      "configured_name": "2K5 PTIT"
+    },
+    {
+      "group_id": "778910719727961",
+      "names_in_snapshot": [
+        "D21 PTIT Hà Nội"
+      ],
+      "url_from_id": "https://www.facebook.com/groups/778910719727961/",
+      "posts": 170,
+      "comments": 311,
+      "replies": 273,
+      "listed_in_handoff_config": false,
+      "configured_name": null
+    }
+  ],
+  "configured_groups_count": 16,
+  "raw_group_ids_not_in_config": [
+    "778910719727961"
+  ],
+  "conversion": {
+    "raw_rows": 13833,
+    "empty_removed": 129,
+    "phase1_duplicate_removed": 4135,
+    "flat_rows": 9569,
+    "exact_reproduction": true
+  },
+  "cleaning": {
+    "duplicate_rows_removed": 171,
+    "legacy_rows": 9398,
+    "legacy_exact_reproduction": true,
+    "current_filter_would_remove": 42,
+    "current_default_rows": 9356,
+    "empty_cleaned_rows_in_snapshot": 32
+  },
+  "annotation": {
+    "cache_rows": 6605,
+    "invalid_predictions": 0,
+    "confidence_ge_075": 6302,
+    "official_rows": 6303,
+    "high_confidence_without_official": 0,
+    "official_not_in_cache": 1,
+    "cached_official_label_disagreements": 0,
+    "metadata_matches_cleaned_snapshot": true,
+    "cleaned_text_fallback_to_raw": 10,
+    "unexplained_cleaned_text_changes": 0
+  },
+  "merge": {
+    "cross_phase_duplicate_removed": 1,
+    "phase2_retained": 6302,
+    "rows": 38233,
+    "exact_reproduction": true
+  },
+  "labels": {
+    "phase1": {
+      "ham": 28722,
+      "spam": 3209
+    },
+    "phase2_export": {
+      "ham": 5197,
+      "spam": 1106
+    },
+    "merged_drive": {
+      "ham": 33919,
+      "spam": 4314
+    },
+    "training_v7": {
+      "ham": 32907,
+      "spam": 5326
+    }
+  },
+  "v7_comparison": {
+    "same_id_set": true,
+    "same_id_order": true,
+    "shared_ids": 38233,
+    "drive_only": 0,
+    "v7_only": 0,
+    "changed_fields": {
+      "label": 1366,
+      "cleaned_text": 0,
+      "text": 0,
+      "comment_type": 0,
+      "reaction_count": 0
+    },
+    "label_transitions": [
+      {
+        "from": "ham",
+        "to": "spam",
+        "count": 1189
+      },
+      {
+        "from": "spam",
+        "to": "ham",
+        "count": 177
+      }
+    ]
+  },
+  "crawler_inventory": [
+    {
+      "name": ".env.example",
+      "bytes": 314,
+      "lines": 8,
+      "sha256": "cc3056dcf63cb5aaec88cd493a594f0d1d40a545ac2848205d4bcb71ffdb5294"
+    },
+    {
+      "name": "comment_scraper.py",
+      "bytes": 11419,
+      "lines": 329,
+      "sha256": "429f79075e24ad755c449afbfe675382c58cb92803294918aea2e0d029ed0a00",
+      "syntax": "valid",
+      "definitions": [
+        {
+          "name": "retry_request",
+          "line": 31,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "comments_payload",
+          "line": 80,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "replies_payload",
+          "line": 113,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fb_json",
+          "line": 145,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_comments",
+          "line": 166,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_replies",
+          "line": 255,
+          "kind": "FunctionDef"
+        }
+      ]
+    },
+    {
+      "name": "facebook_ui.py",
+      "bytes": 44991,
+      "lines": 1066,
+      "sha256": "e8bcb0a35417b1310ce56732b0d5abcfdb0f60299e155a06597e098a81bdc4b0",
+      "syntax": "valid",
+      "definitions": [
+        {
+          "name": "parse_cookies",
+          "line": 29,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "CookieDialog",
+          "line": 45,
+          "kind": "ClassDef"
+        },
+        {
+          "name": "ScraperThread",
+          "line": 356,
+          "kind": "ClassDef"
+        },
+        {
+          "name": "FacebookScraperUI",
+          "line": 675,
+          "kind": "ClassDef"
+        },
+        {
+          "name": "main",
+          "line": 1054,
+          "kind": "FunctionDef"
+        }
+      ]
+    },
+    {
+      "name": "group_post_scraper_v2.py",
+      "bytes": 34027,
+      "lines": 831,
+      "sha256": "2ebcb9e67865a44304b7479881e5295407070c1c18f775abc3c53e254a90169c",
+      "syntax": "valid",
+      "definitions": [
+        {
+          "name": "FacebookSessionExpiredException",
+          "line": 39,
+          "kind": "ClassDef"
+        },
+        {
+          "name": "check_facebook_session_error",
+          "line": 44,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_group_name",
+          "line": 61,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "retry_request",
+          "line": 91,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "download_image",
+          "line": 139,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_remaining_images",
+          "line": 176,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_data_blocks",
+          "line": 274,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "clean_data_blocks",
+          "line": 310,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "parse_fb_response",
+          "line": 326,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_comment_count",
+          "line": 334,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "is_reel_or_video_post",
+          "line": 395,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_media",
+          "line": 441,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "post_already_exists",
+          "line": 509,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_post_data",
+          "line": 518,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_posts",
+          "line": 584,
+          "kind": "FunctionDef"
+        }
+      ]
+    },
+    {
+      "name": "main.py",
+      "bytes": 19984,
+      "lines": 574,
+      "sha256": "fb08fc1f568c23f3f77ac783aeeeedbf41288fed390d608ce9b42c3585639099",
+      "syntax": "valid",
+      "definitions": [
+        {
+          "name": "extract_user_id_from_url",
+          "line": 20,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_group_id_from_url",
+          "line": 70,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_post_id_from_url",
+          "line": 125,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "convert_post_id_to_feedback_id",
+          "line": 205,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_comments_for_post",
+          "line": 211,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "save_post_data",
+          "line": 235,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "display_menu",
+          "line": 271,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "scrape_simple_post",
+          "line": 284,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "scrape_page_posts",
+          "line": 405,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "scrape_group_posts",
+          "line": 475,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "main",
+          "line": 545,
+          "kind": "FunctionDef"
+        }
+      ]
+    },
+    {
+      "name": "post_scraper.py",
+      "bytes": 31415,
+      "lines": 782,
+      "sha256": "99c55b446ef9168a1763d297a7640e2354ff9207c8f85f3b60f01b10929b8a2f",
+      "syntax": "valid",
+      "definitions": [
+        {
+          "name": "retry_request",
+          "line": 19,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "download_image",
+          "line": 67,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_remaining_images",
+          "line": 104,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_data_blocks",
+          "line": 205,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "clean_data_blocks",
+          "line": 243,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "parse_fb_response",
+          "line": 261,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_page_name",
+          "line": 295,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_comment_count",
+          "line": 314,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "is_reel_or_video_post",
+          "line": 361,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_media",
+          "line": 409,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "post_already_exists",
+          "line": 486,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_posts",
+          "line": 495,
+          "kind": "FunctionDef"
+        }
+      ]
+    },
+    {
+      "name": "proxy_utils.py",
+      "bytes": 4263,
+      "lines": 115,
+      "sha256": "7eb5561e8e5497a7973df39823f17e4ec03fee665d309cb43962a86158a620b2",
+      "syntax": "valid",
+      "definitions": [
+        {
+          "name": "_replace_trailing_port",
+          "line": 12,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "_build_proxy_dict",
+          "line": 20,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "rotate_static_proxy",
+          "line": 24,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "is_proxy_infra_error",
+          "line": 40,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "is_ip_blocked",
+          "line": 59,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "select_proxy",
+          "line": 81,
+          "kind": "FunctionDef"
+        }
+      ]
+    },
+    {
+      "name": "README.md",
+      "bytes": 6154,
+      "lines": 138,
+      "sha256": "14a308490b8038be008ed5cd1934bb2891fab784e2b6095d8119e2b12f7f30c1"
+    },
+    {
+      "name": "README_ORIGINAL.md",
+      "bytes": 12273,
+      "lines": 351,
+      "sha256": "9263baa50c255a778beb9d1f100cbec0efc4e3670faeeafb8fa982a5f9608a80"
+    },
+    {
+      "name": "README_RUN.md",
+      "bytes": 6154,
+      "lines": 138,
+      "sha256": "14a308490b8038be008ed5cd1934bb2891fab784e2b6095d8119e2b12f7f30c1"
+    },
+    {
+      "name": "requirements.txt",
+      "bytes": 42,
+      "lines": 4,
+      "sha256": "ef21fab62e41ba3bc3e2b15388ee2d0bd7fc7ac473c9411e170ea9ed4c625fb5"
+    },
+    {
+      "name": "single_post_image.py",
+      "bytes": 6682,
+      "lines": 237,
+      "sha256": "48d81ee42d81def56ce28a32c149425b769bde098ae08b2ea9437ffda395b963",
+      "syntax": "valid",
+      "definitions": [
+        {
+          "name": "build_payload",
+          "line": 35,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "extract_data_blocks",
+          "line": 69,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "clean_data_blocks",
+          "line": 104,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "process_raw_graphql",
+          "line": 115,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "download_image",
+          "line": 126,
+          "kind": "FunctionDef"
+        },
+        {
+          "name": "fetch_all_images",
+          "line": 160,
+          "kind": "FunctionDef"
+        }
+      ]
+    }
+  ],
+  "runner": {
+    "name": "scrape_ptit_groups.py",
+    "sha256": "ef72bbfac7c27ce249da2d9aeaed1375282aa2c8c4879265585604941fd3a346"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "compared_commit": "7415098",
+  "unchanged_function_class_ast": {
+    "pipeline/prepare/preprocess_for_model.py": true,
+    "pipeline/features/spam_features.py": true,
+    "pipeline/modeling/training_utils.py": true
+  },
+  "factory_equivalence": [
+    {
+      "feature": "BoW",
+      "model": "Naive Bayes",
+      "same_estimators_parameters_grid_and_jobs": true
+    },
+    {
+      "feature": "BoW",
+      "model": "SVM",
+      "same_estimators_parameters_grid_and_jobs": true
+    },
+    {
+      "feature": "TF-IDF",
+      "model": "Naive Bayes",
+      "same_estimators_parameters_grid_and_jobs": true
+    },
+    {
+      "feature": "TF-IDF",
+      "model": "SVM",
+      "same_estimators_parameters_grid_and_jobs": true
+    },
+    {
+      "feature": "FastText",
+      "model": "Naive Bayes",
+      "same_estimators_parameters_grid_and_jobs": true
+    },
+    {
+      "feature": "FastText",
+      "model": "SVM",
+      "same_estimators_parameters_grid_and_jobs": true
+    }
+  ],
+  "vendor_files_byte_identical": {
+    ".env.example": "cc3056dcf63cb5aaec88cd493a594f0d1d40a545ac2848205d4bcb71ffdb5294",
+    "comment_scraper.py": "429f79075e24ad755c449afbfe675382c58cb92803294918aea2e0d029ed0a00",
+    "facebook_ui.py": "e8bcb0a35417b1310ce56732b0d5abcfdb0f60299e155a06597e098a81bdc4b0",
+    "group_post_scraper_v2.py": "2ebcb9e67865a44304b7479881e5295407070c1c18f775abc3c53e254a90169c",
+    "main.py": "fb08fc1f568c23f3f77ac783aeeeedbf41288fed390d608ce9b42c3585639099",
+    "post_scraper.py": "99c55b446ef9168a1763d297a7640e2354ff9207c8f85f3b60f01b10929b8a2f",
+    "proxy_utils.py": "7eb5561e8e5497a7973df39823f17e4ec03fee665d309cb43962a86158a620b2",
+    "README.md": "14a308490b8038be008ed5cd1934bb2891fab784e2b6095d8119e2b12f7f30c1",
+    "README_ORIGINAL.md": "9263baa50c255a778beb9d1f100cbec0efc4e3670faeeafb8fa982a5f9608a80",
+    "README_RUN.md": "14a308490b8038be008ed5cd1934bb2891fab784e2b6095d8119e2b12f7f30c1",
+    "requirements.txt": "ef21fab62e41ba3bc3e2b15388ee2d0bd7fc7ac473c9411e170ea9ed4c625fb5",
+    "single_post_image.py": "48d81ee42d81def56ce28a32c149425b769bde098ae08b2ea9437ffda395b963"
+  },
+  "training_csv_sha256": "7305d712996da3ff0dce1ea4142844b7629e9880bcac47ee38934f0b6e6cfbee",
+  "note": "Read-only comparison; no model fitting or Facebook/API calls in this check."
+}

@@ -1,0 +1,3 @@
+# Chỉ cần khi chạy runner thu thập live; notebook 01 đọc snapshot không cần GUI.
+requests==2.34.2
+python-dotenv==1.2.4
