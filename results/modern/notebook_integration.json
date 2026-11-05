@@ -1,0 +1,43 @@
+{
+  "checked_client_date": "2026-11-05",
+  "notebooks": {
+    "02": {
+      "success": true,
+      "seconds": 648.58,
+      "notebook": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\spamham",
+      "python": "3.12.14",
+      "executed_code_cells": 19,
+      "cells": 36,
+      "errors_in_cells": 0,
+      "mode": "train_and_evaluate"
+    },
+    "03": {
+      "success": true,
+      "seconds": 10.41,
+      "notebook": "notebooks\\03_vibert.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\modern\\vibert",
+      "python": "3.12.14",
+      "executed_code_cells": 9,
+      "cells": 20,
+      "errors_in_cells": 0,
+      "mode": "review"
+    }
+  },
+  "traditional_9_metric_rows_and_parameters_exactly_preserved_except_timing": true,
+  "traditional_training_and_preprocessing_modules_unchanged": true,
+  "notebook_01_unchanged_and_previous_verification_retained": true,
+  "modern_metrics_and_same_test_ids_verified": true,
+  "cloud_training_device": "NVIDIA A100-SXM4-80GB",
+  "local_model_available": true,
+  "local_cpu_64_label_disagreements": 0,
+  "branch": "phi",
+  "protected_local_heads": {
+    "master": "efc4fba2a6289936fdcd43f822698f251ee9e61f",
+    "cuong": "efc4fba2a6289936fdcd43f822698f251ee9e61f"
+  }
+}

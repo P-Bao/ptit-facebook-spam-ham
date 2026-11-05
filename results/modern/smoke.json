@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "scope": "real checkpoint forward/backward, not full training metrics",
+  "device": "cuda",
+  "examples": 2,
+  "loss": 0.6938676238059998,
+  "missing_keys": [
+    "classifier.bias",
+    "classifier.weight"
+  ],
+  "tokenizer_lowercase": false
+}

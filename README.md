@@ -181,7 +181,8 @@ không tự gọi lại crawler hoặc LLM. `.env` thật và token/cookie đư�
 
 Notebook tổ chức thứ tự xử lý, gọi hàm trong `pipeline/` và trình bày dữ liệu/bảng/hình.
 Cell xử lý và huấn luyện có thực thi; khối hiển thị mã nguồn chỉ đọc hàm để giải thích.
-Lệnh `scripts/run_notebook.py` thực hiện toàn bộ các cell bằng Python của `.venv`.
+Lệnh `scripts/run_notebook.py` thực hiện toàn bộ cell bằng Python dùng để gọi
+lệnh: `.venv` cho 01/02, `.venv-modern` cho 03.
 
 Các module có CLI như thu thập, chuyển CSV, làm sạch, gán nhãn và tool gộp có thể
 chạy bằng `python -m <module>` trong đúng môi trường. `experiments.py`,
@@ -218,3 +219,17 @@ Trong `artifacts/spamham/`, ngoài model và metrics còn có `stopword_cv.csv`,
 `imbalance_cv.csv`, `imbalance_comparison.csv`, `test_predictions.csv`;
 `imbalance_training.png`, `imbalance_results.png`, `confusion_baselines.png`,
 `confusion_strategies.png`, `pr_baselines.png`, `pr_strategies.png`.
+
+
+## 8. viBERT và kết quả mô hình hiện đại
+
+Đã fine-tune viBERT trên Colab A100 80 GB, chọn loss thường/3 epoch bằng
+validation rồi fit toàn bộ train. Trên cùng 7.474 test: Accuracy **96,35%**,
+Precision **89,42%**, Recall **80,86%**, F1 **0,8493**, AP **0,9108**;
+S3 có F1 **0,7552**. Kết quả và giới hạn được trình bày trong Notebook 03.
+
+Notebook 02 mục 5.2 hiển thị mã viBERT, mục 6.4 đọc bảng so sánh test. Notebook
+03 giải thích toàn bộ fine-tune và demo; dùng `.venv-modern`, không dùng `.venv`
+truyền thống. Runner hỗ trợ `--notebook 03`, mặc định review model đã tải.
+Model/tokenizer local: `artifacts/modern/vibert/model/`; bảng/evidence Git:
+`results/modern/`. Chỉ pull Git chưa có trọng số và dữ liệu để chạy demo.

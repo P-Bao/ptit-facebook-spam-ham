@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "seconds": 10.41,
+  "notebook": "notebooks\\03_vibert.ipynb",
+  "isolated_kernel": true,
+  "uses_project_modules": true,
+  "output_dir": "artifacts\\modern\\vibert",
+  "python": "3.12.14",
+  "executed_code_cells": 9
+}

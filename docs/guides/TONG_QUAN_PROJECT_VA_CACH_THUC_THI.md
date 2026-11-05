@@ -35,7 +35,7 @@ huấn luyện mới thực thi công việc tương ứng.
 | `pipeline/presentation/` | `notebook_display.py`: bảng, mã nguồn và thông tin file có màu tương phản; không thay đổi dữ liệu hoặc dự đoán. |
 | `pipeline/modern/` | `data.py`: chuẩn hóa nhẹ và chia tập cùng baseline. `train.py`: fine-tune, chọn validation, fit cuối và test. `predict.py`: nạp model/tokenizer để dự đoán. `vibert_config.json`: cấu hình. |
 | `tools/dataset_versions/` | `merge_labeled_data.py`: gộp CSV có sẵn với đầu ra notebook 01 → `data/final/comments_merged.csv`. `audit_source.py`: đối chiếu bundle nguồn khi cần kiểm tra nội bộ. |
-| `scripts/` | `run_notebook.py`: chạy 01/02 trong kernel mới. `check_environment.py`: kiểm `.venv` truyền thống. `prepare_colab_bundle.py`: gói code và dữ liệu cần cho viBERT để chuyển sang Colab. |
+| `scripts/` | `run_notebook.py`: chạy 01/02/03 trong kernel mới bằng môi trường được chọn. `check_environment.py`: kiểm `.venv` truyền thống. `prepare_colab_bundle.py`: gói code và dữ liệu cần cho viBERT để chuyển sang Colab. |
 | `requirements/` | `notebook.txt`: 01/02; `collection.txt`: crawler; `annotation.txt`: nhãn; `dev.txt`: kiểm thử; `modern.txt`: viBERT local Python 3.12; `modern-colab.txt`: viBERT Colab Python 3.13. |
 | `tests/` | Các file `test_*.py` kiểm tra dữ liệu, ID/nhãn, liên kết cache, tiền xử lý, CV, lưu/tải/dự đoán và hiển thị. `test_notebook_runner.py` kiểm tra đường dẫn CSV local, đầu ra và đóng kernel. |
 | `data/` | `intermediate/`: đầu ra trung gian notebook 01; `processed/v7_preprocessed.csv`: v7 và các cột token cho mô hình; `labeled/comments_labeled.csv`: CSV mới; `labeled/comments_labeled_phase1.csv`: CSV có sẵn; `final/comments_merged.csv`: bản tool tạo; `final/labeled_v7.csv`: đầu vào thực nghiệm local. |
@@ -224,3 +224,17 @@ kiểm cấu hình runner và đường dẫn local.
 trước đây. Notebook 01/02 không dùng `verified_run`/`source_audit` để nạp dữ liệu
 hay dự đoán; phần bổ sung trong Notebook 02 đọc bảng viBERT ở `results/modern/`.
 Mô hình để tái sử dụng nằm trong `artifacts/spamham/`, dữ liệu trong `data/`.
+
+
+## Nhánh viBERT và đối chiếu cuối
+
+Notebook 03 dùng v7, giữ đúng test của Notebook 02. Phát triển trên
+24.815 fit/5.944 validation; loss thường ở epoch 3 được chọn bằng validation F1.
+Fit lại 30.759 train từ pretrained, đo 7.474 test: Accuracy 96,35%, Precision
+89,42%, Recall 80,86%, F1 0,8493, AP 0,9108. S3 có test F1 0,7552.
+
+M1 dùng tokenizer và biểu diễn ngữ cảnh riêng, không phải BoW/TF-IDF/FastText
+ghép thêm thuật toán thứ ba. Model/tokenizer safetensors ở
+`artifacts/modern/vibert/model/`; S3 `.joblib` giữ riêng. Kết quả GPU đã kiểm nạp
+lại trên toàn bộ test; CPU local kiểm 64 mẫu, nhãn khớp. Xem hướng dẫn viBERT
+để biết phiên bản môi trường, cấu hình, chế độ train/review và các giới hạn.

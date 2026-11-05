@@ -113,3 +113,46 @@ chế độ được ghi rõ, không gọi việc đọc CSV là train.
 
 Notebook 02 trình bày bảng so test khi có kết quả hoàn tất; Notebook 03 giải
 thích chi tiết tokenization, fine-tune và demo viBERT.
+
+
+## Kết quả viBERT đã kiểm chứng ngày 05/11/2026
+
+Đã fine-tune checkpoint chính thức trên **NVIDIA A100-SXM4-80GB** của Colab.
+Hai cấu hình loss dùng 24.815 fit và 5.944 validation. Loss thường ở epoch 3
+đạt validation F1 **0,82048**, loss có trọng số đạt **0,81916**; chọn loss thường
+theo tiêu chí đã xác định. Khởi tạo lại pretrained và fit **30.759 train** trong
+ba epoch, sau đó mới đo trên cùng **7.474 test** với S3. Không dùng test để chọn
+loss/epoch hoặc điều chỉnh ngưỡng; ngưỡng xác suất cố định 0,5.
+
+| Mô hình | Accuracy | Precision spam | Recall spam | F1 spam | AP |
+|---|---:|---:|---:|---:|---:|
+| S3 — TF-IDF + SVM | 0.9433 | 0.8374 | 0.6877 | 0.7552 | 0.8117 |
+| M1 — viBERT | 0.9635 | 0.8942 | 0.8086 | 0.8493 | 0.9108 |
+
+Ma trận M1: **6.432 TN, 91 FP, 182 FN, 769 TP**. So với S3, bắt thêm 115 spam
+và giảm 36 ham nhận nhầm. Đây là kết quả trên tập test hiện tại, chưa phải kết
+luận cho mọi nguồn dữ liệu hoặc nhiều seed. Không so validation F1 của viBERT
+với CV F1 của SVM như các phép đo tương đương.
+
+Đã nạp lại trên GPU và kiểm tra toàn bộ 7.474 dự đoán khớp; model/tokenizer đã
+được tải về `artifacts/modern/vibert/model/`. Kiểm tra CPU local trên 64 mẫu đầu
+của test: **không khác nhãn**; chênh lệch xác suất tối đa khoảng
+**0.00003762** do môi trường/độ chính xác số khác nhau.
+Dự đoán lặp lại trên CPU giữ nguyên. Không khẳng định mọi số thực trùng tuyệt đối
+giữa GPU FP16 và CPU FP32.
+
+Notebook 03 có hai chế độ rõ ràng: train thực hiện fine-tune; review đọc lịch sử,
+chỉ số và nạp checkpoint đã học. Có thể chạy review local từ Terminal:
+
+```powershell
+.\.venv-modern\Scripts\python.exe scripts/run_notebook.py --notebook 03 --inplace
+```
+
+Chạy cell không chỉ hiển thị tượng trưng: các cell dữ liệu/tokenization xử lý
+dữ liệu, các cell review đọc kết quả đã train, cell demo nạp trọng số và tính
+dự đoán. Chỉ đổi MODE sang train khi muốn huấn luyện lại bằng GPU.
+
+`results/modern/` giữ báo cáo nhẹ và bằng chứng; model/data được Git bỏ qua.
+Các `.bin` checkpoint optimizer trong thư mục huấn luyện dùng để resume;
+trọng số triển khai nằm trong `model.safetensors`, không phải `.joblib` của S3.
+Phần báo cáo học phần chưa được viết trong đợt triển khai này.
