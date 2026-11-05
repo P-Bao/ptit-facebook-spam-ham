@@ -107,6 +107,17 @@ print(sys.version)
 Đường dẫn phải thuộc `.venv` của project, phiên bản Python là 3.12.
 Notebook dùng chung module trong repo; để chạy lại cần giữ cấu trúc thư mục đi kèm.
 
+Để kiểm tra lại toàn bộ kết quả, dùng **Restart Kernel → Run All** hoặc runner
+ở mục 3. Chạy riêng một cell giữa notebook yêu cầu các biến của phần trước đã
+được tạo; sau khi huấn luyện lại cần chạy tiếp đánh giá và lưu mô hình để tránh
+hiển thị kết quả cũ. Cùng dữ liệu, phiên bản và cấu hình seed có thể tái lập các
+chỉ số; thời gian chạy thay đổi. Runner còn cố định hash seed và số luồng trước
+khi mở Python, nên dùng cách này khi cần đối chiếu chính xác cả FastText.
+
+Cell lưu mô hình ở mục 8 notebook 02 có gọi `joblib.dump()`: chạy cell sẽ ghi
+lại `artifacts/spamham/spam_ham_ml_only.joblib`, nạp lại và kiểm tra dự đoán.
+Chỉ mở notebook hoặc xem output cũ không huấn luyện và không ghi lại model.
+
 ## 5. Dữ liệu và kết quả
 
 ```text

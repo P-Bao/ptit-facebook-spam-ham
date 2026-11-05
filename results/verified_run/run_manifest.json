@@ -28,7 +28,7 @@
     "jinja2": "3.1.6"
   },
   "python": "3.12.14",
-  "completed_utc": "2026-11-05T13:55:07.125606+00:00",
+  "completed_utc": "2026-11-05T14:35:06.280487+00:00",
   "modern_model": "not_implemented",
   "selection_rule": "max mean validation F1 on train CV; test not used for selection",
   "baseline_configurations": 6,

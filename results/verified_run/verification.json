@@ -1,23 +1,19 @@
 {
   "checked_client_date": "2026-11-05",
-  "completed_utc": "2026-11-05T14:00:39.684062+00:00",
-  "baseline_commit": "d938b0a147f81de6146875682f80fbeedcf66dd0",
+  "completed_utc": "2026-11-05T14:35:26.147873+00:00",
+  "baseline_commit": "528f91595b84f0c0eee7be021febf4ac222bbcf5",
   "notebooks": {
     "01": {
-      "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
       "cells": 15,
       "code_cells": 6,
-      "seconds": 4.45,
       "errors": 0,
-      "output_dir": "data",
-      "inherited_from": "d938b0a"
+      "seconds": 4.34
     },
     "02": {
-      "path": "notebooks/02_thuc_nghiem_va_demo.ipynb",
       "cells": 34,
       "code_cells": 18,
-      "seconds": 603.77,
-      "errors": 0
+      "errors": 0,
+      "seconds": 575.52
     }
   },
   "tests_passed": 55,
@@ -95,5 +91,8 @@
     }
   },
   "modern_model": "not_implemented",
-  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown after computational cells completed"
+  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown after computational cells completed",
+  "all_9_configurations_reproduced_on_repeat_run": true,
+  "fresh_run_both_notebooks": true,
+  "stability_evidence": "results/verified_run/stability_check.json"
 }
