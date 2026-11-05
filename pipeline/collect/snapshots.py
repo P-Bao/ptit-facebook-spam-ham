@@ -51,3 +51,12 @@ def ensure_snapshots(data_root, names=None):
             path.write_bytes(content)
         result[name] = path
     return result
+
+
+def collection_inputs(data_root):
+    """Tên logic cho đầu vào notebook; tên/hash bản nguồn giữ trong manifest."""
+    names = {"posts": "groups_data_phase2.json",
+             "annotation_index": "comments_phase2_cleaned.csv",
+             "predictions": "predictions_glm_cache_phase2.json"}
+    paths = ensure_snapshots(data_root, names.values())
+    return {key: paths[name] for key, name in names.items()}

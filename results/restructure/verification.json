@@ -56,5 +56,5 @@
   "collection_calls_facebook_llm_argilla": false,
   "uses_project_modules": true,
   "archived_baseline": "results/history/7415098",
-  "later_notebook_output_verification": "results/notebook_display/verification.json"
+  "later_notebook_output_verification": "results/final_editorial/verification.json"
 }

@@ -27,5 +27,6 @@
   "output_file_row_counts_verified": true,
   "renderer_browser_test": "results/notebook_display/contrast_verification.json",
   "raw_inference_agrees_on_all_7474_test_ids": true,
-  "notes": "Notebook 01 reprocesses saved JSON/cache. No Facebook, LLM or Argilla calls. Notebook 02 fits and evaluates all models again."
+  "notes": "Notebook 01 reprocesses saved JSON/cache. No Facebook, LLM or Argilla calls. Notebook 02 fits and evaluates all models again.",
+  "superseded_by": "results/final_editorial/verification.json"
 }
