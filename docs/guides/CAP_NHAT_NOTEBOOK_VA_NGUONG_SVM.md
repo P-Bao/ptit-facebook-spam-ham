@@ -3,6 +3,11 @@
 Tài liệu ghi lại đợt hoàn thiện SVM trước bước viBERT. Nhánh viBERT được mô tả
 riêng trong [hướng dẫn Colab](HUONG_DAN_VIBERT_COLAB.md) và Notebook 03.
 
+**Trạng thái hiện hành:** viBERT đã hoàn tất (M1 test F1 0,8493); project có ba
+notebook. Các số cell/thời gian/số test và câu “chưa triển khai” bên dưới thuộc
+các lượt SVM lịch sử. Xem [tổng quan](TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md)
+và `results/verified_run/final_review.json` để biết lượt rà soát mới nhất.
+
 ## Phạm vi thay đổi
 
 Chỉnh Notebook 02 và các hàm huấn luyện/dự đoán liên quan. Giữ nguyên Notebook

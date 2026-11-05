@@ -1,0 +1,170 @@
+{
+  "checked_utc": "2026-11-05T17:00:45.582506+00:00",
+  "checked_client_date": "2026-11-06",
+  "scope": "01 offline replay; 02 full training/test/save; 03 local review/inference, no new GPU fine-tuning",
+  "notebooks": [
+    {
+      "file": "notebooks/01_thu_thap_va_gan_nhan.ipynb",
+      "code_cells": 6,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 3.8,
+      "notebook": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "data",
+      "python": "3.12.14",
+      "executed_code_cells": 6
+    },
+    {
+      "file": "notebooks/02_thuc_nghiem_va_demo.ipynb",
+      "code_cells": 19,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 613.62,
+      "notebook": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\spamham",
+      "python": "3.12.14",
+      "executed_code_cells": 19
+    },
+    {
+      "file": "notebooks/03_vibert.ipynb",
+      "code_cells": 9,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 12.95,
+      "notebook": "notebooks\\03_vibert.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\modern\\vibert",
+      "python": "3.12.14",
+      "executed_code_cells": 9
+    }
+  ],
+  "checks": {
+    "all_9_classic_metrics_and_parameters_unchanged_except_timing": true,
+    "artifacts/spamham/test_predictions.csv": {
+      "rows": 7474,
+      "unchanged": true
+    },
+    "data/labeled/comments_labeled.csv": {
+      "rows": 6289,
+      "unchanged": true
+    },
+    "data/final/comments_merged.csv": {
+      "rows": 38220,
+      "unchanged": true
+    },
+    "data/processed/v7_preprocessed.csv": {
+      "rows": 38233,
+      "unchanged": true
+    },
+    "project_source_utf8_and_python_syntax_valid": true,
+    "active_markdown_links_resolve": true,
+    "all_pipeline_packages_have_readme": true,
+    "modern_metrics_recomputed_from_all_test_predictions": {
+      "accuracy": 0.9634733743644635,
+      "precision": 0.8941860465116279,
+      "recall": 0.8086225026288117,
+      "f1": 0.8492545554942021,
+      "ap": 0.9107797708888891
+    },
+    "modern_confusion_matrix": [
+      [
+        6432,
+        91
+      ],
+      [
+        182,
+        769
+      ]
+    ],
+    "source_sample": "グエン・ヴィエ・ フイ cuối kỳ gánh hết",
+    "data_replacement_characters": {
+      "data/final/labeled_v7.csv": {
+        "text": 0,
+        "cleaned_text": 0
+      },
+      "data/labeled/comments_labeled.csv": {
+        "text": 0,
+        "cleaned_text": 0
+      }
+    },
+    "documentation_commands": {
+      "offline_readme_steps_match_notebook_01": true,
+      "labeled_rows": 6289,
+      "readme_external_inference_examples_passed": [
+        "S3 .venv",
+        "viBERT .venv-modern CPU"
+      ],
+      "cli_help_verified": [
+        "pipeline.collect.scrape_ptit_groups",
+        "pipeline.collect.json_to_csv",
+        "pipeline.prepare.clean_for_labeling",
+        "pipeline.label.ai_assisted_spam_ham",
+        "pipeline.label.upload_to_argilla",
+        "pipeline.label.auto_accept_labels",
+        "pipeline.label.download_labeled_data",
+        "tools.dataset_versions.merge_labeled_data",
+        "pipeline.modern.train"
+      ],
+      "live_collection_annotation_or_training_repeated": false
+    },
+    "modern_cpu_reload": {
+      "local_cpu_checked_rows": 64,
+      "label_disagreements": 0,
+      "max_probability_difference_from_gpu_fp16": 3.7617393008709116e-05,
+      "repeat_16_probabilities_identical": true,
+      "source_sample_id": "cmt_10948",
+      "source_text": "グエン・ヴィエ・ フイ cuối kỳ gánh hết",
+      "tokens": [
+        "[UNK]",
+        "[UNK]",
+        "[UNK]",
+        "[UNK]",
+        "[UNK]",
+        "cuối",
+        "kỳ",
+        "g",
+        "##ánh",
+        "hết"
+      ],
+      "unk_count": 5,
+      "model_training_repeated": false
+    },
+    "tests": {
+      "classic": {
+        "tests": 61,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "modern": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "collection": {
+      "posts": 2170,
+      "groups": 5,
+      "raw_rows": 13833,
+      "nonempty_rows": 13704,
+      "cleaned_rows": 10974,
+      "linked_prediction_count": 6571,
+      "labeled_rows": 6289,
+      "labels": {
+        "ham": 5190,
+        "spam": 1099
+      }
+    }
+  },
+  "known_limitations": [
+    "Windows joblib resource_tracker KeyError at kernel teardown; cells and saved results succeeded",
+    "No new Facebook, LLM, Argilla requests or Colab training in this review",
+    "One dataset/split/seed; unknown tokens and short context remain modeling limitations"
+  ]
+}

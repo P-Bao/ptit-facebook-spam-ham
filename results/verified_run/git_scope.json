@@ -1,9 +1,10 @@
 {
   "branch": "phi",
-  "initial_phi": "c4334f269bc9f99d91b5c025500559ffeeaa9b6d",
+  "initial_phi": "a94214fcf02117b4297df2546ddebb4164505df0",
   "protected_local_heads": {
     "master": "efc4fba2a6289936fdcd43f822698f251ee9e61f",
     "cuong": "efc4fba2a6289936fdcd43f822698f251ee9e61f"
   },
-  "allowed_push_refspec": "HEAD:refs/heads/phi"
+  "allowed_push_refspec": "HEAD:refs/heads/phi",
+  "review_scope": "notebook token explanation, current documentation and four-member study assignments"
 }

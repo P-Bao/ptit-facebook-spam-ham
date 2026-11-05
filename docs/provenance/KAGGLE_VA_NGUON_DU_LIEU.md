@@ -2,8 +2,8 @@
 
 # Đối chiếu Kaggle và xác minh nguồn dữ liệu
 
-Ghi chép đối chiếu ngày 04/11, trước lượt tái cấu trúc. Bản hiện tại gồm hai
-notebook import module repo; hướng dẫn mới ở `docs/guides/` và thay đổi ở
+Ghi chép đối chiếu ngày 04/11, trước lượt tái cấu trúc. Bản hiện tại gồm ba
+notebook import module repo, viBERT đã hoàn tất; hướng dẫn mới ở `docs/guides/` và thay đổi ở
 `docs/archive/changes/2026-11-05_TAI_CAU_TRUC_VA_DONG_BO.md`. Các so sánh phiên bản cũ
 dưới đây được giữ làm lịch sử, không phải yêu cầu còn nhúng module vào notebook.
 

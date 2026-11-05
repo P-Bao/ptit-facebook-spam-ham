@@ -1,5 +1,10 @@
 # Huấn luyện và trình bày viBERT trên Colab
 
+**Trạng thái:** đã train trên A100, tải model về và kiểm suy luận local.
+Muốn trình bày kết quả hiện có, đến mục “Review tại máy” bên dưới; không cần
+lặp lại toàn bộ phần cài/train. Luồng đầy đủ ba notebook và lệnh module nằm
+trong [README gốc](../../README.md).
+
 ## Môi trường và dữ liệu
 
 Giữ nguyên `.venv` truyền thống. `.venv-modern` kiểm tra/demo trên Python 3.12
@@ -51,6 +56,11 @@ drive.mount('/content/drive')
 Chuyển gói qua MCP, hoặc tải từ máy bằng `google.colab.files.upload()`, sau đó:
 
 ```python
+from google.colab import files
+files.upload()  # Chọn ptit_vibert_bundle.zip trên máy.
+```
+
+```python
 from pathlib import Path
 import zipfile, sys, subprocess, os
 PROJECT_ROOT = Path('/content/ptit-facebook-spam-ham')
@@ -74,6 +84,12 @@ RUN_DIR = '/content/drive/MyDrive/PTIT_SpamHam/viBERT/2026-11-05'
 `--stage all` thực hiện liên tiếp ba bước. Khi điều khiển qua MCP có thể chạy CLI
 bằng `subprocess.Popen`, ghi log vào `training.log`, theo dõi `state.json` và
 checkpoint; đây vẫn là huấn luyện thật. Không mở hai tiến trình vào cùng output.
+
+Đường dẫn trên là run đã hoàn tất của nhóm. Với một lần train độc lập, thay
+bằng thư mục mới (ví dụ `viBERT/new_run`) trước khi chạy; không dùng điểm test
+đã thấy để đổi tham số. Có thể chạy Notebook 03 trên Colab bằng cách đặt biến
+`SPAMHAM_VIBERT_OUTPUT` tới `RUN_DIR` trước cell cấu hình, đổi `MODE="train"`;
+CLI và notebook đều gọi `pipeline.modern.train.run_experiment()`.
 
 ## Lựa chọn và tiếp tục khi gián đoạn
 
@@ -156,3 +172,97 @@ dự đoán. Chỉ đổi MODE sang train khi muốn huấn luyện lại bằng
 Các `.bin` checkpoint optimizer trong thư mục huấn luyện dùng để resume;
 trọng số triển khai nằm trong `model.safetensors`, không phải `.joblib` của S3.
 Phần báo cáo học phần chưa được viết trong đợt triển khai này.
+
+## Chuyển model và kết quả từ Colab về máy
+
+Giữ bản run trên Drive. Để dùng lại chỉ cần model/tokenizer và các file kết
+quả phục vụ review; checkpoint optimizer/encoder tạm dùng resume có thể rất
+lớn, không cần tải về để demo. Khi muốn resume training, dùng checkpoint đầy
+đủ còn trên Drive, không dùng riêng model ZIP như một checkpoint optimizer.
+
+Tạo hai gói chuyển trong Colab nếu cần tải bằng trình duyệt:
+
+```python
+from pathlib import Path
+from google.colab import files
+import shutil, zipfile
+
+run = Path(RUN_DIR)
+model_zip = shutil.make_archive('/content/ptit_vibert_model', 'zip', root_dir=run / 'model')
+review_zip = Path('/content/ptit_vibert_review.zip')
+with zipfile.ZipFile(review_zip, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+    outputs = list(run.glob('*.csv')) + list(run.glob('*.json'))
+    outputs += list((run / 'figures').glob('*.png'))
+    outputs += list((run / 'selection').glob('*/training_history.csv'))
+    outputs += list((run / 'final_training').glob('training_history.csv'))
+    for path in outputs:
+        archive.write(path, path.relative_to(run))
+files.download(str(review_zip))
+files.download(model_zip)
+```
+
+Nếu trình duyệt chưa tải, mở bảng **Files** của Colab, vào `/content/`, chọn
+menu của file ZIP → **Download**; cho phép tải file nếu trình duyệt hỏi. Đây là
+gói chuyển nội bộ, không phải yêu cầu ZIP bài nộp.
+
+Tại máy, mở Terminal từ gốc repo. Model ZIP hiện tại của nhóm có trọng số ở
+ngay gốc ZIP, nên giải nén **vào `model/`**, không giải nén vào gốc repo:
+
+```powershell
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\ptit_vibert_model_20261105.zip" -DestinationPath artifacts/modern/vibert/model -Force
+```
+
+Với gói review tạo theo đoạn trên:
+
+```powershell
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\ptit_vibert_review.zip" -DestinationPath artifacts/modern/vibert -Force
+```
+
+Chỉ giải nén đè nếu đây là kết quả của cùng run muốn sử dụng. Với run khác,
+giữ thư mục riêng và đổi `SPAMHAM_VIBERT_OUTPUT` để tránh trộn model/lịch sử.
+
+## Review tại máy
+
+Cấu trúc tối thiểu phục vụ toàn bộ Notebook 03:
+
+```text
+artifacts/modern/vibert/
+  model/
+    model.safetensors
+    config.json
+    inference_config.json
+    tokenizer.json
+    tokenizer_config.json
+    special_tokens_map.json
+    vocab.txt
+  selection/
+    unweighted/training_history.csv
+    balanced/training_history.csv
+  figures/
+    confusion_vibert.png
+    pr_comparison.png
+  validation_metrics.csv
+  selected.json
+  run_config.json
+  verification.json
+  comparison_with_svm.csv
+  test_predictions.csv
+```
+
+Các file `metrics.csv`, `split_ids.csv`, `split_summary.csv`, `smoke.json` và
+trạng thái cũng nên giữ để kiểm tra kết quả. `training_args.bin` là metadata
+huấn luyện; `VibertPredictor` không nạp file này để suy luận. Đầu vào v7 vẫn
+nằm tại `data/final/labeled_v7.csv`.
+
+Mở Notebook 03 → chọn kernel `.venv-modern` → giữ `MODE="review"` → Restart
+Kernel → Run All. Hoặc dùng runner bằng chính Python `.venv-modern` như lệnh
+ở trên. Review xử lý dữ liệu/tokenizer, đọc lịch sử/test, nạp model và tính
+dự đoán demo; không gọi lại các epoch train.
+
+Xem [cách đọc token](DOC_TOKEN_VA_KET_QUA.md) nếu thấy `##`/`[UNK]`. Đó không
+phải lỗi font. M1 dùng `text` gốc nên giữ cả ký tự nước ngoài có sẵn trong CSV.
+Số mẫu quá 128 token và số token `[UNK]` là hai đại lượng khác nhau.
+
+Để dự đoán bằng code bên ngoài notebook, dùng `VibertPredictor` trong
+`pipeline/modern/predict.py`; ví dụ Terminal ở [README mục 8](../../README.md#8-dự-đoán-bằng-module-bên-ngoài).
+Để chạy 01/02, quay về `.venv`; không áp môi trường modern cho toàn project.

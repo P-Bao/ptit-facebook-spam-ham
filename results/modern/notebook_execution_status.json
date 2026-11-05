@@ -1,6 +1,6 @@
 {
   "success": true,
-  "seconds": 10.41,
+  "seconds": 12.95,
   "notebook": "notebooks\\03_vibert.ipynb",
   "isolated_kernel": true,
   "uses_project_modules": true,

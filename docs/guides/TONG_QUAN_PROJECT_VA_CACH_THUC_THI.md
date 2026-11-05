@@ -1,240 +1,220 @@
 # Tổng quan project và luồng thực hiện
 
-## Mục tiêu
+Project phân loại bình luận Facebook của sinh viên PTIT thành **ham** (bình
+luận thông thường) và **spam** (nội dung rác/chào mời). Ba notebook đi từ dữ
+liệu, gán nhãn đến mô hình truyền thống và viBERT; kết quả cuối dùng để đánh
+giá phương pháp và dự đoán bình luận mới.
 
-Phân loại bình luận Facebook của sinh viên PTIT thành **ham** (bình luận thông
-thường) và **spam** (nội dung rác hoặc chào mời). Project trình bày quá trình chuẩn
-bị dữ liệu, xử lý tiếng Việt, biểu diễn văn bản, huấn luyện, đánh giá và ứng dụng
-mô hình cho bình luận mới. Nhóm gồm Bảo, Cương, Phi, Phương.
+```mermaid
+flowchart TD
+    A["JSON thu thập + chỉ mục/gợi ý nhãn đã lưu"] --> N1["01: chuyển bảng → làm sạch → tiếp nhận nhãn"]
+    N1 --> CSV["data/labeled/comments_labeled.csv"]
+    V7["data/final/labeled_v7.csv"] --> N2["02: token hóa → CV → đánh giá truyền thống"]
+    N2 --> S3["S3: pipeline và ngưỡng trong .joblib"]
+    V7 --> N3["03: tokenizer → fine-tune Colab → đánh giá viBERT"]
+    N3 --> M1["M1: safetensors + tokenizer/config"]
+    S3 --> C["Đối chiếu cùng 7.474 ID test; dự đoán bình luận mới"]
+    M1 --> C
+```
 
-## Các notebook
+Sơ đồ mô tả luồng xây dựng/thực nghiệm; Notebook 03 mặc định review kết quả
+và checkpoint đã train thay vì chạy lại fine-tune. Hai đầu vào CSV và v7 không
+được tự thay thế cho nhau khi chạy notebook.
 
-| Notebook | Nội dung | Kết quả chính |
+## 1. Đọc project theo thứ tự nào?
+
+| Tài liệu | Dùng khi nào? |
+|---|---|
+| [README gốc](../../README.md) | Cài môi trường, chọn kernel, chạy từng lệnh hoặc từng notebook |
+| Tài liệu này | Hiểu toàn bộ luồng, đầu vào/đầu ra và kết quả |
+| [Danh mục pipeline](../../pipeline/README.md) | Vai trò từng module; mở README con để đọc từng file/hàm |
+| [Lộ trình trình bày](../presentation/LO_TRINH_TRINH_BAY.md) | Mục notebook nào mở đoạn code nào |
+| [Phân công học](../team/TEAM_ASSIGNMENTS.md) | Từng thành viên cần hiểu lý thuyết, code và output nào |
+
+## 2. Các thư mục và file ở gốc
+
+| Thư mục/file | Vai trò |
+|---|---|
+| `notebooks/` | 01: thu thập/chuẩn bị nhãn; 02: thực nghiệm truyền thống; 03: viBERT |
+| `pipeline/` | Mã xử lý, huấn luyện, suy luận và hiển thị dùng chung; mỗi thư mục con có README |
+| `external/facebook_scraper/` | Mã nền crawler được bàn giao, dựa trên repo tham khảo. `group_post_scraper_v2.py` lấy bài; `main.py`/`comment_scraper.py` lấy comment/reply; các module ảnh, proxy, GUI hỗ trợ các nhánh khác, không đều được dùng trong notebook |
+| `data/` | CSV làm việc và đầu vào thực nghiệm; không đưa Git |
+| `artifacts/` | Mô hình đã học, dự đoán theo ID, lịch sử và hình; không đưa Git |
+| `results/` | Bảng kết quả và bằng chứng kiểm tra nhỏ để theo dõi trong Git |
+| `tests/` | Kiểm thử hàm/module bằng dữ liệu nhỏ; không phải dữ liệu huấn luyện thực nghiệm |
+| `scripts/run_notebook.py` | Điều phối cả notebook trong kernel mới, dùng đúng Python gọi lệnh |
+| `scripts/check_environment.py` | Kiểm Python và phiên bản đã pin của môi trường truyền thống |
+| `scripts/prepare_colab_bundle.py` | Gói code, v7 và dự đoán S3 để chuyển nội bộ lên Colab; không đóng gói phiên/API |
+| `tools/dataset_versions/` | `merge_labeled_data.py` tạo CSV tổng hợp riêng; `audit_source.py` đối soát nguồn khi cần. Không tham gia fit mô hình |
+| `requirements/` | `notebook.txt`: 01/02; `collection.txt`/`annotation.txt`: dịch vụ; `dev.txt`: test; `modern.txt`: review local; `modern-colab.txt`: train GPU |
+| `docs/` | Hướng dẫn, phân công, nguồn tham khảo, ảnh đề và tài liệu lịch sử |
+| `.cache/collection/` | JSON thu thập, chỉ mục ID và phản hồi gán nhãn đã lưu cho Notebook 01 |
+| `.work/` | Kernel/runtime, notebook thực thi, file kiểm thử/gói chuyển tạm; không phải nơi lưu model cuối |
+| `.venv/`, `.venv-modern/` | Hai môi trường Python riêng, tránh xung đột dependency |
+| `.gitignore`, `pytest.ini` | Loại file local khỏi Git; cấu hình tìm test/import |
+
+`__init__.py` tạo package, không phải bước chạy. README trong từng package mô
+tả thứ tự gọi hàm. Không cần chạy lần lượt tất cả file `.py` trong một folder.
+
+## 3. Notebook 01 — Thu thập và chuẩn bị dữ liệu
+
+Các đường dẫn module trong bảng tính từ `pipeline/`.
+
+| Mục | File/hàm đi qua | Công việc và đầu ra |
 |---|---|---|
-| [01_thu_thap_va_gan_nhan.ipynb](../../notebooks/01_thu_thap_va_gan_nhan.ipynb) | Nguồn thu thập → bài/comment/reply → JSON thành bảng → làm sạch → gán nhãn → xuất CSV | `comments_labeled.csv`, thống kê và ví dụ dữ liệu |
-| [02_thuc_nghiem_va_demo.ipynb](../../notebooks/02_thuc_nghiem_va_demo.ipynb) | Khảo sát v7 → tiền xử lý → chia tập/CV → đặc trưng và mô hình → đánh giá → dự đoán | Model `.joblib`, bảng chỉ số, biểu đồ, phân tích lỗi và demo |
-| [03_vibert.ipynb](../../notebooks/03_vibert.ipynb) | Tokenization → fine-tune hai loss → chọn bằng validation → fit toàn bộ train → test chung với S3 → demo | Model safetensors/tokenizer, lịch sử, metrics và dự đoán theo ID |
+| 1. Cấu hình | `scripts/check_environment.py` ở gốc repo | Kiểm `.venv`, đặt nguồn `.cache/collection/` và đầu ra `data/` |
+| 2. Thu thập | `collect/scrape_ptit_groups.py`: `run_scraper`, `on_batch`, `SingleFileWriter.save_records`; mã nền `external/facebook_scraper/` ở gốc repo | Giải thích nhóm → bài → comment/reply → JSON. Cell đọc JSON đã lưu, hiện group/link/bình luận thực tế |
+| 3. Chuẩn hóa cấu trúc | `collect/json_to_csv.py`: `flatten_posts` | Comment/reply thành từng dòng, bỏ text rỗng → `data/intermediate/comments.csv` |
+| 4. Làm sạch/định danh | `prepare/clean_for_labeling.py`: `clean_facebook_comments`; `label/cached_annotations.py`: `attach_annotation_ids` | Giữ `text`, tạo `cleaned_text`, khử trùng/lọc, nối ID đúng → `comments_cleaned.csv` |
+| 5. Nhãn | `label/ai_assisted_spam_ham.py`: mã tạo gợi ý; `auto_accept_labels.py`: CLI được cell gọi | Áp ngưỡng confidence 0,75 → `annotation_predictions.json`, `annotation_review.csv` |
+| 6. Xuất dữ liệu | Cell lọc `official_label`, đổi tên cột và `to_csv` | Chỉ giữ ham/spam đủ điều kiện → `data/labeled/comments_labeled.csv`; ghi `data/collection_manifest.json` |
 
-Notebook 01 tái lập xử lý từ kết quả thu thập và phản hồi gán nhãn đã lưu, không
-gọi Facebook/LLM/Argilla. Notebook 02 thực hiện huấn luyện khi chạy toàn bộ cell.
-Các khối “Mã nguồn” chỉ đọc và hiển thị hàm; các cell xử lý dữ liệu, gọi CLI và
-huấn luyện mới thực thi công việc tương ứng.
+Chạy Notebook 01 có thực hiện chuyển bảng, làm sạch, nối gợi ý, tiếp nhận nhãn
+và ghi lại CSV. **Không gọi lại Facebook/LLM/Argilla.** Khối trích mã crawler/AI
+giải thích cách thu thập/gán nhãn qua dịch vụ. Nếu cần dữ liệu mới, chạy các CLI
+có phiên/API theo README; số mẫu mới phụ thuộc nguồn hiện tại.
 
-## Cấu trúc thư mục và vai trò các file
+Kết quả hiện tại: **5 nhóm, 2.170 bài → 13.833 comment/reply → 13.704 text không
+rỗng → 10.974 mẫu sau làm sạch → 6.571 gợi ý khớp → 6.289 mẫu được tiếp nhận**
+(5.190 ham, 1.099 spam). CSV có ID, metadata bài/nhóm, `text`, `cleaned_text`,
+nhãn và confidence. Không tự gán ham cho mẫu thiếu gợi ý/chưa đạt ngưỡng.
 
-| Thư mục | File chính và nhiệm vụ |
+Tool `merge_labeled_data.py` là tiện ích ngoài notebook: đọc CSV có sẵn và CSV
+vừa xuất, ghi `data/final/comments_merged.csv`. File này không ghi đè v7 và
+không phải bước bắt buộc trước mỗi lần chạy Notebook 02.
+
+## 4. Notebook 02 — Thực nghiệm truyền thống và ứng dụng
+
+Đầu vào cố định là **`data/final/labeled_v7.csv`**, 38.233 bình luận: 32.907 ham
+(86,07%), 5.326 spam (13,93%). Notebook không tự đổi đầu vào khi chạy Notebook 01.
+
+| Mục | Mã nguồn trong `pipeline/` | Công việc/đầu ra |
+|---|---|---|
+| 1–2. Môi trường/khảo sát | Cell notebook và checker ở `scripts/` | Kiểm phiên bản, ID/nhãn, hiện bình luận thật, tỷ lệ và độ dài |
+| 3. Tiền xử lý | `prepare/preprocess_for_model.py`: `preprocess` | Chuẩn hóa, xử lý tên/URL/điện thoại/emoji, underthesea; lưu toàn bộ hai cột giữ/bỏ từ dừng vào `data/processed/v7_preprocessed.csv` và đọc lại |
+| 4. Thiết kế | `modeling/training_utils.py`: `norm_key`, `bucket`, `grouped_folds` | Nhóm văn bản, chia 30.759 train/7.474 test; CV năm fold trên train |
+| 5. Huấn luyện | `modeling/experiments.py`: `make_pipe`, `fit_experiment`; `features/spam_features.py`: `FastTextVectorizer` | Đối chiếu từ dừng bằng CV; chọn giữ từ dừng, so sánh B1–B6: BoW/TF-IDF/FastText × NB/SVM |
+| 5.1. Mất cân bằng | `fit_experiment`, `undersampled_search`, `tune_svm_threshold` | Cố định TF-IDF+SVM; B4 đối chứng, S1 balanced, S2 giảm ham 2:1, S3 chỉnh ngưỡng OOF |
+| 5.2. viBERT | Trích `modern/train.py`: `load_pretrained` | Giới thiệu nhánh hiện đại; không train viBERT trong Notebook 02 |
+| 6–6.3. Đánh giá | `experiments.evaluate`, `boot_ci` và cell vẽ hình | Test, FP/FN, ma trận, PR/AP và bootstrap F1 cho chín ứng viên |
+| 6.4. Đối chiếu M1 | Đọc `results/modern/` ở gốc repo | Bảng test viBERT–S3 đã xác nhận, không gọi fine-tune |
+| 7. Phân tích | Cell hệ số/lỗi | Ví dụ của **cấu hình được chọn bằng CV**, giữ ID/text/nhãn/score |
+| 8–9. Lưu/demo/nhận xét | `joblib.dump/load`; `inference/predict.py`: `predict_spam` | Lưu S3, nạp lại kiểm tra và phân loại bình luận mới bằng cùng ngưỡng |
+
+**CV và test:** mỗi lượt CV học trên bốn fold train, đo fold validation còn
+lại; trung bình F1 spam dùng chọn cấu hình. Sau đó fit toàn bộ train và đo test
+để báo cáo. Từ vựng, IDF, FastText, scaler và lấy mẫu chỉ học/thực hiện trong
+phần train được phép. CV phục vụ lựa chọn, chưa phải nested CV độc lập.
+
+**Mất cân bằng:** ba chiến lược được thử riêng. Balanced tăng trọng số lỗi của
+spam; under-sampling giảm ham chỉ trong train; ngưỡng thay đổi quyết định,
+không thay đổi số mẫu. B4 xuất hiện ở cả bảng sáu tổ hợp và bảng bốn chiến lược
+nhưng chỉ là một ứng viên: **6 + 3 = 9**, không phải mười mô hình khác nhau.
+
+S3 được chọn theo CV F1 **0,7876**, giữ từ dừng, C=0,3, n-gram=(1,2), ngưỡng
+**−0,1776**; không trọng số và không lấy mẫu lại. Ngưỡng âm là decision score
+SVM, không phải xác suất âm. Test F1 **0,7552**, Precision **0,8374**, Recall
+**0,6877**. S3 chỉ nhỉnh hơn S2 (F1 0,7542); chưa đủ kết luận vượt trội về
+thống kê. Không có mô hình truyền thống đứng đầu mọi chỉ số.
+
+## 5. Notebook 03 — viBERT
+
+| Mục | File/hàm trong `pipeline/modern/` | Công việc/đầu ra |
+|---|---|---|
+| 1–2. Môi trường/dữ liệu | `data.py`: `prepare_data`, `split_summary` | `.venv-modern` local hoặc Colab GPU; giữ test của 02. Trong train: 24.815 fit, 5.944 validation |
+| 3. Tokenization | `normalize_text`, tokenizer cased | Text gốc → NFC/HTML/khoảng trắng → WordPiece, ID/mask/padding; giữ case/từ dừng; max length 128 |
+| 4. Xây dựng | `train.py`: `load_pretrained` | Nạp encoder `FPTAI/vibert-base-cased`, thêm head hai lớp; fine-tune encoder và head |
+| 5. Huấn luyện | `ClassificationTrainer`, `fit_variant`, `select`, `finalize` | So hai loss bằng validation, chọn loss/epoch; khởi tạo lại pretrained và fit toàn bộ train |
+| 6. Đánh giá | `compare_with_svm`, `draw_figures` | Cùng 7.474 ID/nhãn test với S3; bảng metrics, ma trận và PR |
+| 7. Phân tích | Cell đọc `test_predictions.csv` | FP/FN của **M1**, text gốc và xác suất spam |
+| 8–9. Lưu/demo/nhận xét | `save_pretrained`; `predict.py`: `VibertPredictor` | Nạp trọng số/tokenizer, kiểm tra nạp lại và dự đoán bình luận mới |
+
+**`MODE="train"`** gọi fine-tune trên GPU; **`MODE="review"`** đọc lịch sử/kết
+quả và chạy suy luận từ model đã lưu. Notebook mặc định review. Không gọi việc
+đọc bảng là huấn luyện lại.
+
+Đã train trên Colab **A100 80 GB**. Loss thường/epoch 3 được validation chọn
+(F1 0,82048 so với 0,81916 của balanced). Sau đó fit lại 30.759 train và đo test.
+Ngưỡng xác suất spam cố định 0,5. Validation F1 một fold của viBERT không tương
+đương CV F1 năm fold của SVM; bảng đối chiếu chỉ dùng test.
+
+`##`, `[CLS]`, `[SEP]` là ký hiệu WordPiece/BERT. `[UNK]` cho biết phần nội dung
+không biểu diễn được bằng từ vựng hiện có; tên nước ngoài có thể có nhiều
+`[UNK]`. Đây không phải lỗi font. Xem [cách đọc token](DOC_TOKEN_VA_KET_QUA.md).
+
+## 6. Kết quả cuối và giới hạn
+
+| Cấu hình | Accuracy | Precision spam | Recall spam | F1 spam | AP | FP / FN |
+|---|---:|---:|---:|---:|---:|---|
+| S3 — TF-IDF+SVM chỉnh ngưỡng | 0,9433 | 0,8374 | 0,6877 | 0,7552 | 0,8117 | 127 / 297 |
+| M1 — viBERT | **0,9635** | **0,8942** | **0,8086** | **0,8493** | **0,9108** | **91 / 182** |
+
+M1 bắt thêm 115 spam và giảm 36 ham nhận nhầm trên cùng test. Kết quả không chỉ
+là Accuracy cao do lớp ham nhiều. Chưa bảo đảm đúng với mọi bình luận hoặc
+Facebook ở thời điểm/nhóm khác.
+
+Giới hạn: chất lượng nhãn hiện có; bình luận gần trùng/phụ thuộc ngữ cảnh;
+tên riêng/teencode/ký tự ngoài từ vựng; câu quá ngắn/chỉ dấu câu; chưa đánh giá
+nhiều seed hoặc test độc lập theo thời gian/nhóm. Xác suất viBERT có thể cao dù
+sai, chưa calibration. Chia nhóm văn bản hạn chế trùng theo khóa, không chứng
+minh loại hết mọi dạng rò rỉ hoặc ngữ cảnh chung.
+
+## 7. File kết quả nằm ở đâu?
+
+| Đường dẫn | Nội dung và cách dùng |
 |---|---|
-| `notebooks/` | Ba notebook tổ chức thu thập, thực nghiệm truyền thống và fine-tune viBERT. |
-| `external/facebook_scraper/` | Bộ mã nền thu thập: `group_post_scraper_v2.py` lấy bài nhóm; `main.py` điều phối lấy comment/reply; `comment_scraper.py` xử lý bình luận. `post_scraper.py`, `single_post_image.py` hỗ trợ các nhánh lấy bài/ảnh; `proxy_utils.py` hỗ trợ kết nối; `facebook_ui.py` là GUI tùy chọn. README, requirements và `.env.example` hướng dẫn bộ công cụ. |
-| `pipeline/collect/` | `scrape_ptit_groups.py`: runner PTIT, cấu hình nhóm, gọi bộ nền và ghi JSON/state. `json_to_csv.py`: làm phẳng comment/reply thành bảng. Notebook 01 đọc trực tiếp các file local trong `.cache/collection/`. |
-| `pipeline/prepare/` | `clean_for_labeling.py`: làm sạch bảng, khử trùng/lọc và giữ text gốc. `preprocess_for_model.py`: chuẩn hóa đầu vào mô hình, xử lý tên/URL/điện thoại/emoji, tách từ và stop words. |
-| `pipeline/label/` | `upload_to_argilla.py`: đưa record lên giao diện nhãn. `ai_assisted_spam_ham.py`: tạo gợi ý label/confidence. `auto_accept_labels.py`: tiếp nhận gợi ý theo ngưỡng. `download_labeled_data.py`: xuất nhãn đã duyệt. `label_utils.py`: kiểm ID/nhãn và metadata. `cached_annotations.py`: nối gợi ý với đúng bình luận theo nội dung, không dựa vào vị trí dòng. |
-| `pipeline/features/` | `spam_features.py`: FastTextVectorizer, học embedding và tổng hợp vector câu. BoW/TF-IDF sử dụng vectorizer của scikit-learn trong `modeling/`. |
-| `pipeline/modeling/` | `experiments.py`: tạo pipeline BoW/TF-IDF/FastText + NB/SVM, tìm tham số và đánh giá. `training_utils.py`: chia nhóm/fold, sampling trong train, chỉnh ngưỡng và hỗ trợ dự đoán. |
-| `pipeline/inference/` | `predict.py`: nhận bình luận mới và bundle đã huấn luyện, tiền xử lý nhất quán rồi trả nhãn/score. |
-| `pipeline/presentation/` | `notebook_display.py`: bảng, mã nguồn và thông tin file có màu tương phản; không thay đổi dữ liệu hoặc dự đoán. |
-| `pipeline/modern/` | `data.py`: chuẩn hóa nhẹ và chia tập cùng baseline. `train.py`: fine-tune, chọn validation, fit cuối và test. `predict.py`: nạp model/tokenizer để dự đoán. `vibert_config.json`: cấu hình. |
-| `tools/dataset_versions/` | `merge_labeled_data.py`: gộp CSV có sẵn với đầu ra notebook 01 → `data/final/comments_merged.csv`. `audit_source.py`: đối chiếu bundle nguồn khi cần kiểm tra nội bộ. |
-| `scripts/` | `run_notebook.py`: chạy 01/02/03 trong kernel mới bằng môi trường được chọn. `check_environment.py`: kiểm `.venv` truyền thống. `prepare_colab_bundle.py`: gói code và dữ liệu cần cho viBERT để chuyển sang Colab. |
-| `requirements/` | `notebook.txt`: 01/02; `collection.txt`: crawler; `annotation.txt`: nhãn; `dev.txt`: kiểm thử; `modern.txt`: viBERT local Python 3.12; `modern-colab.txt`: viBERT Colab Python 3.13. |
-| `tests/` | Các file `test_*.py` kiểm tra dữ liệu, ID/nhãn, liên kết cache, tiền xử lý, CV, lưu/tải/dự đoán và hiển thị. `test_notebook_runner.py` kiểm tra đường dẫn CSV local, đầu ra và đóng kernel. |
-| `data/` | `intermediate/`: đầu ra trung gian notebook 01; `processed/v7_preprocessed.csv`: v7 và các cột token cho mô hình; `labeled/comments_labeled.csv`: CSV mới; `labeled/comments_labeled_phase1.csv`: CSV có sẵn; `final/comments_merged.csv`: bản tool tạo; `final/labeled_v7.csv`: đầu vào thực nghiệm local. |
-| `artifacts/`, `.cache/`, `.work/` | `artifacts/spamham/`: model và kết quả huấn luyện; `.cache/collection/`: đầu vào tái lập; `.work/`: runtime/test tạm. Không đưa vào Git. `.venv/` chứa môi trường Python. |
-| `results/` | `verified_run/`: bằng chứng lần chạy hiện tại; `source_audit/`: hồ sơ kiểm chứng nguồn; `history/`: bằng chứng các phiên bản trước. |
-| `docs/` | `assignment/`: ảnh đề; `team/`: phân công; `guides/`: hướng dẫn; `presentation/`: lộ trình mở code; `provenance/`: hồ sơ nguồn; `archive/`: tài liệu cũ đã gom lại; `report/`: dành cho báo cáo. |
+| `data/intermediate/`, `data/labeled/` | Bảng trung gian và CSV cuối Notebook 01 |
+| `data/final/labeled_v7.csv` | Đầu vào cố định của 02/03 |
+| `data/processed/v7_preprocessed.csv` | Toàn bộ v7 kèm hai chuỗi token truyền thống |
+| `data/processed/vibert_split.csv` | ID và vai trò tập dữ liệu của viBERT |
+| `artifacts/spamham/` | S3 `.joblib` và dự đoán theo ID của S3; metrics/CV/bootstrap của chín cấu hình, manifest và hình |
+| `artifacts/modern/vibert/` | `model/`, lịch sử hai loss/final train, split, metrics, dự đoán theo ID, hình và trạng thái |
+| `results/verified_run/` | Bằng chứng chạy/kiểm thử truyền thống; xem phạm vi/thời điểm từng JSON |
+| `results/modern/` | Bảng so sánh/kiểm tra viBERT; không chứa trọng số |
+| `results/source_audit/`, `results/history/` | Hồ sơ nguồn và bằng chứng cũ; không phải đầu vào train |
 
-Các file `__init__.py` tạo package để import. `.gitignore` loại dữ liệu, môi trường,
-model và cache khỏi Git; `.env.example` là mẫu cấu hình, không chứa phiên đăng nhập.
-`pytest.ini` cấu hình thư mục kiểm thử và đường dẫn import từ gốc project.
+`.py` chứa cách xây dựng; đối tượng sau `.fit()` chứa trạng thái đã học;
+`.joblib` (S3) hoặc `model.safetensors` kèm tokenizer/config (M1) lưu trạng thái
+đó để dùng lại. Không tải viBERT bằng `joblib.load()`.
 
-## Luồng thực hiện
+`data/`, `artifacts/`, môi trường/cache không được push Git. Máy thành viên cần
+được cung cấp thêm đầu vào/model đúng đường dẫn. Xem README để chạy offline
+hoặc thu thập/gán nhãn/huấn luyện lại qua dịch vụ.
 
-1. **Thu thập:** `scrape_ptit_groups.py` nhận cấu hình nhóm/phiên, gọi
-   `group_post_scraper_v2.py` lấy bài, `main.py` và `comment_scraper.py` lấy comment/reply.
-   Writer lưu metadata và nội dung vào `data/raw/posts.json` khi chạy crawler.
-2. **Tạo bảng:** `json_to_csv.py` chuyển cấu trúc JSON thành từng dòng bình luận,
-   giữ post/group/thời gian/loại nội dung → `comments.csv`.
-3. **Làm sạch:** `clean_for_labeling.py` chuẩn hóa và lọc dữ liệu, giữ `text`, thêm
-   `cleaned_text` → `comments_cleaned.csv`. Đây là chuẩn bị dữ liệu để gán nhãn.
-4. **Gán nhãn:** công cụ AI tạo gợi ý; `auto_accept_labels.py` áp ngưỡng hoặc
-   người duyệt trên Argilla. Xuất các mẫu đủ điều kiện → `comments_labeled.csv`.
-   Notebook sử dụng gợi ý đã lưu, liên kết bằng `cached_annotations.py` trước khi tiếp nhận.
+## 8. Đối chiếu đề bài
 
-**Tổng hợp dữ liệu:** sau notebook 01, chạy
-   `.\.venv\Scripts\python.exe -m tools.dataset_versions.merge_labeled_data`
-   để gộp `data/labeled/comments_labeled_phase1.csv` với `data/labeled/comments_labeled.csv`,
-   xuất `data/final/comments_merged.csv`. Đây là thao tác riêng bên ngoài notebook.
+Theo [ảnh đề](../assignment/de_bai.png): đã có nguồn bình luận PTIT và nhãn
+spam/ham; làm sạch/tách từ và khảo sát từ dừng; ba biểu diễn (vượt mức ít nhất
+hai); NB/SVM, chia train/test; Accuracy/Precision/Recall/F1, confusion matrix
+và so sánh phương pháp; viBERT cho phần mô hình hiện đại bổ sung.
 
-5. **Chuẩn bị thực nghiệm:** notebook 02 đọc `data/final/labeled_v7.csv`, kiểm
-   cấu trúc/nhãn, gọi `preprocess_for_model.py` để tách từ và tạo hai cấu hình
-   giữ/bỏ stop words. Ghi `data/processed/v7_preprocessed.csv` rồi đọc lại các cột token
-   để huấn luyện. Giữ nguyên ID, nội dung nguồn và nhãn.
-6. **Huấn luyện:** chia train/test theo khóa văn bản, CV 5 fold trên train;
-   `experiments.py` đối chiếu hai cấu hình từ dừng trên sáu tổ hợp, chọn tiền xử lý
-   bằng CV rồi khảo sát ba chiến lược bổ sung trên TF-IDF + SVM. Mỗi ứng viên
-   có CV Precision/Recall/F1; F1 spam là tiêu chí lựa chọn.
-   Vectorizer, IDF và FastText chỉ được học trong phần train tương ứng.
-7. **Đánh giá:** chọn cấu hình theo CV, đo trên test; báo cáo Accuracy,
-   Precision/Recall/F1 spam, AP, ma trận nhầm lẫn, PR và phân tích FP/FN.
-   Bảng test gồm sáu cấu hình cơ sở và ba cấu hình bổ sung; cấu hình TF-IDF + SVM
-   không điều chỉnh được dùng lại làm đối chứng, không huấn luyện trùng thành ứng viên mới.
-8. **Lưu và ứng dụng:** notebook lưu `spam_ham_ml_only.joblib`; `predict.py` tải
-   bundle, áp dụng cùng tiền xử lý và dự đoán bình luận mới. Kiểm tra tải lại không đổi kết quả.
+CV, bootstrap, PR/AP và các chiến lược cân bằng/ngưỡng là phần tăng chất lượng
+thực nghiệm, đề không liệt kê bắt buộc từng kỹ thuật này. Trình bày rõ mục
+đích và giới hạn của chúng.
 
-## Cách chạy và đầu ra
+**Code và thực nghiệm đã đáp ứng các đầu mục kỹ thuật; báo cáo học phần chưa
+viết.** Cần hoàn thiện báo cáo và hình thức bài nộp trước khi chốt toàn bộ môn học.
 
-Các bước cài môi trường, chọn kernel VS Code và lệnh chạy lần lượt nằm trong
-[README ở gốc project](../../README.md). Chạy notebook 01 trước, chạy tool gộp,
-rồi chạy notebook 02 khi cần huấn luyện/đánh giá lại.
+## 9. Rà soát bản hiện tại
 
-| Bước | Đầu ra |
-|---|---|
-| Notebook 01 | `data/intermediate/comments.csv`, `comments_cleaned.csv`, `annotation_predictions.json`, `annotation_review.csv`; CSV cuối `data/labeled/comments_labeled.csv`; `data/collection_manifest.json`. |
-| Tool gộp | `data/final/comments_merged.csv`, tạo từ CSV có sẵn và CSV vừa xuất. |
-| Notebook 02 | `data/processed/v7_preprocessed.csv`; trong `artifacts/spamham/` có model `.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`, `stopword_cv.csv`, `imbalance_cv.csv`, `imbalance_comparison.csv`, `test_predictions.csv` và sáu hình số mẫu/trọng số, kết quả chiến lược, ma trận và PR. Công thức tên hình xem README. Notebook kiểm tra dự đoán từ raw text và sau nạp bundle trên toàn bộ test. |
+Lượt rà soát ngày 05–06/11/2026 chạy lại **01 (6 cell code), 02 (19 cell code)
+và 03 review (9 cell code)**, không có lỗi trong cell. 01 hoàn tất 3,80 giây,
+02 khoảng 613,62 giây, 03 review 12,95 giây trên máy hiện tại; thời gian không
+phải chỉ số chất lượng mô hình.
 
-Notebook 01 không cần cookie/API. Crawler và công cụ nhãn qua dịch vụ có bộ
-requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính không đặt ở đó.
+- Cả chín dòng chỉ số/tham số truyền thống khớp lần trước, bỏ qua thời gian;
+  CSV có nhãn, CSV token và 7.474 dự đoán S3 giữ nguyên.
+- Tính lại metrics viBERT từ toàn bộ dự đoán test cho đúng bảng đã báo cáo;
+  nạp lại CPU trên 64 mẫu không khác nhãn so GPU, suy luận lặp 16 mẫu giữ điểm.
+- Bộ kiểm thử chính: 60 đạt, một test torch bỏ qua trong `.venv`; chạy riêng
+  môi trường modern có 4/4 đạt. Một cảnh báo deprecation của Argilla/Pydantic.
+- Các bước offline và ví dụ suy luận trong README đã chạy thử. Link Markdown
+  hiện hành, cú pháp Python và UTF-8 được kiểm tra. `text`/`cleaned_text` trong
+  v7 và CSV Notebook 01 không có ký tự thay thế Unicode U+FFFD.
 
-## Kết quả và giới hạn
-
-- Notebook 01: 5 nhóm, 2.170 bài, 13.833 comment/reply; 13.704 nội dung không rỗng,
-  10.974 mẫu sau làm sạch. Có 6.571 gợi ý khớp; ngưỡng 0,75 tiếp nhận 6.289 mẫu
-  (5.190 ham, 1.099 spam). Mẫu thiếu gợi ý hoặc chưa đạt ngưỡng không nằm trong CSV có nhãn.
-- CSV có sẵn có 31.931 mẫu; tool gộp với 6.289 mẫu mới tạo thành **38.220 mẫu**.
-- Notebook 02: v7 có 38.233 mẫu; train 30.759, test 7.474. Cấu hình **S3 — TF-IDF
-  + SVM, giữ từ dừng, điều chỉnh ngưỡng** được chọn theo CV F1 **0,7876**. Ngưỡng
-  decision score **−0,1776**; không dùng trọng số lớp hoặc lấy mẫu lại. Test:
-  Accuracy **94,33%**, Precision spam **83,74%**, Recall spam **68,77%**, F1 spam
-  **0,7552**, AP **0,8117**. So với ngưỡng 0, spam bỏ sót giảm từ 354 xuống 297,
-  ham nhận nhầm tăng từ 80 lên 127. Đây là đánh đổi cần nêu khi trình bày.
-- Độ chính xác tổng thể cần đọc cùng Recall/F1 vì dữ liệu lệch lớp. Mô hình còn
-  bỏ sót spam và có lỗi ở bình luận ngắn/phụ thuộc ngữ cảnh. Demo là ví dụ ứng dụng,
-  không thay thế tập test. Nhánh viBERT có quy trình fine-tune riêng và so sánh trên cùng test.
-
-## Mã mô hình và mô hình đã huấn luyện
-
-| Thành phần | Ý nghĩa |
-|---|---|
-| `.py` trong `pipeline/modeling/` | Mã định nghĩa, cấu hình và hàm huấn luyện; bản thân file không chứa trọng số học được. |
-| Đối tượng sau `.fit()` | Mô hình đã học nằm trong bộ nhớ, gồm vectorizer và tham số/trọng số. |
-| `spam_ham_ml_only.joblib` trong thư mục đầu ra | Bản lưu của mô hình đã học, kèm cấu hình để tải lại và dự đoán. |
-| `pipeline/modern/` | Mã fine-tune và dự đoán viBERT; trọng số/tokenizer đã học lưu trong `artifacts/modern/vibert/model/`, không nằm trong file `.py`. |
-
-Yêu cầu xây dựng và huấn luyện được thể hiện bằng mã cùng kết quả thực thi,
-không phụ thuộc tên thư mục hay đuôi file. Cả mô hình cơ sở và mô hình hiện đại
-đều có mã xây dựng, bước học và trạng thái đã học cần lưu nếu muốn tái sử dụng.
-
-Theo phạm vi đã thống nhất, báo cáo là tài liệu nộp; notebook và các module dùng
-để trình bày/demo. Để người khác chạy lại, cần repo, môi trường và dữ liệu tương ứng.
-
-## Dữ liệu trước và sau tiền xử lý
-
-Mục 2 notebook 02 hiển thị bình luận từ v7, với ID, nhãn, text gốc, text đã làm
-sạch và loại bình luận. Mục 3 dùng cùng các ID để so sánh thêm hai cột token:
-`tokens_keep_stopwords` và `tokens_remove_stopwords`.
-
-Toàn bộ 38.233 mẫu được ghi vào `data/processed/v7_preprocessed.csv`, không chỉ
-các dòng xem trước. Notebook đọc lại file này, kiểm tra ID/nhãn giữ nguyên rồi
-đưa các cột token vào `TEXT`, là đầu vào các vòng huấn luyện. Từ vựng, IDF và
-embedding vẫn được học trong phần train của từng fold.
-
-Trong dữ liệu hiện tại, có 2 dòng token rỗng khi giữ stop words và 103 dòng khi
-loại stop words. Các dòng này vẫn giữ ID/nhãn; vectorizer biểu diễn bằng vector
-không có đặc trưng thay vì âm thầm bỏ mẫu.
-
-## Thiết kế CV và test
-
-Train gồm 30.759 mẫu; test giữ riêng 7.474 mẫu. Train được chia thành năm fold
-theo nhóm văn bản. Trong mỗi lượt CV, mô hình học từ bốn fold và dự đoán fold
-validation còn lại. Cột “Số mẫu spam trong validation” là số spam trong phần
-validation, không phải một tập dữ liệu riêng.
-
-Trung bình F1 spam trên các fold là **CV F1**, dùng để chọn cấu hình. Precision
-và Recall CV cũng tính trên cùng fold. Sau đó mô hình fit toàn bộ train và đo
-Accuracy/Precision/Recall/F1/AP trên test. CV có thể lạc quan do tìm nhiều cấu
-hình; đây không phải nested CV. Không chọn lại mô hình hoặc ngưỡng bằng test.
-
-## Mất cân bằng nhãn
-
-V7 có 32.907 ham (86,07%) và 5.326 spam (13,93%), xấp xỉ 6,18 ham trên mỗi spam.
-Sáu tổ hợp cơ sở dùng train nguyên bản; SVM không trọng số lớp, NB dùng ngưỡng
-0,5 và SVM dùng ngưỡng decision score 0. TF-IDF + SVM dẫn đầu bước CV cơ sở,
-nên được chọn để khảo sát sâu ba chiến lược. Đây là thiết kế theo từng bước,
-chưa khảo sát mọi chiến lược trên cả sáu tổ hợp.
-
-| Cấu hình TF-IDF + SVM | Cách thực hiện |
-|---|---|
-| Không điều chỉnh | 26.384 ham + 4.375 spam, `class_weight=None`, ngưỡng 0; dùng lại ứng viên cơ sở B4. |
-| Trọng số balanced | `experiments.fit_experiment(class_weight="balanced")`; số mẫu giữ nguyên. Trọng số toàn bộ train khoảng 0,583 cho ham và 3,515 cho spam; mỗi fold tính lại từ phần train. |
-| Under-sampling 2:1 | `training_utils.undersampled_search()`; fit cuối dùng 8.750 ham + 4.375 spam. Lấy mẫu riêng trong train của mỗi fold, không dùng balanced. |
-| Điều chỉnh ngưỡng | `training_utils.tune_svm_threshold()`; giữ siêu tham số của SVM không điều chỉnh, tạo decision score OOF trên train và chọn ngưỡng bằng trung bình F1 validation. |
-
-Nhánh ngưỡng khảo sát 199 phân vị 1–99% của điểm OOF, ngưỡng 0 và hai biên;
-nếu đồng điểm F1 thì ưu tiên ngưỡng gần 0. Số fold và khóa nhóm không thay đổi.
-Trọng số và under-sampling tìm lại C/ngram bằng cùng lưới cơ sở. Các chiến lược
-được thử riêng; không kết hợp ba cách. Tỷ lệ lấy mẫu 2:1 là cấu hình khảo sát,
-không được lựa chọn từ test. Điều chỉnh ngưỡng thay đổi quyết định, không thay
-đổi số mẫu hay cân bằng lại phân bố dữ liệu.
-
-Mục 5.1 trình bày hình số mẫu/trọng số và bảng CV bốn cấu hình. Mục 6.1 báo cáo
-test Precision/Recall/F1, Accuracy/AP và FP/FN. Mục 6.2 có hai nhóm ma trận:
-sáu tổ hợp cơ sở và bốn cấu hình TF-IDF + SVM. Mục 6.3 có PR cho hai phạm vi;
-nhánh chỉ đổi ngưỡng dùng chung đường PR/AP với đối chứng, hai điểm đánh dấu
-cho thấy vị trí quyết định khác nhau. Bootstrap F1 gồm cả chín ứng viên.
-
-`predict_record()` và `predict_spam()` dùng cùng ngưỡng SVM; score lớn hơn ngưỡng
-được dự đoán spam. Ngưỡng mặc định là 0 với SVM và 0,5 với NB. Ngưỡng lưu trong
-bundle được dùng lại khi demo. Mục phân tích lỗi ghi rõ cấu hình được chọn và
-hiển thị ID, text gốc, văn bản xử lý, nhãn thực tế, dự đoán và score.
-
-## Đối chiếu từ dừng
-
-So sánh giữ/loại từ dừng là khảo sát bổ trợ cho lựa chọn tiền xử lý, trình bày
-bằng bảng CV F1 tại mục 5, không có phụ lục. Cấu hình giữ từ dừng được CV chọn;
-sáu tổ hợp cơ sở và các chiến lược tiếp theo cùng dùng cấu hình này.
-
-Không chấm test cho nhánh từ dừng đã loại khỏi luồng chính. Cách tiền xử lý,
-hai cột token và dữ liệu nguồn vẫn được giữ nguyên; từ vựng/embedding vẫn chỉ
-học trong phần train. Khảo sát OOV riêng được bỏ để tập trung vào phân loại;
-FastText vẫn là một phương pháp biểu diễn trong sáu tổ hợp.
-
-## Notebook và module có cùng luồng xử lý
-
-Notebook vừa điều phối dữ liệu/split/cấu hình, vừa gọi hàm trong `pipeline/` và
-hiển thị kết quả. Chạy cell xử lý là thực thi công việc đó. Chạy runner từ Terminal
-là một cách thực thi toàn bộ notebook; mở khối mã nguồn chỉ để xem cách viết hàm.
-
-Các module có `main()`/CLI có thể chạy rời bằng `-m` với đúng đầu vào. Các module
-thư viện như `experiments.py` không tự huấn luyện cả bài khi gọi trực tiếp file;
-cần notebook hoặc chương trình điều phối cung cấp dữ liệu và cấu hình.
-
-## Các thư mục kiểm tra và kết quả
-
-`tests/` chứa chương trình kiểm thử và các tình huống giả lập nhỏ để kiểm tra
-hành vi hàm, không phải dataset thực nghiệm v7. Các nhóm gồm:
-`test_data_pipeline.py` và `test_collection_provenance.py` kiểm luồng dữ liệu;
-`test_cached_annotations.py` kiểm nối nhãn đúng ID; `test_preprocessing_and_training.py`
-kiểm tiền xử lý, CV, sampling và ngưỡng SVM; `test_restructured_modules.py` kiểm module/CLI và
-lưu–tải–dự đoán; `test_notebook_display.py` kiểm hiển thị; `test_notebook_runner.py`
-kiểm cấu hình runner và đường dẫn local.
-
-`results/verified_run/` giữ chỉ số và biên bản kiểm tra mới nhất;
-`results/source_audit/` là hồ sơ đối chiếu nguồn; `results/history/` giữ kết quả
-trước đây. Notebook 01/02 không dùng `verified_run`/`source_audit` để nạp dữ liệu
-hay dự đoán; phần bổ sung trong Notebook 02 đọc bảng viBERT ở `results/modern/`.
-Mô hình để tái sử dụng nằm trong `artifacts/spamham/`, dữ liệu trong `data/`.
-
-
-## Nhánh viBERT và đối chiếu cuối
-
-Notebook 03 dùng v7, giữ đúng test của Notebook 02. Phát triển trên
-24.815 fit/5.944 validation; loss thường ở epoch 3 được chọn bằng validation F1.
-Fit lại 30.759 train từ pretrained, đo 7.474 test: Accuracy 96,35%, Precision
-89,42%, Recall 80,86%, F1 0,8493, AP 0,9108. S3 có test F1 0,7552.
-
-M1 dùng tokenizer và biểu diễn ngữ cảnh riêng, không phải BoW/TF-IDF/FastText
-ghép thêm thuật toán thứ ba. Model/tokenizer safetensors ở
-`artifacts/modern/vibert/model/`; S3 `.joblib` giữ riêng. Kết quả GPU đã kiểm nạp
-lại trên toàn bộ test; CPU local kiểm 64 mẫu, nhãn khớp. Xem hướng dẫn viBERT
-để biết phiên bản môi trường, cấu hình, chế độ train/review và các giới hạn.
+Windows vẫn có thông báo `joblib resource_tracker.KeyError` lúc dọn kernel 02;
+cell tính toán và kiểm file/model hoàn tất. Chưa đổi dependency để tránh ảnh
+hưởng cấu hình đã kiểm chứng. Không có lần cào Facebook/gọi API nhãn hoặc train
+GPU mới trong lượt rà soát này. Bằng chứng:
+`results/verified_run/final_review.json`, `documentation_commands.json` và
+`results/modern/final_review_reload.json`.

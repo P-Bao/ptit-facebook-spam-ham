@@ -4,7 +4,7 @@ Hiển thị code và bảng với màu tương phản cố định trong notebo
 Đầu vào: DataFrame/Series hoặc đường dẫn/hàm Python cần minh họa.
 Xử lý: escape nội dung; đặt màu inline để không phụ thuộc theme sáng/tối của IDE.
 Đầu ra: HTML dễ đọc và thông tin file; không thực thi đoạn code được show.
-Liên quan: notebooks/01_thu_thap_va_gan_nhan.ipynb; notebooks/02_thuc_nghiem_va_demo.ipynb.
+Liên quan: cả ba notebook 01/02/03; chỉ thay cách hiển thị, không thay dự đoán.
 """
 
 import ast
