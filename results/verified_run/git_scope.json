@@ -1,13 +1,13 @@
 {
   "branch": "phi",
-  "initial_phi": "741509865c6ba64fea7e1a5826f5664c865dc8af",
+  "initial_phi": "a6fdc5543e1031333ecccc614cb6ef04edcbdf63",
   "protected_local_heads": {
     "master": "efc4fba2a6289936fdcd43f822698f251ee9e61f",
     "cuong": "efc4fba2a6289936fdcd43f822698f251ee9e61f"
   },
   "protected_remote_heads_before": {
     "master": "efc4fba2a6289936fdcd43f822698f251ee9e61f",
-    "cuong": "efc4fba2a6289936fdcd43f822698f251ee9e61f"
+    "cuong": "f908235b0dd147b5918240f60099b5faa5138468"
   },
   "allowed_push_refspec": "HEAD:refs/heads/phi"
 }

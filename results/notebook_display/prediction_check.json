@@ -1,0 +1,52 @@
+{
+  "source": "saved model checked by executing its prediction API",
+  "model_path": ".work\\runs\\readable_training_verified\\artifacts\\spam_ham_ml_only.joblib",
+  "test_rows": 7474,
+  "confusion_matrix_order": [
+    "ham",
+    "spam"
+  ],
+  "confusion_matrix": [
+    [
+      6443,
+      80
+    ],
+    [
+      354,
+      597
+    ]
+  ],
+  "accuracy": 0.9419320310409419,
+  "precision_spam": 0.8818316100443131,
+  "recall_spam": 0.6277602523659306,
+  "f1_spam": 0.7334152334152334,
+  "raw_api_prediction_disagreements_with_saved_dataset_input": 0,
+  "raw_api_f1_on_same_test_ids": 0.7334152334152334,
+  "example_predictions": [
+    {
+      "text": "Cho mình hỏi lịch thi với ạ",
+      "score": -1.2542561405255837,
+      "score_type": "decision_score",
+      "du_doan": "ham"
+    },
+    {
+      "text": "Liên hệ 0901234567 hoặc https://example.com",
+      "score": 2.968799201447487,
+      "score_type": "decision_score",
+      "du_doan": "spam"
+    },
+    {
+      "text": "Nguyễn Văn An",
+      "score": 0.6889058040182241,
+      "score_type": "decision_score",
+      "du_doan": "spam"
+    },
+    {
+      "text": ".",
+      "score": 0.9861020839940335,
+      "score_type": "decision_score",
+      "du_doan": "spam"
+    }
+  ],
+  "note": "Examples are demonstrations; dataset-based metrics are measured against existing v7 labels, not proof all labels or future predictions are correct."
+}

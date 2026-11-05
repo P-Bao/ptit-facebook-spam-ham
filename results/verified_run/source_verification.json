@@ -20,5 +20,7 @@
   "structure_version": "functional_modules_two_notebooks",
   "notebooks_use_project_modules": true,
   "crawler_entrypoint": "pipeline/collect/scrape_ptit_groups.py",
-  "vendor_directory": "external/facebook_scraper"
+  "vendor_directory": "external/facebook_scraper",
+  "notebook_output_verification": "results/notebook_display/verification.json",
+  "collection_notebook_mode": "reprocess_saved_snapshot_and_cached_labels"
 }

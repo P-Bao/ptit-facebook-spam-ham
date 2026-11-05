@@ -6,9 +6,9 @@ nhúng lại mọi module. Chưa viết báo cáo học phần ở lượt tái 
 
 ## Hai luồng
 
-1. `notebooks/01_thu_thap_va_gan_nhan.ipynb`: code crawler, JSON thật → bảng xem thử
-   → clean → cache/export nhãn đã lưu. Phục vụ ý 1 và một phần ý 2. Run All không
-   gọi Facebook/LLM/Argilla và không nhận CSV xem thử là v7.
+1. `notebooks/01_thu_thap_va_gan_nhan.ipynb`: code crawler, JSON thật → CSV toàn bộ
+   snapshot → clean → chạy CLI chấp nhận nhãn từ cache → đối soát/xuất nhãn đã lưu.
+   Phục vụ ý 1 và một phần ý 2; không gọi Facebook/LLM/Argilla, không nhận output là v7.
 2. `notebooks/02_thuc_nghiem_va_demo.ipynb`: v7 → tiền xử lý model → split/CV →
    BoW/TF-IDF/FastText, NB/SVM → đánh giá → demo. Không cần dữ liệu tham chiếu của
    notebook 01 hoặc chạy merge. Có heading/cell chờ cho ý 4 bổ sung.
@@ -34,9 +34,9 @@ File thiếu tải theo `results/source_audit/drive_manifest.json`; offline cầ
 bị sẵn đúng hash. `SPAMHAM_SOURCE_DIR` nhận folder `data/` phân tầng hoặc bundle
 flat có các tên file trên. Tên snapshot giữ nguyên để đối chiếu nguồn.
 
-Notebook 01 làm phẳng 3 bài để giải thích; nhãn minh họa dùng đúng ID của bảng
-clean/cache/export lịch sử. Không renumber bảng mới rồi áp cache cũ. Tái hiện đầy
-đủ CSV lịch sử còn cần dữ liệu tham chiếu; dùng công cụ audit khi cần.
+Notebook 01 chuyển toàn bộ JSON thành CSV mới và chạy cleaner thật. Bước cache
+dùng đúng ID của bảng cleaned lịch sử; không áp cache vào CSV mới có số/thứ tự
+dòng khác. Tái hiện đầy đủ CSV lịch sử còn cần dữ liệu tham chiếu; dùng audit khi cần.
 
 ## Chạy và đầu ra
 
@@ -48,8 +48,9 @@ clean/cache/export lịch sử. Không renumber bảng mới rồi áp cache cũ
 Runner dùng kernel mới, module repo, lưu hash code/module tại lúc bắt đầu. Chỉ
 ghi notebook chính khi thành công; đây không phải kiểm tra notebook tự chứa.
 
-- Notebook 01: `comments_preview.csv`, `cleaned_preview.csv`, `labeled_preview.csv`,
-  `collection_demo_manifest.json`.
+- Notebook 01: `comments_from_snapshot.csv`, `comments_cleaned_from_snapshot.csv`,
+  `accepted_from_saved_cache.csv`, `labels_auto_accepted.csv`,
+  `labels_saved_official_export.csv`, `collection_demo_manifest.json`.
 - Notebook 02: `spam_ham_ml_only.joblib`, `metrics.csv`, `bootstrap_ci.csv`,
   `run_manifest.json`, bảng/hình trong notebook.
 
@@ -60,3 +61,7 @@ hợp ngay trước lớp. Kịch bản: `docs/presentation/LO_TRINH_TRINH_BAY.m
 Phần nguồn trình bày một đợt có snapshot; phần thực nghiệm dùng v7 do nhóm cung
 cấp, không nói chạy lại công cụ hiện tại tự tạo chính xác v7. Nguồn và giới hạn
 phiên bản ở `docs/provenance/`. LLM gán nhãn không thay cho ý 4 bổ sung.
+
+Giải thích chi tiết code có thực thi hay chỉ đọc, luồng từng file và đánh giá model:
+`docs/guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md`. Bảng/code dùng màu inline cố
+định, không cần đổi theme; nếu IDE còn output cũ hãy mở lại notebook.

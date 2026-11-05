@@ -1,0 +1,31 @@
+{
+  "checked_client_date": "2026-11-05",
+  "completed_utc": "2026-11-05T06:42:04.214636+00:00",
+  "baseline_commit": "a6fdc5543e1031333ecccc614cb6ef04edcbdf63",
+  "notebooks": {
+    "01": {
+      "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "cells": 17,
+      "code_cells": 8,
+      "seconds": 5.78,
+      "errors": 0,
+      "code_sha256": "26b460aae3e20817a4b292fedc210c003478c6a9b72a2ebb6942215d9c033bce"
+    },
+    "02": {
+      "path": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "cells": 36,
+      "code_cells": 19,
+      "seconds": 1458.22,
+      "errors": 0,
+      "code_sha256": "fdc5983ab27275301c2bbc2ce2737d96cd2a04171c530f5ddead26e892bbe90b"
+    }
+  },
+  "tests_passed": 47,
+  "all_model_scores_and_parameters_unchanged": true,
+  "training_data_unchanged": true,
+  "all_run_module_hashes_match_final_files": true,
+  "output_file_row_counts_verified": true,
+  "renderer_browser_test": "results/notebook_display/contrast_verification.json",
+  "raw_inference_agrees_on_all_7474_test_ids": true,
+  "notes": "Notebook 01 reprocesses saved JSON/cache. No Facebook, LLM or Argilla calls. Notebook 02 fits and evaluates all models again."
+}

@@ -6,12 +6,15 @@ Thực nghiệm BoW/TF-IDF/FastText với NB/SVM trên v7. Ý 4 bổ sung có m�
 ## Mở theo thứ tự
 
 1. [01 — Thu thập và gán nhãn](notebooks/01_thu_thap_va_gan_nhan.ipynb): snapshot thật,
-   code crawler, JSON → bảng → clean → cache/export nhãn. Không gọi Facebook/LLM/Argilla.
+   comment/reply, JSON → CSV → clean → chấp nhận nhãn từ cache; hiện file đầu ra.
+   Không gọi Facebook/LLM/Argilla.
 2. [02 — Thực nghiệm và demo](notebooks/02_thuc_nghiem_va_demo.ipynb): v7 → tiền xử lý,
    chia tập → đặc trưng/NB/SVM → đánh giá → dự đoán mới.
 3. [Lộ trình mở code](docs/presentation/LO_TRINH_TRINH_BAY.md).
 4. [Hướng dẫn chạy và dữ liệu](docs/guides/HUONG_DAN_NOTEBOOK_VA_NOP_BAI.md).
 5. [Thay đổi, nguồn file cũ → mới và kiểm chứng](docs/changes/2026-11-05_TAI_CAU_TRUC_VA_DONG_BO.md).
+6. [Toàn bộ folder/file, luồng chạy và đánh giá kết quả](docs/guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md).
+7. [Sửa màu hiển thị và bổ sung output từng bước](docs/changes/2026-11-05_HIEN_THI_VA_OUTPUT_NOTEBOOK.md).
 
 ## Cấu trúc
 
@@ -24,6 +27,7 @@ pipeline/
   features/                   FastTextVectorizer
   modeling/                   NB/SVM, CV, sampling/ngưỡng, đánh giá
   inference/                  Dự đoán raw comment bằng model đã lưu
+  presentation/               Render bảng/code tương phản, thông tin file
   modern/                     Giữ chỗ ý 4 bổ sung
 notebooks/                    Hai notebook import module repo
 tools/dataset_versions/        Gộp/đối soát, không cần để train v7

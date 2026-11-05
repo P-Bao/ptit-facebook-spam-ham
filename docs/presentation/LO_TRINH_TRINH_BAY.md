@@ -13,8 +13,10 @@
 | 7 | `pipeline/label/upload_to_argilla.py`, `ai_assisted_spam_ham.py` | Upload và gợi ý label/confidence | Chuẩn bị nhãn |
 | 8 | `auto_accept_labels.py`, `download_labeled_data.py`, `label_utils.py` | Chốt theo ngưỡng/người duyệt, export đúng ID | Chuẩn bị nhãn |
 
-Notebook đọc snapshot thật và trích code từ file, không gọi dịch vụ live. Ví dụ
-CSV vài bài và ví dụ nhãn từ cache lịch sử có phạm vi riêng được ghi rõ.
+Notebook đọc snapshot thật, chuyển toàn bộ JSON thành CSV, chạy cleaner và CLI
+chấp nhận nhãn từ cache; không gọi dịch vụ live. CSV mới và nguồn cache lịch sử
+có phạm vi riêng được ghi rõ để không ghép nhầm ID. Mỗi bước hiện dữ liệu/file
+đầu ra; các khối “Xem code” mở sau khi giải thích output.
 
 Câu chuyển: “Phần đầu trình bày mã và snapshot của một đợt thu thập. Các thí nghiệm
 tiếp theo dùng dataset PTIT phiên bản v7 do nhóm cung cấp.”
