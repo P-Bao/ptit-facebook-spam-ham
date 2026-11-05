@@ -1,0 +1,13 @@
+{
+  "branch": "phi",
+  "initial_phi": "62219ff442734aa882906efa782ff9abcfecf492",
+  "protected_local_heads": {
+    "cuong": "efc4fba2a6289936fdcd43f822698f251ee9e61f",
+    "master": "efc4fba2a6289936fdcd43f822698f251ee9e61f"
+  },
+  "protected_remote_heads_before": {
+    "cuong": "efc4fba2a6289936fdcd43f822698f251ee9e61f",
+    "master": "efc4fba2a6289936fdcd43f822698f251ee9e61f"
+  },
+  "allowed_push_refspec": "HEAD:refs/heads/phi"
+}

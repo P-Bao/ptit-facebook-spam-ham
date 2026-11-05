@@ -1,3 +1,4 @@
 -r notebook.txt
 -r annotation.txt
+-r collection.txt
 pytest==9.2.0

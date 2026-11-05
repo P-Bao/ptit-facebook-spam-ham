@@ -2,11 +2,11 @@ import numpy as np
 import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
 
-from pipeline.step_02_preprocess.text_preprocessing import (
+from pipeline.prepare.preprocess_for_model import (
     EMOJI, clean_text, mask_names, preprocess,
 )
-from pipeline.step_05_features.spam_features import FastTextVectorizer
-from pipeline.step_06_train_evaluate.training_utils import (
+from pipeline.features.spam_features import FastTextVectorizer
+from pipeline.modeling.training_utils import (
     grouped_folds, norm_key, sample_training_indices, undersampled_search,
 )
 

@@ -559,50 +559,6 @@
       "sha256": "ef21fab62e41ba3bc3e2b15388ee2d0bd7fc7ac473c9411e170ea9ed4c625fb5"
     },
     {
-      "name": "scrape_ptit_groups.py",
-      "bytes": 26037,
-      "lines": 566,
-      "sha256": "6b406b82c89ed6df8924cf87c72714e279ee692e73e8526fbbcc7adbbd186da5",
-      "syntax": "valid",
-      "definitions": [
-        {
-          "name": "parse_cookies",
-          "line": 27,
-          "kind": "FunctionDef"
-        },
-        {
-          "name": "log_message",
-          "line": 128,
-          "kind": "FunctionDef"
-        },
-        {
-          "name": "extract_comment_texts",
-          "line": 134,
-          "kind": "FunctionDef"
-        },
-        {
-          "name": "StateManager",
-          "line": 148,
-          "kind": "ClassDef"
-        },
-        {
-          "name": "SingleFileWriter",
-          "line": 261,
-          "kind": "ClassDef"
-        },
-        {
-          "name": "CommentsOnlyWriter",
-          "line": 322,
-          "kind": "ClassDef"
-        },
-        {
-          "name": "run_scraper",
-          "line": 367,
-          "kind": "FunctionDef"
-        }
-      ]
-    },
-    {
       "name": "single_post_image.py",
       "bytes": 6682,
       "lines": 237,
@@ -641,5 +597,9 @@
         }
       ]
     }
-  ]
+  ],
+  "runner": {
+    "name": "scrape_ptit_groups.py",
+    "sha256": "ef72bbfac7c27ce249da2d9aeaed1375282aa2c8c4879265585604941fd3a346"
+  }
 }

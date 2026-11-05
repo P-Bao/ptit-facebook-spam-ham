@@ -5,11 +5,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from pipeline.step_01_collect.audit_source import audit_source_bundle, read_configured_groups
-from pipeline.step_01_collect.convert_phase2_json import flatten_posts
-from pipeline.step_02_preprocess.clean_data_facebook_spamham import clean_facebook_comments, preprocess
-from pipeline.step_03_label import auto_accept_labels
-from pipeline.step_03_label.label_utils import join_metadata
+from tools.dataset_versions.audit_source import audit_source_bundle, read_configured_groups
+from pipeline.collect.json_to_csv import flatten_posts
+from pipeline.prepare.clean_for_labeling import clean_facebook_comments, preprocess
+from pipeline.label import auto_accept_labels
+from pipeline.label.label_utils import join_metadata
 
 
 def test_legacy_cleaning_keeps_row_positions(tmp_path):
@@ -89,25 +89,13 @@ def test_read_config_does_not_execute_handoff_code(tmp_path):
     assert read_configured_groups(tmp_path)[0]["id"] == "123"
 
 
-def test_notebook_embeds_exact_snapshot_transform_functions():
-    root = Path(__file__).resolve().parents[1]
-    nb = json.loads((root / "notebooks/spam-ham-comments.ipynb").read_text(encoding="utf-8"))
-    helper = next("".join(c["source"]).split("\n", 1)[1] for c in nb["cells"]
-                  if c["cell_type"] == "code" and "".join(c["source"]).startswith("%%writefile spam_source_helpers.py"))
-    extracted = {n.name: ast.dump(n) for n in ast.parse(helper).body if isinstance(n, ast.FunctionDef)}
-    for path, names in [("pipeline/step_01_collect/convert_phase2_json.py", ["to_int", "flatten_posts"]),
-                        ("pipeline/step_02_preprocess/clean_data_facebook_spamham.py", ["preprocess"])]:
-        originals = {n.name: ast.dump(n) for n in ast.parse((root/path).read_text(encoding="utf-8")).body if isinstance(n, ast.FunctionDef)}
-        assert all(extracted[name] == originals[name] for name in names)
-
-
 def test_real_drive_snapshot_when_available():
     root = Path(__file__).resolve().parents[1]
-    folder = root / "data/source_drive"
-    if not (folder / "groups_data_phase2.json").exists() or not (root / "data/labeled_v7.csv").exists():
+    folder = root / "data"
+    if not (folder / "raw/groups_data_phase2.json").exists() or not (root / "data/final/labeled_v7.csv").exists():
         pytest.skip("Snapshot thật không nằm trong Git; dùng tests fixture khi chưa tải")
-    configured = read_configured_groups(root / "facebook_post_comment_scraper_code/facebook_post_comment_scraper")
-    result = audit_source_bundle(folder, root / "data/labeled_v7.csv", preprocess, flatten_posts, configured)
+    configured = read_configured_groups(root / "pipeline/collect/scrape_ptit_groups.py")
+    result = audit_source_bundle(folder, root / "data/final/labeled_v7.csv", preprocess, flatten_posts, configured)
     assert result["conversion"] == {"raw_rows": 13833, "empty_removed": 129,
         "phase1_duplicate_removed": 4135, "flat_rows": 9569, "exact_reproduction": True}
     assert result["cleaning"]["legacy_rows"] == 9398

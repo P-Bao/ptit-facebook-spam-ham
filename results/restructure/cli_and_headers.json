@@ -1,0 +1,59 @@
+{
+  "cli_checks": [
+    {
+      "module": "pipeline.collect.scrape_ptit_groups",
+      "help_exit_code": 0
+    },
+    {
+      "module": "pipeline.collect.json_to_csv",
+      "help_exit_code": 0
+    },
+    {
+      "module": "pipeline.prepare.clean_for_labeling",
+      "help_exit_code": 0
+    },
+    {
+      "module": "pipeline.label.upload_to_argilla",
+      "help_exit_code": 0
+    },
+    {
+      "module": "pipeline.label.ai_assisted_spam_ham",
+      "help_exit_code": 0
+    },
+    {
+      "module": "pipeline.label.auto_accept_labels",
+      "help_exit_code": 0
+    },
+    {
+      "module": "pipeline.label.download_labeled_data",
+      "help_exit_code": 0
+    },
+    {
+      "module": "tools.dataset_versions.merge_labeled_data",
+      "help_exit_code": 0
+    },
+    {
+      "module": "tools.dataset_versions.audit_source",
+      "help_exit_code": 0
+    }
+  ],
+  "consistent_module_headers": [
+    "pipeline/collect/json_to_csv.py",
+    "pipeline/collect/scrape_ptit_groups.py",
+    "pipeline/collect/snapshots.py",
+    "pipeline/features/spam_features.py",
+    "pipeline/inference/predict.py",
+    "pipeline/label/ai_assisted_spam_ham.py",
+    "pipeline/label/auto_accept_labels.py",
+    "pipeline/label/download_labeled_data.py",
+    "pipeline/label/label_utils.py",
+    "pipeline/label/upload_to_argilla.py",
+    "pipeline/modeling/experiments.py",
+    "pipeline/modeling/training_utils.py",
+    "pipeline/prepare/clean_for_labeling.py",
+    "pipeline/prepare/preprocess_for_model.py",
+    "tools/dataset_versions/audit_source.py",
+    "tools/dataset_versions/merge_labeled_data.py"
+  ],
+  "service_calls": false
+}

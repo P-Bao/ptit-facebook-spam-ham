@@ -34,26 +34,14 @@ Thumbs.db
 artifacts/
 .pytest_cache/
 **/.ipynb_checkpoints/
-notebooks/spam_features.py
-notebooks/spam_preprocessing.py
-notebooks/spam_training.py
-/spam_features.py
-/spam_preprocessing.py
-/spam_training.py
-notebooks/spam_source_helpers.py
-notebooks/spam_source_audit.py
-/spam_source_helpers.py
-/spam_source_audit.py
-
-# Dữ liệu/phiên chạy của bộ crawler bàn giao; giữ lại mã gốc và .env.example
-facebook_post_comment_scraper_code/**/group_post/
-facebook_post_comment_scraper_code/**/page_post/
-facebook_post_comment_scraper_code/**/simple_post/
-facebook_post_comment_scraper_code/**/state*.json
-facebook_post_comment_scraper_code/**/ptit_groups_data*.json*
-facebook_post_comment_scraper_code/**/*.log
-facebook_post_comment_scraper_code/**/*.pid
-facebook_post_comment_scraper_code/**/*.tmp
+# Media/phiên chạy do thư viện crawler tạo; giữ mã nền và .env.example
+group_post/
+page_post/
+simple_post/
+external/facebook_scraper/state*.json
+external/facebook_scraper/*.log
+external/facebook_scraper/*.pid
+external/facebook_scraper/*.tmp
 # Archives & Exports
 *.zip
 *.html

@@ -1,5 +1,9 @@
 # Giải đáp và sơ đồ tái cấu trúc để trình bày project
 
+**Hồ sơ kế hoạch trước triển khai.** Cấu trúc đã được thực hiện; xem
+[nhật ký tái cấu trúc](../changes/2026-11-05_TAI_CAU_TRUC_VA_DONG_BO.md) và README
+gốc để dùng đường dẫn/lệnh hiện tại. Bảng cũ → đề xuất dưới đây giữ nguyên để truy vết.
+
 Ngày đối chiếu: 05/11/2026. Đây là bản đề xuất có căn cứ từ code và dữ liệu hiện
 tại; chưa di chuyển module hoặc tách notebook. Phần mô hình hiện đại vẫn được
 giữ chỗ, chưa triển khai trong lượt này.

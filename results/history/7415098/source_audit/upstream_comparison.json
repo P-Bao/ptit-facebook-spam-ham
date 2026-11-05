@@ -1,0 +1,93 @@
+{
+  "checked_client_date": "2026-11-05",
+  "check_method": "Public GitHub API/raw comparison; no Facebook requests and no changes to upstream or protected branches.",
+  "upstream_url": "https://github.com/mohdtalal3/facebook_post_comment_scraper",
+  "main_at_check": "0c33360a15c1df52712b8abeaa13d38e79cc7ba5",
+  "compared_legacy_revision": "b518ce1ab85c968754a49d627cab554100da9f81",
+  "legacy_commit_url": "https://github.com/mohdtalal3/facebook_post_comment_scraper/tree/b518ce1ab85c968754a49d627cab554100da9f81",
+  "files": [
+    {
+      "file": "comment_scraper.py",
+      "present_at_compared_revision": true,
+      "url": "https://raw.githubusercontent.com/mohdtalal3/facebook_post_comment_scraper/b518ce1ab85c968754a49d627cab554100da9f81/comment_scraper.py",
+      "upstream_sha256": "974d014f2454839f3e59dd2ef5cdd5a68c9dedff25fc242e869ecf733b7008ae",
+      "local_sha256": "429f79075e24ad755c449afbfe675382c58cb92803294918aea2e0d029ed0a00",
+      "text_identical": false,
+      "line_similarity": 0.9877,
+      "upstream_lines": 321,
+      "local_lines": 329
+    },
+    {
+      "file": "facebook_ui.py",
+      "present_at_compared_revision": true,
+      "url": "https://raw.githubusercontent.com/mohdtalal3/facebook_post_comment_scraper/b518ce1ab85c968754a49d627cab554100da9f81/facebook_ui.py",
+      "upstream_sha256": "e8bcb0a35417b1310ce56732b0d5abcfdb0f60299e155a06597e098a81bdc4b0",
+      "local_sha256": "e8bcb0a35417b1310ce56732b0d5abcfdb0f60299e155a06597e098a81bdc4b0",
+      "text_identical": true,
+      "line_similarity": 1.0,
+      "upstream_lines": 1066,
+      "local_lines": 1066
+    },
+    {
+      "file": "group_post_scraper_v2.py",
+      "present_at_compared_revision": true,
+      "url": "https://raw.githubusercontent.com/mohdtalal3/facebook_post_comment_scraper/b518ce1ab85c968754a49d627cab554100da9f81/group_post_scraper_v2.py",
+      "upstream_sha256": "f27d93b1d57bfac58e594c6cf986ba58d41cf44519bef236aa4392ab88b14421",
+      "local_sha256": "2ebcb9e67865a44304b7479881e5295407070c1c18f775abc3c53e254a90169c",
+      "text_identical": false,
+      "line_similarity": 0.9505,
+      "upstream_lines": 764,
+      "local_lines": 831
+    },
+    {
+      "file": "main.py",
+      "present_at_compared_revision": true,
+      "url": "https://raw.githubusercontent.com/mohdtalal3/facebook_post_comment_scraper/b518ce1ab85c968754a49d627cab554100da9f81/main.py",
+      "upstream_sha256": "90da4ff909755607eca0c6e5a3b45e003b58aae5a02f677d97fb07c747d96257",
+      "local_sha256": "fb08fc1f568c23f3f77ac783aeeeedbf41288fed390d608ce9b42c3585639099",
+      "text_identical": false,
+      "line_similarity": 0.9921,
+      "upstream_lines": 569,
+      "local_lines": 574
+    },
+    {
+      "file": "post_scraper.py",
+      "present_at_compared_revision": true,
+      "url": "https://raw.githubusercontent.com/mohdtalal3/facebook_post_comment_scraper/b518ce1ab85c968754a49d627cab554100da9f81/post_scraper.py",
+      "upstream_sha256": "99c55b446ef9168a1763d297a7640e2354ff9207c8f85f3b60f01b10929b8a2f",
+      "local_sha256": "99c55b446ef9168a1763d297a7640e2354ff9207c8f85f3b60f01b10929b8a2f",
+      "text_identical": true,
+      "line_similarity": 1.0,
+      "upstream_lines": 782,
+      "local_lines": 782
+    },
+    {
+      "file": "proxy_utils.py",
+      "present_at_compared_revision": true,
+      "url": "https://raw.githubusercontent.com/mohdtalal3/facebook_post_comment_scraper/b518ce1ab85c968754a49d627cab554100da9f81/proxy_utils.py",
+      "upstream_sha256": "7eb5561e8e5497a7973df39823f17e4ec03fee665d309cb43962a86158a620b2",
+      "local_sha256": "7eb5561e8e5497a7973df39823f17e4ec03fee665d309cb43962a86158a620b2",
+      "text_identical": true,
+      "line_similarity": 1.0,
+      "upstream_lines": 115,
+      "local_lines": 115
+    },
+    {
+      "file": "scrape_ptit_groups.py",
+      "present_at_compared_revision": false
+    },
+    {
+      "file": "single_post_image.py",
+      "present_at_compared_revision": true,
+      "url": "https://raw.githubusercontent.com/mohdtalal3/facebook_post_comment_scraper/b518ce1ab85c968754a49d627cab554100da9f81/single_post_image.py",
+      "upstream_sha256": "48d81ee42d81def56ce28a32c149425b769bde098ae08b2ea9437ffda395b963",
+      "local_sha256": "48d81ee42d81def56ce28a32c149425b769bde098ae08b2ea9437ffda395b963",
+      "text_identical": true,
+      "line_similarity": 1.0,
+      "upstream_lines": 237,
+      "local_lines": 237
+    }
+  ],
+  "ptit_runner_path_history_entries_returned": 0,
+  "note": "Comparison establishes overlap, not authorship or the exact version used for historical scraping."
+}

@@ -9,12 +9,16 @@
   "drive_folder_url": "https://drive.google.com/drive/folders/1_htgS4zywI0soGbKY0gSboAtQexlm1j9",
   "drive_files": 7,
   "source_audit": "results/source_audit/audit.json",
-  "source_audit_sha256": "55e36b6d68b71326bd7f2eeaebc617c2527ce630b134872bc1a18d0575cb5810",
+  "source_audit_sha256": "718ac73c1ded93a74c7d4fc2e2e2d07dbaf5bcb8933e3aaabf1b9dd888146ed7",
   "raw_phase2_posts": 2170,
   "raw_phase2_groups": 5,
   "raw_comments_and_replies": 13833,
   "drive_merged_vs_v7_label_changes": 1366,
   "phase1_raw_available": false,
   "v7_label_revision_log_available": false,
-  "exact_notebook_download_cell_tested": true
+  "exact_notebook_download_cell_tested": true,
+  "structure_version": "functional_modules_two_notebooks",
+  "notebooks_use_project_modules": true,
+  "crawler_entrypoint": "pipeline/collect/scrape_ptit_groups.py",
+  "vendor_directory": "external/facebook_scraper"
 }
