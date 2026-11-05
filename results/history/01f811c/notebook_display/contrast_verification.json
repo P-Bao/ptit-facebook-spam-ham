@@ -1,0 +1,30 @@
+{
+  "checked_client_date": "2026-11-05",
+  "rendered_from_executed_notebook": true,
+  "tested_against_conflicting_theme_css": true,
+  "renderer_sha256": "5699596a4cbcc43e44f79863496b4679ad683a6c0ab0ef65fc01ec7a0108e441",
+  "checks": [
+    {
+      "theme": "dark",
+      "elements": 57,
+      "minimum_contrast": 14.481508292066573,
+      "styles": [
+        "rgb(15, 23, 42) / rgb(226, 232, 240)",
+        "rgb(17, 24, 39) / rgb(255, 255, 255)",
+        "rgb(241, 245, 249) / rgb(15, 23, 42)"
+      ],
+      "screenshot": ".work/notebook_contrast/dark.png"
+    },
+    {
+      "theme": "light",
+      "elements": 57,
+      "minimum_contrast": 14.481508292066573,
+      "styles": [
+        "rgb(15, 23, 42) / rgb(226, 232, 240)",
+        "rgb(17, 24, 39) / rgb(255, 255, 255)",
+        "rgb(241, 245, 249) / rgb(15, 23, 42)"
+      ],
+      "screenshot": ".work/notebook_contrast/light.png"
+    }
+  ]
+}

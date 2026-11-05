@@ -1,0 +1,5 @@
+{
+  "test_rows": 7474,
+  "prediction_disagreements": 0,
+  "model_file": "artifacts/spamham/spam_ham_ml_only.joblib"
+}

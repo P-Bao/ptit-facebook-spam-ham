@@ -13,7 +13,7 @@ import unicodedata
 
 import numpy as np
 from sklearn.base import clone
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, precision_score, recall_score
 from sklearn.model_selection import ParameterGrid
 
 
@@ -58,38 +58,49 @@ def sample_training_indices(y, indices, seed=42, ratio=2):
 
 
 def undersampled_search(pipe, grid, X, y, folds, seed=42):
-    """Chọn tham số bằng các fold gốc; validation giữ phân bố gốc."""
+    """Trả model, chỉ số CV, tham số và số mẫu; chỉ lấy mẫu phần train."""
     rows = []
     for params in ParameterGrid(grid):
-        scores = []
+        predictions = np.zeros(len(y), dtype=int)
         for train, valid in folds:
             selected = sample_training_indices(y, train, seed)
             assert not set(selected) & set(valid)
             model = clone(pipe).set_params(**params).fit(X[selected], y[selected])
-            scores.append(f1_score(y[valid], model.predict(X[valid]), zero_division=0))
-        rows.append((float(np.mean(scores)), params))
-    score, params = max(rows, key=lambda row: row[0])
+            predictions[valid] = model.predict(X[valid])
+        rows.append((mean_cv_scores(y, predictions, folds), params))
+    scores, params = max(rows, key=lambda row: row[0]["CV F1 (spam)"])
     selected = sample_training_indices(y, np.arange(len(y)), seed)
     fitted = clone(pipe).set_params(**params).fit(X[selected], y[selected])
-    return fitted, score, params, len(selected)
+    return fitted, scores, params, len(selected)
 
 
-def tune_nb_threshold(pipe, X, y, folds):
-    """OOF trên train; chọn ngưỡng bằng mean F1 cùng các fold, không nhận test."""
-    probabilities = np.zeros(len(y))
+def mean_cv_scores(y, predictions, folds):
+    """Trung bình chỉ số trên các phần validation, cùng cách tổng hợp GridSearchCV."""
+    return {f"CV {name} (spam)": float(np.mean([
+        metric(y[valid], predictions[valid], zero_division=0) for _, valid in folds]))
+        for name, metric in [("Precision", precision_score), ("Recall", recall_score), ("F1", f1_score)]}
+
+
+def tune_svm_threshold(pipe, X, y, folds):
+    """Chọn ngưỡng decision score từ OOF của train; không nhận dữ liệu test.
+
+    Giữ siêu tham số SVM đã chọn bằng CV. Khảo sát 199 phân vị 1–99%,
+    ngưỡng 0 và hai biên; đồng điểm F1 ưu tiên ngưỡng gần 0 hơn.
+    CV ở đây là điểm phục vụ lựa chọn, không phải ước lượng nested CV độc lập.
+    """
+    scores = np.zeros(len(y))
     covered = np.zeros(len(y), dtype=int)
     for train, valid in folds:
         model = clone(pipe).fit(X[train], y[train])
-        probabilities[valid] = model.predict_proba(X[valid])[:, 1]
+        scores[valid] = model.decision_function(X[valid])
         covered[valid] += 1
     assert (covered == 1).all()
-    rows = []
-    for threshold in np.linspace(0.05, 0.95, 200):
-        score = np.mean([f1_score(y[valid], probabilities[valid] >= threshold, zero_division=0)
-                         for _, valid in folds])
-        rows.append((float(score), float(threshold)))
-    score, threshold = max(rows, key=lambda row: row[0])
-    return clone(pipe).fit(X, y), score, threshold
+    thresholds = np.unique(np.r_[0.0, np.quantile(scores, np.linspace(0.01, 0.99, 199)),
+                                  np.nextafter(scores.min(), -np.inf), scores.max()])
+    rows = [(mean_cv_scores(y, (scores > threshold).astype(int), folds), float(threshold))
+            for threshold in thresholds]
+    metrics, threshold = max(rows, key=lambda row: (row[0]["CV F1 (spam)"], -abs(row[1])))
+    return clone(pipe).fit(X, y), metrics, threshold
 
 
 def predict_record(record, X):
@@ -99,5 +110,5 @@ def predict_record(record, X):
         predictions = (scores >= record.get("_threshold", 0.5)).astype(int)
     else:
         scores = model.decision_function(X)
-        predictions = model.predict(X)
+        predictions = (scores > record.get("_threshold", 0.0)).astype(int)
     return predictions, scores

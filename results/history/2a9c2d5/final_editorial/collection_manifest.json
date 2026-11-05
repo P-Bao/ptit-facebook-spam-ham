@@ -1,0 +1,23 @@
+{
+  "mode": "replay_collection_and_cached_annotations",
+  "facebook_requests": false,
+  "llm_argilla_calls": false,
+  "posts": 2170,
+  "groups": 5,
+  "raw_rows": 13833,
+  "nonempty_rows": 13704,
+  "cleaned_rows": 10974,
+  "linked_prediction_count": 6571,
+  "labeled_rows": 6289,
+  "labels": {
+    "ham": 5190,
+    "spam": 1099
+  },
+  "final_csv": "C:\\KH086\\PT&KP DLVB\\PROJECT\\ptit-facebook-spam-ham\\.work\\runs\\final_editorial_collection\\artifacts\\comments_labeled.csv",
+  "source_sha256": {
+    "posts": "3452faa5fd37037c7eaaa56f82af512e4ab8d85a952ce4db7fa16c62a657e4a6",
+    "annotation_index": "927e3a7c65fe6416258faa444bc76f0c2f778f38c270364411bfbc233890ea7b",
+    "predictions": "48e345447158141cb84f9663f65947bd1e112a614951406ed5734768038f711e"
+  },
+  "final_csv_sha256": "32c8d20652a6ecccd4659271207a44b9908c54b4018c9b8ea7bd7e54370461b6"
+}

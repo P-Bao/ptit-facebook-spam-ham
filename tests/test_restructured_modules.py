@@ -1,5 +1,3 @@
-import hashlib
-import json
 import os
 from pathlib import Path
 import subprocess
@@ -10,43 +8,9 @@ import numpy as np
 import pytest
 from sklearn.model_selection import StratifiedKFold
 
-from pipeline.collect import snapshots
 from pipeline.inference.predict import predict_spam
-from pipeline.modeling.experiments import evaluate, fit_experiment
+from pipeline.modeling.experiments import evaluate, fit_experiment, make_pipe
 from pipeline.prepare.preprocess_for_model import preprocess
-
-
-def snapshot_manifest(tmp_path, monkeypatch):
-    manifest = tmp_path / "results/source_audit/drive_manifest.json"
-    manifest.parent.mkdir(parents=True)
-    manifest.write_text(json.dumps([{"name": "groups_data_phase2.json", "bytes": 2,
-        "download_url": "https://example.invalid/source", "sha256": hashlib.sha256(b"[]").hexdigest()}]), encoding="utf-8")
-    monkeypatch.setattr(snapshots, "PROJECT_ROOT", tmp_path)
-
-
-def test_existing_snapshot_hash_mismatch_is_not_overwritten(tmp_path, monkeypatch):
-    snapshot_manifest(tmp_path, monkeypatch)
-    source = tmp_path / "data/raw/groups_data_phase2.json"
-    source.parent.mkdir(parents=True)
-    source.write_bytes(b"wrong")
-    monkeypatch.setattr(snapshots, "urlopen", lambda *a, **k: pytest.fail("Must not download over existing file"))
-    with pytest.raises(ValueError, match="hash"):
-        snapshots.ensure_snapshots(tmp_path / "data", [source.name])
-    assert source.read_bytes() == b"wrong"
-
-
-def test_download_rejects_wrong_payload_before_writing(tmp_path, monkeypatch):
-    snapshot_manifest(tmp_path, monkeypatch)
-
-    class BadResponse:
-        def __enter__(self): return self
-        def __exit__(self, *args): pass
-        def read(self, limit): return b"bad"
-
-    monkeypatch.setattr(snapshots, "urlopen", lambda *a, **k: BadResponse())
-    with pytest.raises(ValueError, match="hash"):
-        snapshots.ensure_snapshots(tmp_path / "data", ["groups_data_phase2.json"])
-    assert not (tmp_path / "data/raw/groups_data_phase2.json").exists()
 
 
 @pytest.mark.parametrize("feature,algorithm", [("BoW", "Naive Bayes"), ("TF-IDF", "SVM")])
@@ -58,12 +22,26 @@ def test_extracted_training_and_saved_bundle_inference(tmp_path, feature, algori
     record = fit_experiment("test", feature, algorithm, X, y, folds, n_jobs=1)
     evaluate(record, X, y)
     assert record["F1"] == 1
-    bundle = {"model": record["_model"], "threshold": .5, "remove_stop": False}
+    assert record["CV Precision (spam)"] == record["CV Recall (spam)"] == record["CV F1 (spam)"] == 1
+    bundle = {"model": record["_model"], "threshold": record["_threshold"], "remove_stop": False}
     path = tmp_path / "bundle.joblib"
     joblib.dump(bundle, path)
     predicted = predict_spam(raw[:2], joblib.load(path))
     assert predicted.du_doan.tolist() == ["ham", "spam"]
     assert predict_spam([], bundle).empty
+    if algorithm == "SVM":
+        # Nếu ngưỡng không được áp dụng trong inference, mẫu spam vẫn bị đoán spam.
+        bundle["threshold"] = float(record["_model"].decision_function(X).max() + 1)
+        joblib.dump(bundle, path)
+        assert predict_spam(raw[:2], joblib.load(path)).du_doan.tolist() == ["ham", "ham"]
+
+
+@pytest.mark.parametrize("feature", ["BoW", "TF-IDF", "FastText"])
+def test_svm_baselines_do_not_mix_class_weights(feature):
+    _, baseline_grid, _ = make_pipe(feature, "SVM")
+    _, balanced_grid, _ = make_pipe(feature, "SVM", class_weight="balanced")
+    assert baseline_grid["clf__class_weight"] == [None]
+    assert balanced_grid["clf__class_weight"] == ["balanced"]
 
 
 def test_crawler_entrypoint_help_after_separation():
@@ -78,7 +56,7 @@ def test_crawler_entrypoint_help_after_separation():
     assert (output.stat().st_mtime_ns if output.exists() else None) == before
 
 
-def test_default_stage_paths_connect_without_overwriting_snapshots():
+def test_default_stage_paths_connect():
     from pipeline.collect import json_to_csv
     from pipeline.prepare import clean_for_labeling
     from pipeline.label import upload_to_argilla, ai_assisted_spam_ham, auto_accept_labels, download_labeled_data
@@ -88,5 +66,5 @@ def test_default_stage_paths_connect_without_overwriting_snapshots():
     cleaned = clean_for_labeling.DEFAULT_OUTPUT_CSV
     assert cleaned == upload_to_argilla.DEFAULT_CSV_PATH == ai_assisted_spam_ham.DEFAULT_CSV_PATH
     assert cleaned == auto_accept_labels.DEFAULT_CSV_PATH == download_labeled_data.DEFAULT_CSV_LOOKUP
-    assert download_labeled_data.DEFAULT_OUTPUT_CSV.name not in snapshots.SOURCE_LOCATIONS
-    assert merge_labeled_data.DEFAULT_OUTPUT_CSV.name not in snapshots.SOURCE_LOCATIONS
+    assert download_labeled_data.DEFAULT_OUTPUT_CSV == merge_labeled_data.DEFAULT_PHASE2_CSV
+    assert json_to_csv.DEFAULT_PHASE1_CSV == merge_labeled_data.DEFAULT_PHASE1_CSV

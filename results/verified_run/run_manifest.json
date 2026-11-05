@@ -1,7 +1,6 @@
 {
-  "dataset_repo": "p-storm/ptit-facebook-comments-spamham",
-  "dataset_revision": "5b904713bb2896ab8f6ff336545b9debd2489724",
-  "dataset_sha256": "7305d712996da3ff0dce1ea4142844b7629e9880bcac47ee38934f0b6e6cfbee",
+  "dataset_file": "C:\\KH086\\PT&KP DLVB\\PROJECT\\ptit-facebook-spam-ham\\data\\final\\labeled_v7.csv",
+  "processed_file": "C:\\KH086\\PT&KP DLVB\\PROJECT\\ptit-facebook-spam-ham\\data\\processed\\v7_preprocessed.csv",
   "audit": {
     "rows": 38233,
     "labels": {
@@ -26,22 +25,27 @@
     "joblib": "1.5.1",
     "gensim": "4.4.0",
     "underthesea": "8.3.0",
-    "huggingface_hub": "0.36.2",
     "jinja2": "3.1.6"
   },
   "python": "3.12.14",
-  "completed_utc": "2026-11-05T05:20:06.705596+00:00",
+  "completed_utc": "2026-11-05T13:55:07.125606+00:00",
   "modern_model": "not_implemented",
+  "selection_rule": "max mean validation F1 on train CV; test not used for selection",
+  "baseline_configurations": 6,
+  "additional_strategies": 3,
   "selected": {
+    "Mã": "S3",
     "Tiền xử lý": "giữ stop words",
     "Đặc trưng": "TF-IDF",
     "Thuật toán": "SVM",
-    "Biến thể": "chính",
-    "CV F1 (spam)": 0.7735613299500151,
-    "Accuracy": 0.9419320310409419,
-    "Precision": 0.8818316100443131,
-    "Recall": 0.6277602523659306,
-    "F1": 0.7334152334152334,
+    "Chiến lược": "Điều chỉnh ngưỡng",
+    "CV Precision (spam)": 0.8490321906574294,
+    "CV Recall (spam)": 0.7352844318710363,
+    "CV F1 (spam)": 0.7876129035895455,
+    "Accuracy": 0.9432700026759433,
+    "Precision": 0.8373879641485276,
+    "Recall": 0.6876971608832808,
+    "F1": 0.7551963048498845,
     "AP": 0.8116912085784026,
     "Tham số": {
       "clf__C": 0.3,
@@ -49,7 +53,9 @@
       "vec__ngram_range": [
         1,
         2
-      ]
+      ],
+      "threshold": -0.17762792522140153
     }
-  }
+  },
+  "decision_threshold": -0.17762792522140153
 }

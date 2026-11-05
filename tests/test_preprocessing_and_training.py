@@ -8,6 +8,7 @@ from pipeline.prepare.preprocess_for_model import (
 from pipeline.features.spam_features import FastTextVectorizer
 from pipeline.modeling.training_utils import (
     grouped_folds, norm_key, sample_training_indices, undersampled_search,
+    tune_svm_threshold, predict_record,
 )
 
 
@@ -88,6 +89,43 @@ def test_undersampling_leaves_validation_untouched():
         assert RecordingClassifier.fits[i].issubset(set(train))
         assert not RecordingClassifier.fits[i] & set(valid)
         assert RecordingClassifier.predictions[i] == set(valid)
+
+
+class RecordingDecisionClassifier(RecordingClassifier):
+    def decision_function(self, X):
+        self.__class__.predictions.append(set(X.tolist()))
+        return np.where(X % 2, 0.3, 0.1)
+
+
+def test_svm_threshold_uses_only_out_of_fold_scores():
+    X = np.arange(60)
+    y = X % 2
+    folds = [(np.arange(20, 60), np.arange(20)),
+             (np.r_[0:20, 40:60], np.arange(20, 40)),
+             (np.arange(40), np.arange(40, 60))]
+    RecordingDecisionClassifier.fits = []
+    RecordingDecisionClassifier.predictions = []
+    model, metrics, threshold = tune_svm_threshold(RecordingDecisionClassifier(), X, y, folds)
+    for i, (train, valid) in enumerate(folds):
+        assert RecordingDecisionClassifier.fits[i] == set(train)
+        assert RecordingDecisionClassifier.predictions[i] == set(valid)
+        assert not RecordingDecisionClassifier.fits[i] & set(valid)
+    assert RecordingDecisionClassifier.fits[-1] == set(X)
+    assert metrics["CV F1 (spam)"] == 1.0
+    assert 0.1 <= threshold < 0.3
+    default_pred, _ = predict_record({"_model": model}, X)
+    tuned_pred, _ = predict_record({"_model": model, "_threshold": threshold}, X)
+    assert default_pred.sum() == len(y)
+    np.testing.assert_array_equal(tuned_pred, y)
+
+
+def test_svm_default_threshold_keeps_zero_on_ham_side():
+    class ZeroMargin:
+        def decision_function(self, X):
+            return np.array([-0.2, 0.0, 0.2])
+
+    pred, _ = predict_record({"_model": ZeroMargin()}, [0, 1, 2])
+    assert pred.tolist() == [0, 0, 1]
 
 
 def test_fasttext_oov_and_empty_sentence():

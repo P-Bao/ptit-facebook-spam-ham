@@ -1,0 +1,23 @@
+{
+  "command": ".venv/Scripts/python.exe -m tools.dataset_versions.merge_labeled_data",
+  "phase1": {
+    "path": "data/labeled/comments_labeled_phase1.csv",
+    "rows": 31931,
+    "sha256": "5cad1e8918e8a8bb9106422f7a1778083da8407f6d1ad24b32fc76c82dd7a343"
+  },
+  "notebook_01": {
+    "path": "data/labeled/comments_labeled.csv",
+    "rows": 6289,
+    "sha256": "32c8d20652a6ecccd4659271207a44b9908c54b4018c9b8ea7bd7e54370461b6"
+  },
+  "merged": {
+    "path": "data/final/comments_merged.csv",
+    "rows": 38220,
+    "sha256": "ca20f169b0b3ab45f035c8c755b7c579a056ae429eb54b0f0a739cf1d5a9a14d",
+    "labels": {
+      "ham": 33912,
+      "spam": 4308
+    }
+  },
+  "training_csv_unchanged": true
+}

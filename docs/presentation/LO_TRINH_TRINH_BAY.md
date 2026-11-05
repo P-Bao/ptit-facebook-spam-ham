@@ -1,37 +1,34 @@
-# Lộ trình mở code khi trình bày
+# Lộ trình trình bày mã nguồn
 
-## Notebook 01 — từ thu thập đến bảng nhãn
+## Notebook 01 — Thu thập và chuẩn bị dữ liệu
 
-| Thứ tự | Mở file/hàm | Giải thích | Đề |
-|---|---|---|---|
-| 1 | `pipeline/collect/scrape_ptit_groups.py`: `PTIT_GROUPS`, `run_scraper` | Nguồn, cấu hình, runner | Thu thập |
-| 2 | `external/facebook_scraper/group_post_scraper_v2.py`: `fetch_posts` | Lấy trang bài và metadata | Thu thập |
-| 3 | `external/facebook_scraper/main.py`: `fetch_comments_for_post`; `comment_scraper.py` | Comment/reply của bài | Thu thập |
-| 4 | Runner: `on_batch`, `SingleFileWriter.save_records` | Record JSON, state hỗ trợ tiếp tục; không chứng minh thu đủ | Thu thập |
-| 5 | `pipeline/collect/json_to_csv.py`: `flatten_posts` | Mỗi comment/reply một dòng | Chuẩn bị dữ liệu |
-| 6 | `pipeline/prepare/clean_for_labeling.py`: `preprocess`, `clean_facebook_comments` | Thêm cleaned_text, giữ raw, khử trùng/lọc | Ý 2 |
-| 7 | `pipeline/label/upload_to_argilla.py`, `ai_assisted_spam_ham.py` | Upload và gợi ý label/confidence | Chuẩn bị nhãn |
-| 8 | `auto_accept_labels.py`, `download_labeled_data.py`, `label_utils.py` | Chốt theo ngưỡng/người duyệt, export đúng ID | Chuẩn bị nhãn |
+| Phần | Mã nguồn để mở | Nội dung giải thích |
+|---|---|---|
+| Nguồn và bài viết | `pipeline/collect/scrape_ptit_groups.py`, `external/facebook_scraper/group_post_scraper_v2.py` | Cấu hình nhóm, lấy bài và metadata. |
+| Bình luận và lưu trữ | `external/facebook_scraper/main.py`, `comment_scraper.py`; runner: `on_batch`, `save_records` | Lấy comment/reply, ghi cấu trúc JSON. |
+| Chuẩn hóa bảng | `pipeline/collect/json_to_csv.py`: `flatten_posts` | Mỗi comment/reply thành một dòng. |
+| Làm sạch | `pipeline/prepare/clean_for_labeling.py` | Chuẩn hóa, lọc/khử trùng, giữ nội dung gốc. |
+| Gán nhãn | `pipeline/label/ai_assisted_spam_ham.py`, `cached_annotations.py`, `auto_accept_labels.py` | Gợi ý, liên kết đúng ID và áp ngưỡng tiếp nhận. |
+| Xuất CSV | Cell xuất dữ liệu | Các cột, số mẫu, tỷ lệ nhãn và `data/labeled/comments_labeled.csv`. |
 
-Notebook đọc snapshot thật và trích code từ file, không gọi dịch vụ live. Ví dụ
-CSV vài bài và ví dụ nhãn từ cache lịch sử có phạm vi riêng được ghi rõ.
+Notebook tái lập xử lý từ dữ liệu/phản hồi đã lưu. Giải thích output trước,
+mở khối mã nguồn tương ứng khi cần phân tích cách thực hiện.
 
-Câu chuyển: “Phần đầu trình bày mã và snapshot của một đợt thu thập. Các thí nghiệm
-tiếp theo dùng dataset PTIT phiên bản v7 do nhóm cung cấp.”
+Khi cần tổng hợp dữ liệu, chạy `tools/dataset_versions/merge_labeled_data.py`
+theo hướng dẫn README; file kết quả nằm ở `data/final/comments_merged.csv`.
 
-## Notebook 02 — từ v7 đến mô hình và demo
+## Notebook 02 — Thực nghiệm và ứng dụng
 
-| Phần | File/hàm | Giải thích | Đề |
-|---|---|---|---|
-| Dataset | Cell nạp v7 | Revision/hash, số mẫu, kiểm tra nhãn/ID | Mô tả dữ liệu |
-| Tiền xử lý | `pipeline/prepare/preprocess_for_model.py`: `preprocess` | Tách từ, giữ/bỏ stop words | Ý 2 |
-| Chia tập | Notebook; `pipeline/modeling/training_utils.py` | Text trùng cùng nhóm, train/test và CV | Ý 4 |
-| Đặc trưng | `pipeline/features/spam_features.py`; `experiments.make_pipe` | BoW/TF-IDF/FastText, fit trong train/fold | Ý 3 |
-| Huấn luyện | `pipeline/modeling/experiments.py`: `make_pipe`, `fit_experiment` | NB/SVM, grid/CV, chọn trước test | Ý 4 |
-| Mô hình hiện đại | Mục chờ notebook; `pipeline/modern/README.md` | Chưa có kết quả, triển khai sau | Ý 4 bổ sung |
-| Đánh giá | `experiments.evaluate`, bảng/hình notebook | Accuracy/Precision/Recall/F1/Confusion Matrix, so sánh | Ý 5 |
-| Phân tích thêm | Sampling/ngưỡng, AP/CI/OOV, FP/FN | Để sau phần bắt buộc | Cải thiện |
-| Demo | `pipeline/inference/predict.py`: `predict_spam` | Raw → cùng preprocess → model đã fit → spam/ham | Ứng dụng |
+| Phần | Mã nguồn để mở | Nội dung giải thích |
+|---|---|---|
+| Dữ liệu | Cell nạp v7 | Đọc CSV local, số mẫu, phân bố nhãn và bình luận thật từ file. |
+| Tiền xử lý | `pipeline/prepare/preprocess_for_model.py` | Tiền xử lý toàn bộ v7, so sánh cùng ID, lưu/đọc lại CSV token cho mô hình. |
+| Thiết kế thực nghiệm | Mục 4; `pipeline/modeling/training_utils.py` | Nhóm văn bản, train/validation/test; CV F1 chọn cấu hình, test báo cáo kết quả. |
+| Đặc trưng và huấn luyện | Mục 5; `pipeline/modeling/experiments.py`, `pipeline/features/spam_features.py` | Đối chiếu từ dừng bằng CV, chọn tiền xử lý rồi so sánh sáu tổ hợp cơ sở; học trong train/fold. |
+| Mô hình hiện đại | Mục chờ trong notebook; `pipeline/modern/` | Phần dành cho triển khai tiếp theo. |
+| Mất cân bằng | Mục 5.1; `training_utils.py`: `undersampled_search`, `tune_svm_threshold` | Cùng TF-IDF + SVM: không điều chỉnh, balanced, lấy mẫu 2:1, chỉnh ngưỡng; bảng CV và hình số mẫu/trọng số. |
+| Đánh giá | Mục 6–6.3; `experiments.evaluate` | Test của sáu tổ hợp và bốn chiến lược; FP/FN, ma trận nhầm lẫn và PR. Đổi ngưỡng chỉ đổi điểm hoạt động trên đường PR. |
+| Phân tích lỗi | Mục 7 | Ghi rõ cấu hình được chọn, ID/text gốc, nhãn thực tế, dự đoán, score và ngưỡng. |
+| Ứng dụng | Cell lưu mô hình; `pipeline/inference/predict.py` | Bundle đã học, tải lại và dự đoán raw text. |
 
-`tools/dataset_versions/` dùng tổng hợp/kiểm chứng, không bắt buộc khi train v7.
-Báo cáo dẫn nguồn và phụ lục; không dùng vị trí folder để suy diễn không có giới hạn dữ liệu.
+Hướng dẫn đầy đủ: [Tổng quan project](../guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md).

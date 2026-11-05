@@ -1,0 +1,9 @@
+{
+  "parallel_worker_smoke_test": "passed",
+  "graceful_shutdown": true,
+  "child_processes_checked": 4,
+  "child_processes_remaining": 0,
+  "runtime_directory_removed": true,
+  "teardown_warning_observed": "joblib resource_tracker KeyError in Windows shutdown smoke test",
+  "scope": "Cleanup smoke test; workers exited and scratch removal succeeded"
+}

@@ -1,0 +1,23 @@
+{
+  "file": "data/processed/v7_preprocessed.csv",
+  "rows": 38233,
+  "columns": [
+    "id",
+    "label",
+    "text",
+    "cleaned_text",
+    "comment_type",
+    "reaction_count",
+    "tokens_keep_stopwords",
+    "tokens_remove_stopwords"
+  ],
+  "original_columns_preserved": true,
+  "all_token_rows_match_preprocess_function": true,
+  "used_for_training_after_csv_reload": true,
+  "empty_token_rows": {
+    "tokens_keep_stopwords": 2,
+    "tokens_remove_stopwords": 103
+  },
+  "verification_inherited_from": "results/history/d938b0a/verified_run/preprocessing_check.json",
+  "preprocessing_code_unchanged": true
+}

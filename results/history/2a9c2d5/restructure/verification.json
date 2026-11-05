@@ -1,0 +1,60 @@
+{
+  "checked_client_date": "2026-11-05",
+  "completed_utc": "2026-11-05T05:20:42.867634+00:00",
+  "notebooks": {
+    "01": {
+      "path": "notebooks/01_thu_thap_va_gan_nhan.ipynb",
+      "cells": 15,
+      "code_cells": 7,
+      "cell_errors": 0,
+      "seconds": 2.16,
+      "code_sha256": "6d766b740552e8cee74725a2444b9976be36f3d1a43b7bb730d35d1a316cdda4"
+    },
+    "02": {
+      "path": "notebooks/02_thuc_nghiem_va_demo.ipynb",
+      "cells": 36,
+      "code_cells": 19,
+      "cell_errors": 0,
+      "seconds": 1469.28,
+      "code_sha256": "9a77f3c8765fcba3aa2ee6b83e414d0eb50cdeeb0ace3a7e8e3c793f23808d5f"
+    }
+  },
+  "tests_passed": 44,
+  "training_csv_unchanged": true,
+  "snapshot_audit_matches_prior_run": true,
+  "all_16_experiment_scores_and_parameters_unchanged": true,
+  "selected_model": {
+    "Tiền xử lý": "giữ stop words",
+    "Đặc trưng": "TF-IDF",
+    "Thuật toán": "SVM",
+    "Biến thể": "chính",
+    "CV F1 (spam)": 0.7735613299500151,
+    "Accuracy": 0.9419320310409419,
+    "Precision": 0.8818316100443131,
+    "Recall": 0.6277602523659306,
+    "F1": 0.7334152334152334,
+    "AP": 0.8116912085784026,
+    "Tham số": {
+      "clf__C": 0.3,
+      "clf__class_weight": null,
+      "vec__ngram_range": [
+        1,
+        2
+      ]
+    }
+  },
+  "trained_module_hashes_match_final": true,
+  "non_training_modules_updated_after_training_started": [
+    "pipeline/collect/json_to_csv.py",
+    "pipeline/collect/scrape_ptit_groups.py",
+    "pipeline/label/download_labeled_data.py",
+    "tools/dataset_versions/audit_source.py",
+    "tools/dataset_versions/merge_labeled_data.py"
+  ],
+  "module_hash_note": "Runner stores a repository module hash snapshot at start; only unrelated collection/label/tools paths changed during the training run. All modules used for model computation match final files.",
+  "collection_used_saved_real_snapshot": true,
+  "collection_calls_facebook_llm_argilla": false,
+  "uses_project_modules": true,
+  "archived_baseline": "results/history/7415098",
+  "later_notebook_output_verification": "results/final_editorial/verification.json"
+}

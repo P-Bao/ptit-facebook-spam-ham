@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data"
 
 DEFAULT_INPUT_JSON = DATA_DIR / "raw" / "posts.json"
-DEFAULT_PHASE1_CSV = DATA_DIR / "labeled" / "comments_labeled_export.csv"
+DEFAULT_PHASE1_CSV = DATA_DIR / "labeled" / "comments_labeled_phase1.csv"
 DEFAULT_OUTPUT_CSV = DATA_DIR / "intermediate" / "comments.csv"
 
 FIELDNAMES = ["post_id", "group_id", "group_name", "created_at", "comment_type", "text", "reaction_count"]

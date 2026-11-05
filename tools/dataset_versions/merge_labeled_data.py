@@ -1,7 +1,7 @@
 """tools/dataset_versions/merge_labeled_data.py
 Tổng hợp hai CSV đã gán nhãn, không tạo nhãn mới.
 
-Đầu vào: --phase1 và --phase2: hai bảng nhãn hiện có.
+Đầu vào: CSV có nhãn có sẵn và data/labeled/comments_labeled.csv từ notebook 01.
 Xử lý: Giữ ID nguồn, thêm prefix Phase 2, loại trùng chéo theo cleaned_text, ghi source.
 Đầu ra: CSV gộp; không tự tái tạo lịch sử chỉnh nhãn v7.
 Liên quan: pipeline.label; audit_source; không cần chạy khi train trực tiếp data/final/labeled_v7.csv.
@@ -19,9 +19,9 @@ if hasattr(sys.stdout, "reconfigure"):
 BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "data"
 
-DEFAULT_PHASE1_CSV = DATA_DIR / "labeled" / "comments_labeled_export.csv"
-DEFAULT_PHASE2_CSV = DATA_DIR / "labeled" / "comments_labeled_phase2.csv"
-DEFAULT_OUTPUT_CSV = DATA_DIR / "labeled" / "comments_merged.csv"
+DEFAULT_PHASE1_CSV = DATA_DIR / "labeled" / "comments_labeled_phase1.csv"
+DEFAULT_PHASE2_CSV = DATA_DIR / "labeled" / "comments_labeled.csv"
+DEFAULT_OUTPUT_CSV = DATA_DIR / "final" / "comments_merged.csv"
 
 COLUMNS = ["id", "label", "cleaned_text", "text", "comment_type", "reaction_count"]
 VALID_LABELS = {"spam", "ham"}

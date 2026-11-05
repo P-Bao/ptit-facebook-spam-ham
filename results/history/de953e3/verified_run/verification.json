@@ -1,0 +1,32 @@
+{
+  "checked_client_date": "2026-11-05",
+  "completed_utc": "2026-11-05T10:06:46.381988+00:00",
+  "baseline_commit": "024a9218abe4801da75744d21a9fcf1efcb15dd0",
+  "notebooks": {
+    "01": {
+      "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "cells": 15,
+      "code_cells": 6,
+      "seconds": 4.45,
+      "errors": 0,
+      "output_dir": "data"
+    },
+    "02": {
+      "path": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "cells": 36,
+      "code_cells": 19,
+      "seconds": 1312.19,
+      "errors": 0,
+      "output_dir": "artifacts\\spamham"
+    }
+  },
+  "tests_passed": 50,
+  "removed_snapshot_specific_tests": 5,
+  "input_mode": "local_files",
+  "all_model_scores_and_parameters_unchanged": true,
+  "training_algorithm_modules_unchanged": true,
+  "preprocessing_rows_verified": 38233,
+  "raw_inference_agrees_on_all_7474_test_ids": true,
+  "modern_model": "not_implemented",
+  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown, after all computational cells completed"
+}

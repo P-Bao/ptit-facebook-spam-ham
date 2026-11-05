@@ -19,7 +19,9 @@ def predict_spam(texts, model_bundle):
     if not texts:
         return pd.DataFrame(columns=["text", "score", "score_type", "du_doan"])
     X = [preprocess(text, text, model_bundle["remove_stop"]) for text in texts]
-    record = {"_model": model_bundle["model"], "_threshold": model_bundle["threshold"]}
+    record = {"_model": model_bundle["model"]}
+    if "threshold" in model_bundle:
+        record["_threshold"] = model_bundle["threshold"]
     pred, score = predict_record(record, X)
     return pd.DataFrame({"text": texts, "score": score,
         "score_type": "probability_spam" if hasattr(model_bundle["model"], "predict_proba") else "decision_score",

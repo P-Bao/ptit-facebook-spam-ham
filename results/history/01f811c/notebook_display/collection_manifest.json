@@ -1,0 +1,58 @@
+{
+  "mode": "reprocess_saved_snapshot_and_cached_labels",
+  "facebook_requests": false,
+  "llm_argilla_calls": false,
+  "raw_posts": 2170,
+  "groups": 5,
+  "raw_comment_reply_rows": 13833,
+  "converted_rows": 13704,
+  "cleaned_rows": 10974,
+  "cached_candidates": 9398,
+  "auto_accepted_rows": 6302,
+  "official_export_rows": 6303,
+  "source_sha256": {
+    "groups_data_phase2.json": "3452faa5fd37037c7eaaa56f82af512e4ab8d85a952ce4db7fa16c62a657e4a6",
+    "comments_phase2.csv": "f57ba35438d3cc071dccf1bfea6ddad101f7fef26a7837c154f713b37d75a826",
+    "comments_phase2_cleaned.csv": "927e3a7c65fe6416258faa444bc76f0c2f778f38c270364411bfbc233890ea7b",
+    "predictions_glm_cache_phase2.json": "48e345447158141cb84f9663f65947bd1e112a614951406ed5734768038f711e",
+    "comments_labeled_phase2.csv": "b42b866c5b44fb9358b7f33c15cc40e812c704de60edd71e124341236aadbd79"
+  },
+  "output_files": [
+    {
+      "file": ".work/runs/readable_collection/artifacts/comments_from_snapshot.csv",
+      "trạng thái": "vừa ghi",
+      "số bản ghi": 13704,
+      "KB": 2331.6,
+      "chứa": "post_id, group_id, group_name, created_at, comment_type, text, reaction_count"
+    },
+    {
+      "file": ".work/runs/readable_collection/artifacts/comments_cleaned_from_snapshot.csv",
+      "trạng thái": "vừa ghi",
+      "số bản ghi": 10974,
+      "KB": 2589.3,
+      "chứa": "post_id, group_id, group_name, created_at, comment_type, text, cleaned_text, reaction_count"
+    },
+    {
+      "file": ".work/runs/readable_collection/artifacts/accepted_from_saved_cache.csv",
+      "trạng thái": "vừa ghi",
+      "số bản ghi": 9398,
+      "KB": 2387.8,
+      "chứa": "đủ dòng nguồn; official_label rỗng nếu chưa được nhận"
+    },
+    {
+      "file": ".work/runs/readable_collection/artifacts/labels_auto_accepted.csv",
+      "trạng thái": "vừa ghi",
+      "số bản ghi": 6302,
+      "KB": 1666.9,
+      "chứa": "chỉ các ID có official_label ham/spam sau áp ngưỡng"
+    },
+    {
+      "file": ".work/runs/readable_collection/artifacts/labels_saved_official_export.csv",
+      "trạng thái": "vừa ghi",
+      "số bản ghi": 6303,
+      "KB": 873.5,
+      "chứa": "id, label, cleaned_text, text, comment_type, reaction_count"
+    }
+  ],
+  "next_notebook": "02_thuc_nghiem_va_demo.ipynb"
+}

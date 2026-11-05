@@ -1,0 +1,62 @@
+{
+  "files": {
+    "pipeline/step_01_collect/convert_phase2_json.py": "pipeline/collect/json_to_csv.py",
+    "pipeline/step_01_collect/audit_source.py": "tools/dataset_versions/audit_source.py",
+    "pipeline/step_01_collect/README.md": "pipeline/collect/README.md",
+    "pipeline/step_02_preprocess/clean_data_facebook_spamham.py": "pipeline/prepare/clean_for_labeling.py",
+    "pipeline/step_02_preprocess/text_preprocessing.py": "pipeline/prepare/preprocess_for_model.py",
+    "pipeline/step_04_merge/merge_labeled_data.py": "tools/dataset_versions/merge_labeled_data.py",
+    "pipeline/step_05_features/spam_features.py": "pipeline/features/spam_features.py",
+    "pipeline/step_06_train_evaluate/training_utils.py": "pipeline/modeling/training_utils.py",
+    "docs/references/CRAWLER_VA_DU_LIEU_DRIVE.md": "docs/provenance/CRAWLER_VA_DU_LIEU_DRIVE.md",
+    "docs/references/KAGGLE_VA_NGUON_DU_LIEU.md": "docs/provenance/KAGGLE_VA_NGUON_DU_LIEU.md",
+    "pipeline/step_03_label/ai_assisted_spam_ham.py": "pipeline/label/ai_assisted_spam_ham.py",
+    "pipeline/step_03_label/auto_accept_labels.py": "pipeline/label/auto_accept_labels.py",
+    "pipeline/step_03_label/download_labeled_data.py": "pipeline/label/download_labeled_data.py",
+    "pipeline/step_03_label/label_utils.py": "pipeline/label/label_utils.py",
+    "pipeline/step_03_label/upload_to_argilla.py": "pipeline/label/upload_to_argilla.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/.env.example": "external/facebook_scraper/.env.example",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/comment_scraper.py": "external/facebook_scraper/comment_scraper.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/facebook_ui.py": "external/facebook_scraper/facebook_ui.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/group_post_scraper_v2.py": "external/facebook_scraper/group_post_scraper_v2.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/main.py": "external/facebook_scraper/main.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/post_scraper.py": "external/facebook_scraper/post_scraper.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/proxy_utils.py": "external/facebook_scraper/proxy_utils.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/README.md": "external/facebook_scraper/README.md",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/README_ORIGINAL.md": "external/facebook_scraper/README_ORIGINAL.md",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/README_RUN.md": "external/facebook_scraper/README_RUN.md",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/requirements.txt": "external/facebook_scraper/requirements.txt",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/scrape_ptit_groups.py": "pipeline/collect/scrape_ptit_groups.py",
+    "facebook_post_comment_scraper_code/facebook_post_comment_scraper/single_post_image.py": "external/facebook_scraper/single_post_image.py"
+  },
+  "data": {
+    "data/source_drive/groups_data_phase2.json": "data/raw/groups_data_phase2.json",
+    "data/source_drive/comments_phase2.csv": "data/intermediate/comments_phase2.csv",
+    "data/source_drive/comments_phase2_cleaned.csv": "data/intermediate/comments_phase2_cleaned.csv",
+    "data/source_drive/predictions_glm_cache_phase2.json": "data/intermediate/predictions_glm_cache_phase2.json",
+    "data/source_drive/comments_labeled_export.csv": "data/labeled/comments_labeled_export.csv",
+    "data/source_drive/comments_labeled_phase2.csv": "data/labeled/comments_labeled_phase2.csv",
+    "data/source_drive/comments_labeled_merged.csv": "data/labeled/comments_labeled_merged.csv"
+  },
+  "from_commit": "7415098",
+  "extracted_from_notebook": {
+    "pipeline/modeling/experiments.py": [
+      "make_pipe",
+      "fit_experiment",
+      "evaluate",
+      "boot_ci"
+    ],
+    "pipeline/inference/predict.py": [
+      "predict_spam"
+    ],
+    "notebooks/01_thu_thap_va_gan_nhan.ipynb": [
+      "collection presentation and snapshot examples"
+    ],
+    "notebooks/02_thuc_nghiem_va_demo.ipynb": [
+      "existing experiments with project module imports"
+    ]
+  },
+  "training_data_moved": {
+    "data/labeled_v7.csv": "data/final/labeled_v7.csv"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "checked_client_date": "2026-11-05",
+  "completed_utc": "2026-11-05T07:38:53.977157+00:00",
+  "baseline_commit": "01f811c3c7218307f2fe4c42487bb691469daade",
+  "notebooks": {
+    "01": {
+      "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "cells": 15,
+      "code_cells": 6,
+      "seconds": 6.5,
+      "errors": 0,
+      "code_sha256": "118c028f0b25db1ba3e449f0838fef61c7626d6f8f53e0c9ee20999d5ab62677"
+    },
+    "02": {
+      "path": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "cells": 36,
+      "code_cells": 19,
+      "seconds": 1414.3,
+      "errors": 0,
+      "code_sha256": "f86cf9f4eecdbfdfd293f39e08a60e382e175cdd3902254d07357756a7d230ea"
+    }
+  },
+  "tests_passed": 50,
+  "all_model_scores_and_parameters_unchanged": true,
+  "training_data_unchanged": true,
+  "all_executed_model_module_hashes_match_final_files": true,
+  "collection_modules_changed_after_training_start_but_not_used_by_training": [
+    "pipeline/collect/snapshots.py"
+  ],
+  "output_file_row_counts_verified": true,
+  "raw_inference_agrees_on_all_7474_test_ids": true,
+  "renderer_browser_test": "results/final_editorial/contrast_verification.json",
+  "collection_mode": "replay_collection_and_cached_annotations",
+  "modern_model": "not_implemented"
+}

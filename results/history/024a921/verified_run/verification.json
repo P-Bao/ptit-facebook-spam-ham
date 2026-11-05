@@ -1,0 +1,38 @@
+{
+  "checked_client_date": "2026-11-05",
+  "completed_utc": "2026-11-05T08:22:46.040369+00:00",
+  "baseline_commit": "2a9c2d580c7088267e41daa8d8c93c1a81c4cf6a",
+  "notebooks": {
+    "01": {
+      "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "cells": 15,
+      "code_cells": 6,
+      "seconds": 6.78,
+      "errors": 0,
+      "code_sha256": "0914f0bfd6436aa22a13328997ad1f7f5a02e4d8cdb72692aa1c0d0cbb9039f2",
+      "output_dir": "data"
+    },
+    "02": {
+      "path": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "cells": 36,
+      "code_cells": 19,
+      "seconds": 1371.64,
+      "errors": 0,
+      "code_sha256": "4b2fb95d4513c378181502b5ffd743e77d08ab985c8079af252974beb432d9ad",
+      "output_dir": "artifacts/spamham"
+    }
+  },
+  "tests_passed": 55,
+  "all_module_hashes_match_final_files": true,
+  "training_data_unchanged": true,
+  "all_model_scores_and_parameters_unchanged": true,
+  "collection_csv_bytes_unchanged": true,
+  "merged_from_actual_notebook_output": true,
+  "raw_inference_agrees_on_all_7474_test_ids": true,
+  "environment_check": "passed",
+  "pip_check": "No broken requirements found",
+  "renderer_browser_test": "results/verified_run/display_contrast.json",
+  "modern_model": "not_implemented",
+  "runner_graceful_shutdown_smoke": "results/verified_run/kernel_shutdown_check.json",
+  "runner_shutdown_updated_after_full_training": true
+}
