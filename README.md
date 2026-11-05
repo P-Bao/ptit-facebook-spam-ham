@@ -177,6 +177,14 @@ hoặc runner là nơi điều phối thí nghiệm đầy đủ.
 | `results/history/` | Lưu bằng chứng các phiên bản cũ. | Dùng tra cứu lịch sử. |
 | `artifacts/spamham/` | Mô hình đã huấn luyện và báo cáo được notebook 02 sinh ra. | Bundle `.joblib` dùng để dự đoán lại. |
 
-Mất cân bằng lớp được khảo sát ở mục 5.1 notebook 02: SVM thử trọng số lớp,
-Naive Bayes thử ngưỡng và có nhánh under-sampling. Chọn mô hình bằng F1 spam trên
-CV; validation/test giữ tỷ lệ nhãn tự nhiên. Chi tiết trong tài liệu tổng quan.
+Mục 5.1 notebook 02 trình bày phạm vi từng cách xử lý mất cân bằng, bảng số mẫu
+trước/sau under-sampling và biểu đồ trọng số. Mục 6.1 đối chiếu Precision, Recall,
+F1 cùng FP/FN của năm nhánh: SVM gốc, SVM balanced, SVM under-sampling, NB ngưỡng
+mặc định và NB chỉnh ngưỡng. Đây là các thí nghiệm riêng; validation/test giữ tỷ lệ
+nhãn tự nhiên, mô hình được chọn bằng CV F1 spam.
+
+Đối chứng giữ/bỏ stop words được chuyển xuống **Phụ lục A — thực nghiệm bổ sung**.
+Giữ cả hai cấu hình cho phép đối chiếu kỹ thuật loại từ dừng với phương án được CV
+lựa chọn; phần chính tập trung vào đặc trưng, thuật toán và mất cân bằng lớp.
+Hai biểu đồ và bảng chi tiết được lưu thêm tại `artifacts/spamham/`:
+`imbalance_training.png`, `imbalance_results.png`, `imbalance_comparison.csv`.

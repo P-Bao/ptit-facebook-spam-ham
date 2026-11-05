@@ -1,7 +1,7 @@
 {
   "checked_client_date": "2026-11-05",
-  "completed_utc": "2026-11-05T10:06:46.381988+00:00",
-  "baseline_commit": "024a9218abe4801da75744d21a9fcf1efcb15dd0",
+  "completed_utc": "2026-11-05T10:55:02.582649+00:00",
+  "baseline_commit": "de953e3b005c18f0d9d8a20240ea4838a33363e2",
   "notebooks": {
     "01": {
       "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
@@ -9,24 +9,43 @@
       "code_cells": 6,
       "seconds": 4.45,
       "errors": 0,
-      "output_dir": "data"
+      "output_dir": "data",
+      "inherited_from": "de953e3"
     },
     "02": {
       "path": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
-      "cells": 36,
-      "code_cells": 19,
-      "seconds": 1312.19,
+      "cells": 38,
+      "code_cells": 20,
+      "seconds": 1421.28,
       "errors": 0,
       "output_dir": "artifacts\\spamham"
     }
   },
   "tests_passed": 50,
-  "removed_snapshot_specific_tests": 5,
-  "input_mode": "local_files",
-  "all_model_scores_and_parameters_unchanged": true,
+  "all_16_model_scores_and_parameters_unchanged": true,
   "training_algorithm_modules_unchanged": true,
-  "preprocessing_rows_verified": 38233,
+  "training_calls_unchanged": true,
+  "stopword_comparison": "optional_appendix",
+  "imbalance_branches": [
+    "SVM gốc",
+    "SVM balanced",
+    "SVM under-sampling",
+    "NB ngưỡng 0,5",
+    "NB chỉnh ngưỡng"
+  ],
+  "imbalance_methods_applied_separately": true,
+  "imbalance_report_values_match_model_metrics": true,
+  "figures": {
+    "imbalance_training.png": {
+      "width": 1665,
+      "height": 543
+    },
+    "imbalance_results.png": {
+      "width": 1946,
+      "height": 681
+    }
+  },
   "raw_inference_agrees_on_all_7474_test_ids": true,
   "modern_model": "not_implemented",
-  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown, after all computational cells completed"
+  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown after computational cells completed"
 }

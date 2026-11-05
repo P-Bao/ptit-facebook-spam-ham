@@ -26,7 +26,9 @@ theo hướng dẫn README; file kết quả nằm ở `data/final/comments_merg
 | Thiết kế thực nghiệm | Cell chia tập; `pipeline/modeling/training_utils.py` | Nhóm văn bản, train/test và CV. |
 | Đặc trưng và huấn luyện | `pipeline/modeling/experiments.py`, `pipeline/features/spam_features.py` | BoW/TF-IDF/FastText + NB/SVM; học trong train/fold. |
 | Mô hình hiện đại | Mục chờ trong notebook; `pipeline/modern/` | Phần dành cho triển khai tiếp theo. |
-| Đánh giá | Bảng/hình và `experiments.evaluate` | Chỉ số, confusion matrix, ảnh hưởng stop words/cân bằng lớp, FP/FN. |
+| Mất cân bằng | Mục 5.1; `training_utils.py` | Bảng phạm vi năm nhánh, số mẫu train trước/sau lấy mẫu và trọng số lớp. |
+| Đánh giá | Mục 6.1; `experiments.evaluate` | Precision/Recall/F1, FP/FN, biểu đồ đánh đổi và confusion matrix. |
 | Ứng dụng | Cell lưu mô hình; `pipeline/inference/predict.py` | Bundle đã học, tải lại và dự đoán raw text. |
+| Đối chứng bổ sung | Phụ lục A | Bảng CV F1 và test F1 của hai cấu hình stop words theo từng cặp đặc trưng–thuật toán. |
 
 Hướng dẫn đầy đủ: [Tổng quan project](../guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md).

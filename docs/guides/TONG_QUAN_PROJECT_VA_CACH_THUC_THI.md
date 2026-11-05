@@ -86,7 +86,7 @@ rồi chạy notebook 02 khi cần huấn luyện/đánh giá lại.
 |---|---|
 | Notebook 01 | `data/intermediate/comments.csv`, `comments_cleaned.csv`, `annotation_predictions.json`, `annotation_review.csv`; CSV cuối `data/labeled/comments_labeled.csv`; `data/collection_manifest.json`. |
 | Tool gộp | `data/final/comments_merged.csv`, tạo từ CSV có sẵn và CSV vừa xuất. |
-| Notebook 02 | `data/processed/v7_preprocessed.csv`; `artifacts/spamham/spam_ham_ml_only.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`. |
+| Notebook 02 | `data/processed/v7_preprocessed.csv`; trong `artifacts/spamham/` có model `.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`, `imbalance_comparison.csv` và hai hình `imbalance_training.png`, `imbalance_results.png`. |
 
 Notebook 01 không cần cookie/API. Crawler và công cụ nhãn qua dịch vụ có bộ
 requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính không đặt ở đó.
@@ -152,6 +152,38 @@ balanced. Trên test, balanced tăng Recall spam từ 62,78% lên 77,92%, đồn
 Precision giảm từ 88,18% xuống 71,39%. Cấu hình cuối được chọn bằng CV trước khi
 đánh giá test. Các biện pháp này khảo sát ảnh hưởng mất cân bằng; mô hình vẫn có
 sai số và chưa loại bỏ hoàn toàn việc bỏ sót spam.
+
+Notebook 02 trình bày rõ phạm vi thực nghiệm:
+
+| Nhánh | Dữ liệu train khi fit cuối | Điều chỉnh |
+|---|---|---|
+| TF-IDF + SVM gốc | 26.384 ham + 4.375 spam | `class_weight=None` |
+| TF-IDF + SVM balanced | Giữ nguyên số mẫu | Trọng số toàn bộ train khoảng 0,583 cho ham và 3,515 cho spam; mỗi fold tính lại từ train của fold. |
+| TF-IDF + SVM under-sampling | 8.750 ham + 4.375 spam | Giữ spam, chọn ngẫu nhiên ham theo tỷ lệ tối đa 2:1; không kết hợp trọng số balanced. |
+| TF-IDF + Naive Bayes gốc | Giữ nguyên số mẫu | Ngưỡng mặc định 0,5 |
+| TF-IDF + Naive Bayes chỉnh ngưỡng | Giữ nguyên số mẫu | Ngưỡng khoảng 0,1721 từ dự đoán ngoài fold trên train. |
+
+Ba biện pháp được thử thành các nhánh riêng. Under-sampling có thể áp dụng cho
+các mô hình khác, nhưng thí nghiệm này chọn SVM để đối chiếu với cách dùng trọng
+số trên cùng họ thuật toán. Không có yêu cầu áp dụng đồng thời cả ba cách cho
+mọi mô hình; phối hợp chúng sẽ cần một thí nghiệm riêng để kiểm tra tác động.
+Tỷ lệ lấy mẫu 2:1 là cấu hình đối chứng cố định, không được chọn bằng kết quả test.
+
+Mục 5.1 có bảng phạm vi, bảng số mẫu và hình trọng số/lấy mẫu. Mục 6.1 có bảng
+chỉ số, số FP/FN và biểu đồ Precision–Recall–F1 cùng lỗi phân loại. Các giá trị được
+lấy từ mô hình đã fit và dự đoán trên test, không phải số minh họa tự đặt.
+
+## Đối chứng stop words
+
+Đề yêu cầu áp dụng kỹ thuật tiền xử lý và so sánh đặc trưng/thuật toán; so sánh
+giữ/bỏ stop words là thực nghiệm bổ sung. Bảng này được chuyển xuống phụ lục,
+giữ phần chính gọn và vẫn trình bày được nhánh loại từ dừng.
+
+Cấu hình giữ stop words hiện được CV lựa chọn. Với TF-IDF + SVM chính, CV F1
+khi giữ là 0,7736 và khi loại là 0,7562; test F1 tương ứng là 0,7334 và 0,7194.
+Vì vậy, bỏ toàn bộ nhánh giữ stop words có thể thay đổi mô hình được chọn và
+chỉ số cuối. Việc đưa đối chứng xuống phụ lục giữ nguyên dữ liệu, thí nghiệm và
+nguyên tắc lựa chọn theo CV; không chọn lại cấu hình bằng kết quả test.
 
 ## Notebook và module có cùng luồng xử lý
 
