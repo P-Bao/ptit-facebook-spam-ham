@@ -25,10 +25,11 @@ TOKEN_PATTERN = r"(?u)\b\w+\b|[^\w\s]"
 NGRAMS = [(1, 1), (1, 2)]
 FEATURES = ("BoW", "TF-IDF", "FastText")
 MODELS = ("Naive Bayes", "SVM")
+CV_SCORING = {"precision": "precision", "recall": "recall", "f1": "f1"}
 
 
-def make_pipe(feat, model_name, *, seed=42, cache=None, n_jobs=2):
-    """Giữ nguyên thuật toán/grid đã kiểm chứng trước khi tách khỏi notebook."""
+def make_pipe(feat, model_name, *, seed=42, cache=None, n_jobs=2, class_weight=None):
+    """Tạo cấu hình cơ sở; bật balanced riêng cho đối chứng TF-IDF + SVM."""
     if feat not in FEATURES or model_name not in MODELS:
         raise ValueError("Đặc trưng/thuật toán không nằm trong cấu hình thực nghiệm")
     if feat == "FastText":
@@ -39,7 +40,7 @@ def make_pipe(feat, model_name, *, seed=42, cache=None, n_jobs=2):
             model_grid = {"clf__var_smoothing": [1e-9, 1e-7, 1e-5, 1e-3]}
         else:
             steps = [("sc", StandardScaler()), ("clf", LinearSVC(dual=False, max_iter=20000, random_state=seed))]
-            model_grid = {"clf__C": [0.01, 0.1, 1.0], "clf__class_weight": [None, "balanced"]}
+            model_grid = {"clf__C": [0.01, 0.1, 1.0], "clf__class_weight": [class_weight]}
         jobs = 1
     else:
         vectorizer = (CountVectorizer(token_pattern=TOKEN_PATTERN, min_df=2) if feat == "BoW"
@@ -50,19 +51,25 @@ def make_pipe(feat, model_name, *, seed=42, cache=None, n_jobs=2):
             model_grid = {"clf__alpha": [0.1, 0.3, 1.0]}
         else:
             steps = [("clf", LinearSVC(dual=False, max_iter=20000, random_state=seed))]
-            model_grid = {"clf__C": [0.1, 0.3, 1.0, 3.0], "clf__class_weight": [None, "balanced"]}
+            model_grid = {"clf__C": [0.1, 0.3, 1.0, 3.0], "clf__class_weight": [class_weight]}
         jobs = n_jobs
     return Pipeline([("vec", vectorizer), *steps], memory=cache), {**vector_grid, **model_grid}, jobs
 
 
-def fit_experiment(pre, feat, model_name, X, y, folds, *, seed=42, cache=None, n_jobs=2):
-    pipe, grid, jobs = make_pipe(feat, model_name, seed=seed, cache=cache, n_jobs=n_jobs)
+def fit_experiment(pre, feat, model_name, X, y, folds, *, seed=42, cache=None, n_jobs=2,
+                   class_weight=None, strategy="Không điều chỉnh"):
+    pipe, grid, jobs = make_pipe(feat, model_name, seed=seed, cache=cache, n_jobs=n_jobs,
+                                 class_weight=class_weight)
     start = time.time()
-    search = GridSearchCV(pipe, grid, scoring="f1", cv=folds, n_jobs=jobs, refit=True, error_score="raise")
+    search = GridSearchCV(pipe, grid, scoring=CV_SCORING, cv=folds, n_jobs=jobs,
+                          refit="f1", error_score="raise")
     search.fit(X, y)
     return {"Tiền xử lý": pre, "Đặc trưng": feat, "Thuật toán": model_name,
-            "Biến thể": "chính", "CV F1 (spam)": search.best_score_,
+            "Chiến lược": strategy,
+            **{f"CV {name} (spam)": float(search.cv_results_[f"mean_test_{key}"][search.best_index_])
+               for key, name in [("precision", "Precision"), ("recall", "Recall"), ("f1", "F1")]},
             "Tham số": search.best_params_, "Thời gian (s)": time.time()-start,
+            "_threshold": 0.5 if model_name == "Naive Bayes" else 0.0,
             "_model": search.best_estimator_}
 
 

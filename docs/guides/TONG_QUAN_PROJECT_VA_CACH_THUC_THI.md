@@ -69,10 +69,14 @@ model và cache khỏi Git; `.env.example` là mẫu cấu hình, không chứa 
    giữ/bỏ stop words. Ghi `data/processed/v7_preprocessed.csv` rồi đọc lại các cột token
    để huấn luyện. Giữ nguyên ID, nội dung nguồn và nhãn.
 6. **Huấn luyện:** chia train/test theo khóa văn bản, CV 5 fold trên train;
-   `experiments.py` huấn luyện 12 tổ hợp chính và các đối chứng cân bằng lớp/ngưỡng.
+   `experiments.py` đối chiếu hai cấu hình từ dừng trên sáu tổ hợp, chọn tiền xử lý
+   bằng CV rồi khảo sát ba chiến lược bổ sung trên TF-IDF + SVM. Mỗi ứng viên
+   có CV Precision/Recall/F1; F1 spam là tiêu chí lựa chọn.
    Vectorizer, IDF và FastText chỉ được học trong phần train tương ứng.
 7. **Đánh giá:** chọn cấu hình theo CV, đo trên test; báo cáo Accuracy,
-   Precision/Recall/F1 spam, AP, confusion matrix, so sánh stop words và phân tích FP/FN.
+   Precision/Recall/F1 spam, AP, ma trận nhầm lẫn, PR và phân tích FP/FN.
+   Bảng test gồm sáu cấu hình cơ sở và ba cấu hình bổ sung; cấu hình TF-IDF + SVM
+   không điều chỉnh được dùng lại làm đối chứng, không huấn luyện trùng thành ứng viên mới.
 8. **Lưu và ứng dụng:** notebook lưu `spam_ham_ml_only.joblib`; `predict.py` tải
    bundle, áp dụng cùng tiền xử lý và dự đoán bình luận mới. Kiểm tra tải lại không đổi kết quả.
 
@@ -86,7 +90,7 @@ rồi chạy notebook 02 khi cần huấn luyện/đánh giá lại.
 |---|---|
 | Notebook 01 | `data/intermediate/comments.csv`, `comments_cleaned.csv`, `annotation_predictions.json`, `annotation_review.csv`; CSV cuối `data/labeled/comments_labeled.csv`; `data/collection_manifest.json`. |
 | Tool gộp | `data/final/comments_merged.csv`, tạo từ CSV có sẵn và CSV vừa xuất. |
-| Notebook 02 | `data/processed/v7_preprocessed.csv`; trong `artifacts/spamham/` có model `.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`, `imbalance_comparison.csv` và hai hình `imbalance_training.png`, `imbalance_results.png`. |
+| Notebook 02 | `data/processed/v7_preprocessed.csv`; trong `artifacts/spamham/` có model `.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`, `stopword_cv.csv`, `imbalance_cv.csv`, `imbalance_comparison.csv`, `test_predictions.csv` và sáu hình số mẫu/trọng số, kết quả chiến lược, ma trận và PR. Công thức tên hình xem README. Notebook kiểm tra dự đoán từ raw text và sau nạp bundle trên toàn bộ test. |
 
 Notebook 01 không cần cookie/API. Crawler và công cụ nhãn qua dịch vụ có bộ
 requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính không đặt ở đó.
@@ -97,9 +101,12 @@ requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính k
   10.974 mẫu sau làm sạch. Có 6.571 gợi ý khớp; ngưỡng 0,75 tiếp nhận 6.289 mẫu
   (5.190 ham, 1.099 spam). Mẫu thiếu gợi ý hoặc chưa đạt ngưỡng không nằm trong CSV có nhãn.
 - CSV có sẵn có 31.931 mẫu; tool gộp với 6.289 mẫu mới tạo thành **38.220 mẫu**.
-- Notebook 02: v7 có 38.233 mẫu; train 30.759, test 7.474. TF-IDF + SVM giữ stop words
-  được chọn theo CV. Test: Accuracy **94,19%**, Precision spam **88,18%**,
-  Recall spam **62,78%**, F1 spam **0,7334**, AP **0,8117**.
+- Notebook 02: v7 có 38.233 mẫu; train 30.759, test 7.474. Cấu hình **S3 — TF-IDF
+  + SVM, giữ từ dừng, điều chỉnh ngưỡng** được chọn theo CV F1 **0,7876**. Ngưỡng
+  decision score **−0,1776**; không dùng trọng số lớp hoặc lấy mẫu lại. Test:
+  Accuracy **94,33%**, Precision spam **83,74%**, Recall spam **68,77%**, F1 spam
+  **0,7552**, AP **0,8117**. So với ngưỡng 0, spam bỏ sót giảm từ 354 xuống 297,
+  ham nhận nhầm tăng từ 80 lên 127. Đây là đánh đổi cần nêu khi trình bày.
 - Độ chính xác tổng thể cần đọc cùng Recall/F1 vì dữ liệu lệch lớp. Mô hình còn
   bỏ sót spam và có lỗi ở bình luận ngắn/phụ thuộc ngữ cảnh. Demo là ví dụ ứng dụng,
   không thay thế tập test. Phần mô hình hiện đại vẫn đang chờ triển khai.
@@ -135,55 +142,61 @@ Trong dữ liệu hiện tại, có 2 dòng token rỗng khi giữ stop words v�
 loại stop words. Các dòng này vẫn giữ ID/nhãn; vectorizer biểu diễn bằng vector
 không có đặc trưng thay vì âm thầm bỏ mẫu.
 
+## Thiết kế CV và test
+
+Train gồm 30.759 mẫu; test giữ riêng 7.474 mẫu. Train được chia thành năm fold
+theo nhóm văn bản. Trong mỗi lượt CV, mô hình học từ bốn fold và dự đoán fold
+validation còn lại. Cột “Số mẫu spam trong validation” là số spam trong phần
+validation, không phải một tập dữ liệu riêng.
+
+Trung bình F1 spam trên các fold là **CV F1**, dùng để chọn cấu hình. Precision
+và Recall CV cũng tính trên cùng fold. Sau đó mô hình fit toàn bộ train và đo
+Accuracy/Precision/Recall/F1/AP trên test. CV có thể lạc quan do tìm nhiều cấu
+hình; đây không phải nested CV. Không chọn lại mô hình hoặc ngưỡng bằng test.
+
 ## Mất cân bằng nhãn
 
 V7 có 32.907 ham (86,07%) và 5.326 spam (13,93%), xấp xỉ 6,18 ham trên mỗi spam.
-Project đã thực nghiệm các cách sau:
+Sáu tổ hợp cơ sở dùng train nguyên bản; SVM không trọng số lớp, NB dùng ngưỡng
+0,5 và SVM dùng ngưỡng decision score 0. TF-IDF + SVM dẫn đầu bước CV cơ sở,
+nên được chọn để khảo sát sâu ba chiến lược. Đây là thiết kế theo từng bước,
+chưa khảo sát mọi chiến lược trên cả sáu tổ hợp.
 
-| Cách xử lý | Thực hiện ở đâu và tác dụng |
+| Cấu hình TF-IDF + SVM | Cách thực hiện |
 |---|---|
-| SVM class weight | `experiments.py` thử `None` và `balanced`; balanced tăng mức phạt lỗi ở lớp ít mẫu theo thống kê của phần train đang fit. |
-| Ngưỡng Naive Bayes | `training_utils.tune_nb_threshold()` dùng dự đoán ngoài fold trên train để chọn ngưỡng theo F1 spam. |
-| Under-sampling | `training_utils.undersampled_search()` giảm số ham trong phần train đến tối đa 2 ham/1 spam; không lấy mẫu validation/test. |
-| Tiêu chí đánh giá | Tối ưu F1 spam bằng CV; đọc cùng Precision, Recall và confusion matrix để thấy spam bị bỏ sót. |
+| Không điều chỉnh | 26.384 ham + 4.375 spam, `class_weight=None`, ngưỡng 0; dùng lại ứng viên cơ sở B4. |
+| Trọng số balanced | `experiments.fit_experiment(class_weight="balanced")`; số mẫu giữ nguyên. Trọng số toàn bộ train khoảng 0,583 cho ham và 3,515 cho spam; mỗi fold tính lại từ phần train. |
+| Under-sampling 2:1 | `training_utils.undersampled_search()`; fit cuối dùng 8.750 ham + 4.375 spam. Lấy mẫu riêng trong train của mỗi fold, không dùng balanced. |
+| Điều chỉnh ngưỡng | `training_utils.tune_svm_threshold()`; giữ siêu tham số của SVM không điều chỉnh, tạo decision score OOF trên train và chọn ngưỡng bằng trung bình F1 validation. |
 
-Mô hình cuối hiện là TF-IDF + SVM, `class_weight=None`, vì CV F1 cao hơn cấu hình
-balanced. Trên test, balanced tăng Recall spam từ 62,78% lên 77,92%, đồng thời
-Precision giảm từ 88,18% xuống 71,39%. Cấu hình cuối được chọn bằng CV trước khi
-đánh giá test. Các biện pháp này khảo sát ảnh hưởng mất cân bằng; mô hình vẫn có
-sai số và chưa loại bỏ hoàn toàn việc bỏ sót spam.
+Nhánh ngưỡng khảo sát 199 phân vị 1–99% của điểm OOF, ngưỡng 0 và hai biên;
+nếu đồng điểm F1 thì ưu tiên ngưỡng gần 0. Số fold và khóa nhóm không thay đổi.
+Trọng số và under-sampling tìm lại C/ngram bằng cùng lưới cơ sở. Các chiến lược
+được thử riêng; không kết hợp ba cách. Tỷ lệ lấy mẫu 2:1 là cấu hình khảo sát,
+không được lựa chọn từ test. Điều chỉnh ngưỡng thay đổi quyết định, không thay
+đổi số mẫu hay cân bằng lại phân bố dữ liệu.
 
-Notebook 02 trình bày rõ phạm vi thực nghiệm:
+Mục 5.1 trình bày hình số mẫu/trọng số và bảng CV bốn cấu hình. Mục 6.1 báo cáo
+test Precision/Recall/F1, Accuracy/AP và FP/FN. Mục 6.2 có hai nhóm ma trận:
+sáu tổ hợp cơ sở và bốn cấu hình TF-IDF + SVM. Mục 6.3 có PR cho hai phạm vi;
+nhánh chỉ đổi ngưỡng dùng chung đường PR/AP với đối chứng, hai điểm đánh dấu
+cho thấy vị trí quyết định khác nhau. Bootstrap F1 gồm cả chín ứng viên.
 
-| Nhánh | Dữ liệu train khi fit cuối | Điều chỉnh |
-|---|---|---|
-| TF-IDF + SVM gốc | 26.384 ham + 4.375 spam | `class_weight=None` |
-| TF-IDF + SVM balanced | Giữ nguyên số mẫu | Trọng số toàn bộ train khoảng 0,583 cho ham và 3,515 cho spam; mỗi fold tính lại từ train của fold. |
-| TF-IDF + SVM under-sampling | 8.750 ham + 4.375 spam | Giữ spam, chọn ngẫu nhiên ham theo tỷ lệ tối đa 2:1; không kết hợp trọng số balanced. |
-| TF-IDF + Naive Bayes gốc | Giữ nguyên số mẫu | Ngưỡng mặc định 0,5 |
-| TF-IDF + Naive Bayes chỉnh ngưỡng | Giữ nguyên số mẫu | Ngưỡng khoảng 0,1721 từ dự đoán ngoài fold trên train. |
+`predict_record()` và `predict_spam()` dùng cùng ngưỡng SVM; score lớn hơn ngưỡng
+được dự đoán spam. Ngưỡng mặc định là 0 với SVM và 0,5 với NB. Ngưỡng lưu trong
+bundle được dùng lại khi demo. Mục phân tích lỗi ghi rõ cấu hình được chọn và
+hiển thị ID, text gốc, văn bản xử lý, nhãn thực tế, dự đoán và score.
 
-Ba biện pháp được thử thành các nhánh riêng. Under-sampling có thể áp dụng cho
-các mô hình khác, nhưng thí nghiệm này chọn SVM để đối chiếu với cách dùng trọng
-số trên cùng họ thuật toán. Không có yêu cầu áp dụng đồng thời cả ba cách cho
-mọi mô hình; phối hợp chúng sẽ cần một thí nghiệm riêng để kiểm tra tác động.
-Tỷ lệ lấy mẫu 2:1 là cấu hình đối chứng cố định, không được chọn bằng kết quả test.
+## Đối chiếu từ dừng
 
-Mục 5.1 có bảng phạm vi, bảng số mẫu và hình trọng số/lấy mẫu. Mục 6.1 có bảng
-chỉ số, số FP/FN và biểu đồ Precision–Recall–F1 cùng lỗi phân loại. Các giá trị được
-lấy từ mô hình đã fit và dự đoán trên test, không phải số minh họa tự đặt.
+So sánh giữ/loại từ dừng là khảo sát bổ trợ cho lựa chọn tiền xử lý, trình bày
+bằng bảng CV F1 tại mục 5, không có phụ lục. Cấu hình giữ từ dừng được CV chọn;
+sáu tổ hợp cơ sở và các chiến lược tiếp theo cùng dùng cấu hình này.
 
-## Đối chứng stop words
-
-Đề yêu cầu áp dụng kỹ thuật tiền xử lý và so sánh đặc trưng/thuật toán; so sánh
-giữ/bỏ stop words là thực nghiệm bổ sung. Bảng này được chuyển xuống phụ lục,
-giữ phần chính gọn và vẫn trình bày được nhánh loại từ dừng.
-
-Cấu hình giữ stop words hiện được CV lựa chọn. Với TF-IDF + SVM chính, CV F1
-khi giữ là 0,7736 và khi loại là 0,7562; test F1 tương ứng là 0,7334 và 0,7194.
-Vì vậy, bỏ toàn bộ nhánh giữ stop words có thể thay đổi mô hình được chọn và
-chỉ số cuối. Việc đưa đối chứng xuống phụ lục giữ nguyên dữ liệu, thí nghiệm và
-nguyên tắc lựa chọn theo CV; không chọn lại cấu hình bằng kết quả test.
+Không chấm test cho nhánh từ dừng đã loại khỏi luồng chính. Cách tiền xử lý,
+hai cột token và dữ liệu nguồn vẫn được giữ nguyên; từ vựng/embedding vẫn chỉ
+học trong phần train. Khảo sát OOV riêng được bỏ để tập trung vào phân loại;
+FastText vẫn là một phương pháp biểu diễn trong sáu tổ hợp.
 
 ## Notebook và module có cùng luồng xử lý
 
@@ -201,7 +214,7 @@ cần notebook hoặc chương trình điều phối cung cấp dữ liệu và 
 hành vi hàm, không phải dataset thực nghiệm v7. Các nhóm gồm:
 `test_data_pipeline.py` và `test_collection_provenance.py` kiểm luồng dữ liệu;
 `test_cached_annotations.py` kiểm nối nhãn đúng ID; `test_preprocessing_and_training.py`
-kiểm tiền xử lý, CV và sampling; `test_restructured_modules.py` kiểm module/CLI và
+kiểm tiền xử lý, CV, sampling và ngưỡng SVM; `test_restructured_modules.py` kiểm module/CLI và
 lưu–tải–dự đoán; `test_notebook_display.py` kiểm hiển thị; `test_notebook_runner.py`
 kiểm cấu hình runner và đường dẫn local.
 

@@ -8,6 +8,7 @@ Phần mô hình hiện đại được dành để triển khai tiếp theo.
 - [Notebook 01 — Thu thập và chuẩn bị dữ liệu](notebooks/01_thu_thap_va_gan_nhan.ipynb).
 - [Notebook 02 — Thực nghiệm và ứng dụng](notebooks/02_thuc_nghiem_va_demo.ipynb).
 - [Lộ trình mở mã nguồn khi trình bày](docs/presentation/LO_TRINH_TRINH_BAY.md).
+- [Các thay đổi của notebook và ngưỡng SVM](docs/guides/CAP_NHAT_NOTEBOOK_VA_NGUONG_SVM.md).
 
 ## 1. Chuẩn bị môi trường
 
@@ -78,7 +79,7 @@ Thực hiện lần lượt:
 `--inplace` chỉ cập nhật output notebook gốc khi tất cả cell thành công. Kernel,
 bản sao notebook và trạng thái tạm nằm trong `.work/runs/01/` hoặc `02/`;
 đầu ra dữ liệu/model nằm ở các thư mục trong bảng. Huấn luyện nhiều cấu hình
-cần thời gian; lần kiểm tra trên máy hiện tại khoảng 24 phút.
+cần thời gian; lần kiểm tra sau cập nhật trên máy hiện tại khoảng 10 phút.
 Runner cố định hash seed và số luồng BLAS trước khi mở kernel; dùng runner khi
 cần đối chiếu kết quả tái lập giữa các lần chạy.
 
@@ -177,14 +178,24 @@ hoặc runner là nơi điều phối thí nghiệm đầy đủ.
 | `results/history/` | Lưu bằng chứng các phiên bản cũ. | Dùng tra cứu lịch sử. |
 | `artifacts/spamham/` | Mô hình đã huấn luyện và báo cáo được notebook 02 sinh ra. | Bundle `.joblib` dùng để dự đoán lại. |
 
-Mục 5.1 notebook 02 trình bày phạm vi từng cách xử lý mất cân bằng, bảng số mẫu
-trước/sau under-sampling và biểu đồ trọng số. Mục 6.1 đối chiếu Precision, Recall,
-F1 cùng FP/FN của năm nhánh: SVM gốc, SVM balanced, SVM under-sampling, NB ngưỡng
-mặc định và NB chỉnh ngưỡng. Đây là các thí nghiệm riêng; validation/test giữ tỷ lệ
-nhãn tự nhiên, mô hình được chọn bằng CV F1 spam.
+Mục 4 notebook 02 giải thích train, validation, CV và test. Mục 5 đối chiếu từ
+dừng bằng CV, rồi trình bày sáu tổ hợp BoW/TF-IDF/FastText + NB/SVM ở cấu hình
+tiền xử lý được chọn. SVM cơ sở không dùng trọng số lớp; không lấy mẫu lại.
 
-Đối chứng giữ/bỏ stop words được chuyển xuống **Phụ lục A — thực nghiệm bổ sung**.
-Giữ cả hai cấu hình cho phép đối chiếu kỹ thuật loại từ dừng với phương án được CV
-lựa chọn; phần chính tập trung vào đặc trưng, thuật toán và mất cân bằng lớp.
-Hai biểu đồ và bảng chi tiết được lưu thêm tại `artifacts/spamham/`:
-`imbalance_training.png`, `imbalance_results.png`, `imbalance_comparison.csv`.
+Mục 5.1 cố định **TF-IDF + SVM**, so sánh bốn cấu hình: không điều chỉnh,
+trọng số balanced, under-sampling 2:1 và điều chỉnh ngưỡng decision score bằng
+OOF trên train. CV Precision/Recall/F1 phục vụ lựa chọn; test không dùng để chọn
+tham số hoặc ngưỡng. Mục 6 báo cáo sáu tổ hợp cơ sở; 6.1 đối chiếu bốn chiến lược
+trên test cùng FP/FN. Mục 6.2–6.3 có ma trận nhầm lẫn và Precision–Recall cho cả
+hai phạm vi. Cấu hình chỉ đổi ngưỡng dùng chung đường PR với mô hình đối chứng,
+nhưng có điểm Precision/Recall khác.
+
+Không có phụ lục từ dừng hoặc nhánh chỉnh ngưỡng NB trong notebook hiện tại.
+Mô hình được chọn theo CV trong phạm vi sáu cấu hình cơ sở và ba cấu hình bổ sung,
+không khẳng định tối ưu trong mọi kết hợp chiến lược. Bundle dùng đúng ngưỡng
+trong đánh giá, nạp lại và demo.
+
+Trong `artifacts/spamham/`, ngoài model và metrics còn có `stopword_cv.csv`,
+`imbalance_cv.csv`, `imbalance_comparison.csv`, `test_predictions.csv`;
+`imbalance_training.png`, `imbalance_results.png`, `confusion_baselines.png`,
+`confusion_strategies.png`, `pr_baselines.png`, `pr_strategies.png`.

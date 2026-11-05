@@ -9,7 +9,7 @@ import pytest
 from sklearn.model_selection import StratifiedKFold
 
 from pipeline.inference.predict import predict_spam
-from pipeline.modeling.experiments import evaluate, fit_experiment
+from pipeline.modeling.experiments import evaluate, fit_experiment, make_pipe
 from pipeline.prepare.preprocess_for_model import preprocess
 
 
@@ -22,12 +22,26 @@ def test_extracted_training_and_saved_bundle_inference(tmp_path, feature, algori
     record = fit_experiment("test", feature, algorithm, X, y, folds, n_jobs=1)
     evaluate(record, X, y)
     assert record["F1"] == 1
-    bundle = {"model": record["_model"], "threshold": .5, "remove_stop": False}
+    assert record["CV Precision (spam)"] == record["CV Recall (spam)"] == record["CV F1 (spam)"] == 1
+    bundle = {"model": record["_model"], "threshold": record["_threshold"], "remove_stop": False}
     path = tmp_path / "bundle.joblib"
     joblib.dump(bundle, path)
     predicted = predict_spam(raw[:2], joblib.load(path))
     assert predicted.du_doan.tolist() == ["ham", "spam"]
     assert predict_spam([], bundle).empty
+    if algorithm == "SVM":
+        # Nếu ngưỡng không được áp dụng trong inference, mẫu spam vẫn bị đoán spam.
+        bundle["threshold"] = float(record["_model"].decision_function(X).max() + 1)
+        joblib.dump(bundle, path)
+        assert predict_spam(raw[:2], joblib.load(path)).du_doan.tolist() == ["ham", "ham"]
+
+
+@pytest.mark.parametrize("feature", ["BoW", "TF-IDF", "FastText"])
+def test_svm_baselines_do_not_mix_class_weights(feature):
+    _, baseline_grid, _ = make_pipe(feature, "SVM")
+    _, balanced_grid, _ = make_pipe(feature, "SVM", class_weight="balanced")
+    assert baseline_grid["clf__class_weight"] == [None]
+    assert balanced_grid["clf__class_weight"] == ["balanced"]
 
 
 def test_crawler_entrypoint_help_after_separation():

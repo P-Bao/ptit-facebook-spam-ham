@@ -23,12 +23,12 @@ theo hướng dẫn README; file kết quả nằm ở `data/final/comments_merg
 |---|---|---|
 | Dữ liệu | Cell nạp v7 | Đọc CSV local, số mẫu, phân bố nhãn và bình luận thật từ file. |
 | Tiền xử lý | `pipeline/prepare/preprocess_for_model.py` | Tiền xử lý toàn bộ v7, so sánh cùng ID, lưu/đọc lại CSV token cho mô hình. |
-| Thiết kế thực nghiệm | Cell chia tập; `pipeline/modeling/training_utils.py` | Nhóm văn bản, train/test và CV. |
-| Đặc trưng và huấn luyện | `pipeline/modeling/experiments.py`, `pipeline/features/spam_features.py` | BoW/TF-IDF/FastText + NB/SVM; học trong train/fold. |
+| Thiết kế thực nghiệm | Mục 4; `pipeline/modeling/training_utils.py` | Nhóm văn bản, train/validation/test; CV F1 chọn cấu hình, test báo cáo kết quả. |
+| Đặc trưng và huấn luyện | Mục 5; `pipeline/modeling/experiments.py`, `pipeline/features/spam_features.py` | Đối chiếu từ dừng bằng CV, chọn tiền xử lý rồi so sánh sáu tổ hợp cơ sở; học trong train/fold. |
 | Mô hình hiện đại | Mục chờ trong notebook; `pipeline/modern/` | Phần dành cho triển khai tiếp theo. |
-| Mất cân bằng | Mục 5.1; `training_utils.py` | Bảng phạm vi năm nhánh, số mẫu train trước/sau lấy mẫu và trọng số lớp. |
-| Đánh giá | Mục 6.1; `experiments.evaluate` | Precision/Recall/F1, FP/FN, biểu đồ đánh đổi và confusion matrix. |
+| Mất cân bằng | Mục 5.1; `training_utils.py`: `undersampled_search`, `tune_svm_threshold` | Cùng TF-IDF + SVM: không điều chỉnh, balanced, lấy mẫu 2:1, chỉnh ngưỡng; bảng CV và hình số mẫu/trọng số. |
+| Đánh giá | Mục 6–6.3; `experiments.evaluate` | Test của sáu tổ hợp và bốn chiến lược; FP/FN, ma trận nhầm lẫn và PR. Đổi ngưỡng chỉ đổi điểm hoạt động trên đường PR. |
+| Phân tích lỗi | Mục 7 | Ghi rõ cấu hình được chọn, ID/text gốc, nhãn thực tế, dự đoán, score và ngưỡng. |
 | Ứng dụng | Cell lưu mô hình; `pipeline/inference/predict.py` | Bundle đã học, tải lại và dự đoán raw text. |
-| Đối chứng bổ sung | Phụ lục A | Bảng CV F1 và test F1 của hai cấu hình stop words theo từng cặp đặc trưng–thuật toán. |
 
 Hướng dẫn đầy đủ: [Tổng quan project](../guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md).

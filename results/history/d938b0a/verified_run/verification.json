@@ -1,0 +1,51 @@
+{
+  "checked_client_date": "2026-11-05",
+  "completed_utc": "2026-11-05T10:55:02.582649+00:00",
+  "baseline_commit": "de953e3b005c18f0d9d8a20240ea4838a33363e2",
+  "notebooks": {
+    "01": {
+      "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "cells": 15,
+      "code_cells": 6,
+      "seconds": 4.45,
+      "errors": 0,
+      "output_dir": "data",
+      "inherited_from": "de953e3"
+    },
+    "02": {
+      "path": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "cells": 38,
+      "code_cells": 20,
+      "seconds": 1421.28,
+      "errors": 0,
+      "output_dir": "artifacts\\spamham"
+    }
+  },
+  "tests_passed": 50,
+  "all_16_model_scores_and_parameters_unchanged": true,
+  "training_algorithm_modules_unchanged": true,
+  "training_calls_unchanged": true,
+  "stopword_comparison": "optional_appendix",
+  "imbalance_branches": [
+    "SVM gốc",
+    "SVM balanced",
+    "SVM under-sampling",
+    "NB ngưỡng 0,5",
+    "NB chỉnh ngưỡng"
+  ],
+  "imbalance_methods_applied_separately": true,
+  "imbalance_report_values_match_model_metrics": true,
+  "figures": {
+    "imbalance_training.png": {
+      "width": 1665,
+      "height": 543
+    },
+    "imbalance_results.png": {
+      "width": 1946,
+      "height": 681
+    }
+  },
+  "raw_inference_agrees_on_all_7474_test_ids": true,
+  "modern_model": "not_implemented",
+  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown after computational cells completed"
+}
