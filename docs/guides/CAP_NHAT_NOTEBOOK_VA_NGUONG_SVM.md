@@ -1,5 +1,8 @@
 # Cập nhật thực nghiệm và ngưỡng SVM
 
+Tài liệu ghi lại đợt hoàn thiện SVM trước bước viBERT. Nhánh viBERT được mô tả
+riêng trong [hướng dẫn Colab](HUONG_DAN_VIBERT_COLAB.md) và Notebook 03.
+
 ## Phạm vi thay đổi
 
 Chỉnh Notebook 02 và các hàm huấn luyện/dự đoán liên quan. Giữ nguyên Notebook

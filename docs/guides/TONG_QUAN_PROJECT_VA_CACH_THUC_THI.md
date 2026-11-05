@@ -7,12 +7,13 @@ thường) và **spam** (nội dung rác hoặc chào mời). Project trình bà
 bị dữ liệu, xử lý tiếng Việt, biểu diễn văn bản, huấn luyện, đánh giá và ứng dụng
 mô hình cho bình luận mới. Nhóm gồm Bảo, Cương, Phi, Phương.
 
-## Hai notebook
+## Các notebook
 
 | Notebook | Nội dung | Kết quả chính |
 |---|---|---|
 | [01_thu_thap_va_gan_nhan.ipynb](../../notebooks/01_thu_thap_va_gan_nhan.ipynb) | Nguồn thu thập → bài/comment/reply → JSON thành bảng → làm sạch → gán nhãn → xuất CSV | `comments_labeled.csv`, thống kê và ví dụ dữ liệu |
 | [02_thuc_nghiem_va_demo.ipynb](../../notebooks/02_thuc_nghiem_va_demo.ipynb) | Khảo sát v7 → tiền xử lý → chia tập/CV → đặc trưng và mô hình → đánh giá → dự đoán | Model `.joblib`, bảng chỉ số, biểu đồ, phân tích lỗi và demo |
+| [03_vibert.ipynb](../../notebooks/03_vibert.ipynb) | Tokenization → fine-tune hai loss → chọn bằng validation → fit toàn bộ train → test chung với S3 → demo | Model safetensors/tokenizer, lịch sử, metrics và dự đoán theo ID |
 
 Notebook 01 tái lập xử lý từ kết quả thu thập và phản hồi gán nhãn đã lưu, không
 gọi Facebook/LLM/Argilla. Notebook 02 thực hiện huấn luyện khi chạy toàn bộ cell.
@@ -23,7 +24,7 @@ huấn luyện mới thực thi công việc tương ứng.
 
 | Thư mục | File chính và nhiệm vụ |
 |---|---|
-| `notebooks/` | Hai notebook tổ chức quá trình trình bày, gọi module và hiển thị kết quả. |
+| `notebooks/` | Ba notebook tổ chức thu thập, thực nghiệm truyền thống và fine-tune viBERT. |
 | `external/facebook_scraper/` | Bộ mã nền thu thập: `group_post_scraper_v2.py` lấy bài nhóm; `main.py` điều phối lấy comment/reply; `comment_scraper.py` xử lý bình luận. `post_scraper.py`, `single_post_image.py` hỗ trợ các nhánh lấy bài/ảnh; `proxy_utils.py` hỗ trợ kết nối; `facebook_ui.py` là GUI tùy chọn. README, requirements và `.env.example` hướng dẫn bộ công cụ. |
 | `pipeline/collect/` | `scrape_ptit_groups.py`: runner PTIT, cấu hình nhóm, gọi bộ nền và ghi JSON/state. `json_to_csv.py`: làm phẳng comment/reply thành bảng. Notebook 01 đọc trực tiếp các file local trong `.cache/collection/`. |
 | `pipeline/prepare/` | `clean_for_labeling.py`: làm sạch bảng, khử trùng/lọc và giữ text gốc. `preprocess_for_model.py`: chuẩn hóa đầu vào mô hình, xử lý tên/URL/điện thoại/emoji, tách từ và stop words. |
@@ -32,10 +33,10 @@ huấn luyện mới thực thi công việc tương ứng.
 | `pipeline/modeling/` | `experiments.py`: tạo pipeline BoW/TF-IDF/FastText + NB/SVM, tìm tham số và đánh giá. `training_utils.py`: chia nhóm/fold, sampling trong train, chỉnh ngưỡng và hỗ trợ dự đoán. |
 | `pipeline/inference/` | `predict.py`: nhận bình luận mới và bundle đã huấn luyện, tiền xử lý nhất quán rồi trả nhãn/score. |
 | `pipeline/presentation/` | `notebook_display.py`: bảng, mã nguồn và thông tin file có màu tương phản; không thay đổi dữ liệu hoặc dự đoán. |
-| `pipeline/modern/` | Vị trí dành cho mã mô hình hiện đại; hiện chưa triển khai. |
+| `pipeline/modern/` | `data.py`: chuẩn hóa nhẹ và chia tập cùng baseline. `train.py`: fine-tune, chọn validation, fit cuối và test. `predict.py`: nạp model/tokenizer để dự đoán. `vibert_config.json`: cấu hình. |
 | `tools/dataset_versions/` | `merge_labeled_data.py`: gộp CSV có sẵn với đầu ra notebook 01 → `data/final/comments_merged.csv`. `audit_source.py`: đối chiếu bundle nguồn khi cần kiểm tra nội bộ. |
-| `scripts/` | `run_notebook.py`: chạy notebook bằng kernel mới, tách đầu ra khỏi runtime tạm. `check_environment.py`: kiểm Python, đúng `.venv` và toàn bộ phiên bản notebook đã pin. |
-| `requirements/` | `notebook.txt`: notebook; `collection.txt`: crawler; `annotation.txt`: công cụ nhãn; `dev.txt`: kiểm thử. |
+| `scripts/` | `run_notebook.py`: chạy 01/02 trong kernel mới. `check_environment.py`: kiểm `.venv` truyền thống. `prepare_colab_bundle.py`: gói code và dữ liệu cần cho viBERT để chuyển sang Colab. |
+| `requirements/` | `notebook.txt`: 01/02; `collection.txt`: crawler; `annotation.txt`: nhãn; `dev.txt`: kiểm thử; `modern.txt`: viBERT local Python 3.12; `modern-colab.txt`: viBERT Colab Python 3.13. |
 | `tests/` | Các file `test_*.py` kiểm tra dữ liệu, ID/nhãn, liên kết cache, tiền xử lý, CV, lưu/tải/dự đoán và hiển thị. `test_notebook_runner.py` kiểm tra đường dẫn CSV local, đầu ra và đóng kernel. |
 | `data/` | `intermediate/`: đầu ra trung gian notebook 01; `processed/v7_preprocessed.csv`: v7 và các cột token cho mô hình; `labeled/comments_labeled.csv`: CSV mới; `labeled/comments_labeled_phase1.csv`: CSV có sẵn; `final/comments_merged.csv`: bản tool tạo; `final/labeled_v7.csv`: đầu vào thực nghiệm local. |
 | `artifacts/`, `.cache/`, `.work/` | `artifacts/spamham/`: model và kết quả huấn luyện; `.cache/collection/`: đầu vào tái lập; `.work/`: runtime/test tạm. Không đưa vào Git. `.venv/` chứa môi trường Python. |
@@ -109,7 +110,7 @@ requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính k
   ham nhận nhầm tăng từ 80 lên 127. Đây là đánh đổi cần nêu khi trình bày.
 - Độ chính xác tổng thể cần đọc cùng Recall/F1 vì dữ liệu lệch lớp. Mô hình còn
   bỏ sót spam và có lỗi ở bình luận ngắn/phụ thuộc ngữ cảnh. Demo là ví dụ ứng dụng,
-  không thay thế tập test. Phần mô hình hiện đại vẫn đang chờ triển khai.
+  không thay thế tập test. Nhánh viBERT có quy trình fine-tune riêng và so sánh trên cùng test.
 
 ## Mã mô hình và mô hình đã huấn luyện
 
@@ -118,7 +119,7 @@ requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính k
 | `.py` trong `pipeline/modeling/` | Mã định nghĩa, cấu hình và hàm huấn luyện; bản thân file không chứa trọng số học được. |
 | Đối tượng sau `.fit()` | Mô hình đã học nằm trong bộ nhớ, gồm vectorizer và tham số/trọng số. |
 | `spam_ham_ml_only.joblib` trong thư mục đầu ra | Bản lưu của mô hình đã học, kèm cấu hình để tải lại và dự đoán. |
-| `pipeline/modern/` | Mã cho phương pháp hiện đại sẽ viết sau; checkpoint được lưu trong thư mục đầu ra khi triển khai. |
+| `pipeline/modern/` | Mã fine-tune và dự đoán viBERT; trọng số/tokenizer đã học lưu trong `artifacts/modern/vibert/model/`, không nằm trong file `.py`. |
 
 Yêu cầu xây dựng và huấn luyện được thể hiện bằng mã cùng kết quả thực thi,
 không phụ thuộc tên thư mục hay đuôi file. Cả mô hình cơ sở và mô hình hiện đại
@@ -220,5 +221,6 @@ kiểm cấu hình runner và đường dẫn local.
 
 `results/verified_run/` giữ chỉ số và biên bản kiểm tra mới nhất;
 `results/source_audit/` là hồ sơ đối chiếu nguồn; `results/history/` giữ kết quả
-trước đây. Hai notebook không dùng các thư mục này để nạp dữ liệu hay dự đoán.
+trước đây. Notebook 01/02 không dùng `verified_run`/`source_audit` để nạp dữ liệu
+hay dự đoán; phần bổ sung trong Notebook 02 đọc bảng viBERT ở `results/modern/`.
 Mô hình để tái sử dụng nằm trong `artifacts/spamham/`, dữ liệu trong `data/`.

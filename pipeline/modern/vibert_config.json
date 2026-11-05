@@ -1,0 +1,19 @@
+{
+  "model_name": "FPTAI/vibert-base-cased",
+  "revision": "728a91287e4517d9312066a6aa048fadf4e41e91",
+  "seed": 42,
+  "validation_fold": 0,
+  "max_length": 128,
+  "epochs": 3,
+  "learning_rate": 2e-05,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.1,
+  "batch_size": 8,
+  "gradient_accumulation_steps": 2,
+  "eval_batch_size": 16,
+  "variants": [
+    "unweighted",
+    "balanced"
+  ],
+  "threshold": 0.5
+}

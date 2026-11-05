@@ -2,15 +2,21 @@
 
 Project của nhóm Bảo, Cương, Phi, Phương: chuẩn bị dữ liệu bình luận Facebook,
 thực nghiệm BoW/TF-IDF/FastText với Naive Bayes/SVM, đánh giá và dự đoán bình luận mới.
-Phần mô hình hiện đại được dành để triển khai tiếp theo.
+Nhánh mô hình hiện đại fine-tune viBERT và đối chiếu với S3 trên cùng test.
 
 - [Tổng quan cấu trúc, module và luồng xử lý](docs/guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md).
 - [Notebook 01 — Thu thập và chuẩn bị dữ liệu](notebooks/01_thu_thap_va_gan_nhan.ipynb).
 - [Notebook 02 — Thực nghiệm và ứng dụng](notebooks/02_thuc_nghiem_va_demo.ipynb).
+- [Notebook 03 — Fine-tune và ứng dụng viBERT](notebooks/03_vibert.ipynb).
+- [Huấn luyện viBERT trên Colab, môi trường và đầu ra](docs/guides/HUONG_DAN_VIBERT_COLAB.md).
 - [Lộ trình mở mã nguồn khi trình bày](docs/presentation/LO_TRINH_TRINH_BAY.md).
 - [Các thay đổi của notebook và ngưỡng SVM](docs/guides/CAP_NHAT_NOTEBOOK_VA_NGUONG_SVM.md).
 
 ## 1. Chuẩn bị môi trường
+
+Các lệnh `.venv` ở mục 1–4 dành cho Notebook 01/02. Notebook 03 dùng
+`.venv-modern` để review/demo local hoặc môi trường GPU Colab riêng theo hướng
+dẫn viBERT ở trên; không cài PyTorch/Transformers vào `.venv` truyền thống.
 
 Mở **toàn bộ thư mục project** bằng VS Code. Terminal PowerShell phải đứng tại
 thư mục chứa README này, `pipeline/`, `notebooks/` và `requirements/`.
@@ -133,8 +139,10 @@ data/
     labeled_v7.csv               Đầu vào thực nghiệm local
   collection_manifest.json       Số lượng, nhãn và đường dẫn đầu ra notebook 01
 artifacts/spamham/                Model .joblib, metrics, bootstrap CI, run manifest
+artifacts/modern/vibert/          Model/tokenizer viBERT, lịch sử, metrics và dự đoán test
 .cache/collection/                Ba đầu vào local của notebook 01
 results/verified_run/             Bằng chứng kiểm tra hiện hành
+results/modern/                   Bảng so sánh viBERT–S3 và bằng chứng kiểm tra viBERT
 ```
 
 `data/`, `artifacts/`, `.cache/`, `.work/` được Git bỏ qua. Khi chia sẻ để chạy
@@ -166,7 +174,7 @@ thư viện được giữ nguyên để bảo toàn cấu hình thực nghiệm
 
 Để thu thập/gán nhãn qua dịch vụ, cài thêm `requirements/collection.txt` hoặc
 `requirements/annotation.txt`, cấu hình phiên/API trong môi trường và xem
-`--help` của module tương ứng. Các thao tác này có kết nối dịch vụ; hai notebook
+`--help` của module tương ứng. Các thao tác này có kết nối dịch vụ; Notebook 01/02
 không tự gọi lại crawler hoặc LLM. `.env` thật và token/cookie được giữ ngoài Git.
 
 ## 7. Luồng notebook, module và các thư mục hỗ trợ
