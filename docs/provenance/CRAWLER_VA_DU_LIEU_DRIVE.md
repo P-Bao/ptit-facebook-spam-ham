@@ -1,3 +1,8 @@
+> Đầu vào notebook 01 hiện dùng tên local: `posts.json` (JSON thu thập),
+> `annotation_index.csv` (bảng định danh) và `annotation_predictions.json` (gợi ý),
+> đặt trong `.cache/collection/`. Các tên file nguồn trong biên bản dưới đây là
+> tên khi nhận dữ liệu; notebook hiện không phụ thuộc manifest/checksum.
+
 > Biên bản kiểm chứng nguồn theo phiên bản đã ghi dưới đây. Đường dẫn lưu dữ liệu hiện hành: `.cache/collection/` cho đầu vào tái lập, `data/` cho dữ liệu làm việc. Cách chạy mới nằm trong [README](../../README.md).
 
 # Kiểm chứng mã thu thập và dữ liệu Drive

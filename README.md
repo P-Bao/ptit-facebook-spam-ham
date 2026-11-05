@@ -45,18 +45,19 @@ Tiếp tục khi checker báo **Environment OK** và pip báo **No broken requir
 Các lệnh dưới đây dùng đường dẫn `.venv` trực tiếp nên không cần kích hoạt môi trường
 hoặc đổi Execution Policy. Giữ các phiên bản đã pin trong requirements.
 
-## 2. Chuẩn bị đầu vào
+## 2. Đặt dữ liệu local
 
-```powershell
-.\.venv\Scripts\python.exe -m pipeline.collect.snapshots --include-phase1
-```
+Notebook đọc trực tiếp các file dưới đây; không tải dữ liệu hoặc kiểm checksum.
 
-Lệnh kiểm tra/tải ba đầu vào tái lập vào `.cache/collection/` và chuẩn bị CSV có
-nhãn có sẵn tại `data/labeled/comments_labeled_phase1.csv`, có đối chiếu SHA-256.
-Lần đầu cần mạng nếu chưa có file; các lần sau dùng lại file đúng hash.
-Notebook 02 dùng `data/final/labeled_v7.csv` nếu có; nếu thiếu sẽ tải revision/hash
-đã xác định từ Hugging Face. Notebook 01 tái lập từ JSON và gợi ý nhãn đã lưu,
-không yêu cầu đăng nhập Facebook hoặc gọi API gán nhãn.
+| Bước | File cần có |
+|---|---|
+| Notebook 02 | `data/final/labeled_v7.csv` |
+| Notebook 01 | `.cache/collection/posts.json`, `annotation_index.csv`, `annotation_predictions.json` |
+| Tool gộp | `data/labeled/comments_labeled_phase1.csv` và CSV notebook 01 xuất ra |
+
+Các file này đã có trên máy hiện tại. Khi chuyển sang máy khác, sao chép dữ liệu
+cùng đúng cấu trúc thư mục. Notebook 01 dùng JSON thu thập và gợi ý nhãn đã lưu;
+không đăng nhập Facebook hoặc gọi API gán nhãn trong chế độ trình bày này.
 
 ## 3. Chạy project từ Terminal
 
@@ -72,7 +73,7 @@ Thực hiện lần lượt:
 |---|---|
 | Notebook 01 | Các bảng trung gian trong `data/intermediate/`; CSV cuối tại `data/labeled/comments_labeled.csv`. |
 | Tool gộp | Đọc CSV có sẵn và CSV notebook 01 vừa tạo; ghi `data/final/comments_merged.csv`. |
-| Notebook 02 | Huấn luyện/đánh giá trên v7; lưu model và chỉ số vào `artifacts/spamham/`. |
+| Notebook 02 | Đọc v7, lưu văn bản đã tiền xử lý tại `data/processed/v7_preprocessed.csv`, huấn luyện/đánh giá và lưu model vào `artifacts/spamham/`. |
 
 `--inplace` chỉ cập nhật output notebook gốc khi tất cả cell thành công. Kernel,
 bản sao notebook và trạng thái tạm nằm trong `.work/runs/01/` hoặc `02/`;
@@ -113,12 +114,14 @@ data/
   labeled/
     comments_labeled.csv         CSV cuối của notebook 01
     comments_labeled_phase1.csv   CSV có nhãn có sẵn
+  processed/
+    v7_preprocessed.csv          Toàn bộ v7 kèm hai cột token dùng cho huấn luyện
   final/
     comments_merged.csv           CSV do tool gộp tạo
-    labeled_v7.csv               Đầu vào thực nghiệm nếu đã lưu local
-  collection_manifest.json       Số lượng và hash của lượt xử lý notebook 01
+    labeled_v7.csv               Đầu vào thực nghiệm local
+  collection_manifest.json       Số lượng, nhãn và đường dẫn đầu ra notebook 01
 artifacts/spamham/                Model .joblib, metrics, bootstrap CI, run manifest
-.cache/collection/                Ba đầu vào cần để tái lập notebook 01
+.cache/collection/                Ba đầu vào local của notebook 01
 results/verified_run/             Bằng chứng kiểm tra hiện hành
 ```
 
@@ -140,17 +143,40 @@ Cài thêm dependency kiểm thử khi cần:
 | Thiếu thư viện/sai phiên bản | Cài lại `requirements/notebook.txt` bằng `.venv`, chạy checker và restart kernel. |
 | `No module named pipeline` | Mở notebook trong toàn bộ project và chọn đúng kernel. |
 | `NameError` sau khi chạy một cell giữa notebook | Restart Kernel → Run All theo thứ tự. |
-| Không tải được dữ liệu | Chuẩn bị đầu vào khi có mạng; giữ `.cache/collection/` nếu cần chạy offline. |
-| SHA-256 không khớp | Kiểm tra đúng nguồn/file, giữ bước kiểm hash để tránh dùng nhầm dữ liệu. |
+| Không tìm thấy CSV/JSON | Đặt đúng file local theo mục 2, kiểm tra đường dẫn rồi chạy lại. |
 | Output lưu sai vị trí | Kiểm tra các biến tùy chỉnh `SPAMHAM_OUTPUT_DIR`, `SPAMHAM_SOURCE_DIR`, `SPAMHAM_CSV`; restart kernel sau khi đổi cấu hình. |
 
-Kiểm thử đóng kernel trên Windows có ghi nhận thông báo `resource_tracker.KeyError`
-của joblib ở bước dọn bộ nhớ tạm. Trong kiểm thử này, worker vẫn thoát và thư mục
-tạm được giải phóng; không có cell tính toán thất bại. Bằng chứng được lưu tại
-`results/verified_run/kernel_shutdown_check.json`. Các phiên bản thư viện được giữ
-nguyên để bảo toàn cấu hình thực nghiệm đã kiểm chứng.
+Khi đóng kernel trên Windows, joblib có ghi thông báo `resource_tracker.KeyError`
+ở bước dọn bộ nhớ tạm. Thông báo cũng xuất hiện sau lượt chạy đầy đủ hiện tại;
+các cell tính toán hoàn tất, worker thoát và kết quả lưu được kiểm tra lại.
+Trạng thái chạy nằm trong `results/verified_run/verification.json`. Các phiên bản
+thư viện được giữ nguyên để bảo toàn cấu hình thực nghiệm đã kiểm chứng.
 
 Để thu thập/gán nhãn qua dịch vụ, cài thêm `requirements/collection.txt` hoặc
 `requirements/annotation.txt`, cấu hình phiên/API trong môi trường và xem
 `--help` của module tương ứng. Các thao tác này có kết nối dịch vụ; hai notebook
 không tự gọi lại crawler hoặc LLM. `.env` thật và token/cookie được giữ ngoài Git.
+
+## 7. Luồng notebook, module và các thư mục hỗ trợ
+
+Notebook tổ chức thứ tự xử lý, gọi hàm trong `pipeline/` và trình bày dữ liệu/bảng/hình.
+Cell xử lý và huấn luyện có thực thi; khối hiển thị mã nguồn chỉ đọc hàm để giải thích.
+Lệnh `scripts/run_notebook.py` thực hiện toàn bộ các cell bằng Python của `.venv`.
+
+Các module có CLI như thu thập, chuyển CSV, làm sạch, gán nhãn và tool gộp có thể
+chạy bằng `python -m <module>` trong đúng môi trường. `experiments.py`,
+`training_utils.py` và `preprocess_for_model.py` chủ yếu cung cấp hàm: chạy riêng
+file không tự dựng đủ dữ liệu/split rồi huấn luyện tất cả mô hình. Notebook 02
+hoặc runner là nơi điều phối thí nghiệm đầy đủ.
+
+| Thư mục | Vai trò | Có cần cho huấn luyện/dự đoán? |
+|---|---|---|
+| `tests/` | Mã kiểm thử và các tình huống giả lập nhỏ để kiểm tra dữ liệu, tiền xử lý, CV/sampling, lưu/tải model, hiển thị và runner. | Chạy riêng để kiểm tra chức năng; không thay thế đánh giá trên v7. |
+| `results/verified_run/` | Bảng chỉ số và biên bản kiểm tra lần chạy hiện hành. | Dùng đối chiếu/giải thích kết quả. |
+| `results/source_audit/` | Hồ sơ đối chiếu nguồn trước đây. | Không được notebook đọc để nạp dữ liệu. |
+| `results/history/` | Lưu bằng chứng các phiên bản cũ. | Dùng tra cứu lịch sử. |
+| `artifacts/spamham/` | Mô hình đã huấn luyện và báo cáo được notebook 02 sinh ra. | Bundle `.joblib` dùng để dự đoán lại. |
+
+Mất cân bằng lớp được khảo sát ở mục 5.1 notebook 02: SVM thử trọng số lớp,
+Naive Bayes thử ngưỡng và có nhánh under-sampling. Chọn mô hình bằng F1 spam trên
+CV; validation/test giữ tỷ lệ nhãn tự nhiên. Chi tiết trong tài liệu tổng quan.

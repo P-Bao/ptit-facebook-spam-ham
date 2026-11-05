@@ -21,8 +21,8 @@ theo hướng dẫn README; file kết quả nằm ở `data/final/comments_merg
 
 | Phần | Mã nguồn để mở | Nội dung giải thích |
 |---|---|---|
-| Dữ liệu | Cell nạp v7 | Phiên bản, số mẫu, kiểm tra cấu trúc và phân bố nhãn. |
-| Tiền xử lý | `pipeline/prepare/preprocess_for_model.py` | Chuẩn hóa, tách từ, hai cấu hình stop words. |
+| Dữ liệu | Cell nạp v7 | Đọc CSV local, số mẫu, phân bố nhãn và bình luận thật từ file. |
+| Tiền xử lý | `pipeline/prepare/preprocess_for_model.py` | Tiền xử lý toàn bộ v7, so sánh cùng ID, lưu/đọc lại CSV token cho mô hình. |
 | Thiết kế thực nghiệm | Cell chia tập; `pipeline/modeling/training_utils.py` | Nhóm văn bản, train/test và CV. |
 | Đặc trưng và huấn luyện | `pipeline/modeling/experiments.py`, `pipeline/features/spam_features.py` | BoW/TF-IDF/FastText + NB/SVM; học trong train/fold. |
 | Mô hình hiện đại | Mục chờ trong notebook; `pipeline/modern/` | Phần dành cho triển khai tiếp theo. |

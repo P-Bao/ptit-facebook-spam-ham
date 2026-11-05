@@ -1,7 +1,6 @@
 {
-  "dataset_repo": "p-storm/ptit-facebook-comments-spamham",
-  "dataset_revision": "5b904713bb2896ab8f6ff336545b9debd2489724",
-  "dataset_sha256": "7305d712996da3ff0dce1ea4142844b7629e9880bcac47ee38934f0b6e6cfbee",
+  "dataset_file": "C:\\KH086\\PT&KP DLVB\\PROJECT\\ptit-facebook-spam-ham\\data\\final\\labeled_v7.csv",
+  "processed_file": "C:\\KH086\\PT&KP DLVB\\PROJECT\\ptit-facebook-spam-ham\\data\\processed\\v7_preprocessed.csv",
   "audit": {
     "rows": 38233,
     "labels": {
@@ -26,11 +25,10 @@
     "joblib": "1.5.1",
     "gensim": "4.4.0",
     "underthesea": "8.3.0",
-    "huggingface_hub": "0.36.2",
     "jinja2": "3.1.6"
   },
   "python": "3.12.14",
-  "completed_utc": "2026-11-05T08:21:43.408887+00:00",
+  "completed_utc": "2026-11-05T10:05:44.527464+00:00",
   "modern_model": "not_implemented",
   "selected": {
     "Tiền xử lý": "giữ stop words",

@@ -25,7 +25,7 @@ huấn luyện mới thực thi công việc tương ứng.
 |---|---|
 | `notebooks/` | Hai notebook tổ chức quá trình trình bày, gọi module và hiển thị kết quả. |
 | `external/facebook_scraper/` | Bộ mã nền thu thập: `group_post_scraper_v2.py` lấy bài nhóm; `main.py` điều phối lấy comment/reply; `comment_scraper.py` xử lý bình luận. `post_scraper.py`, `single_post_image.py` hỗ trợ các nhánh lấy bài/ảnh; `proxy_utils.py` hỗ trợ kết nối; `facebook_ui.py` là GUI tùy chọn. README, requirements và `.env.example` hướng dẫn bộ công cụ. |
-| `pipeline/collect/` | `scrape_ptit_groups.py`: runner PTIT, cấu hình nhóm, gọi bộ nền và ghi JSON/state. `json_to_csv.py`: làm phẳng comment/reply thành bảng. `snapshots.py`: tìm/tải ba đầu vào trong `.cache/collection/`, kiểm SHA-256 và chuẩn bị CSV có nhãn có sẵn. |
+| `pipeline/collect/` | `scrape_ptit_groups.py`: runner PTIT, cấu hình nhóm, gọi bộ nền và ghi JSON/state. `json_to_csv.py`: làm phẳng comment/reply thành bảng. Notebook 01 đọc trực tiếp các file local trong `.cache/collection/`. |
 | `pipeline/prepare/` | `clean_for_labeling.py`: làm sạch bảng, khử trùng/lọc và giữ text gốc. `preprocess_for_model.py`: chuẩn hóa đầu vào mô hình, xử lý tên/URL/điện thoại/emoji, tách từ và stop words. |
 | `pipeline/label/` | `upload_to_argilla.py`: đưa record lên giao diện nhãn. `ai_assisted_spam_ham.py`: tạo gợi ý label/confidence. `auto_accept_labels.py`: tiếp nhận gợi ý theo ngưỡng. `download_labeled_data.py`: xuất nhãn đã duyệt. `label_utils.py`: kiểm ID/nhãn và metadata. `cached_annotations.py`: nối gợi ý với đúng bình luận theo nội dung, không dựa vào vị trí dòng. |
 | `pipeline/features/` | `spam_features.py`: FastTextVectorizer, học embedding và tổng hợp vector câu. BoW/TF-IDF sử dụng vectorizer của scikit-learn trong `modeling/`. |
@@ -36,8 +36,8 @@ huấn luyện mới thực thi công việc tương ứng.
 | `tools/dataset_versions/` | `merge_labeled_data.py`: gộp CSV có sẵn với đầu ra notebook 01 → `data/final/comments_merged.csv`. `audit_source.py`: đối chiếu bundle nguồn khi cần kiểm tra nội bộ. |
 | `scripts/` | `run_notebook.py`: chạy notebook bằng kernel mới, tách đầu ra khỏi runtime tạm. `check_environment.py`: kiểm Python, đúng `.venv` và toàn bộ phiên bản notebook đã pin. |
 | `requirements/` | `notebook.txt`: notebook; `collection.txt`: crawler; `annotation.txt`: công cụ nhãn; `dev.txt`: kiểm thử. |
-| `tests/` | Các file `test_*.py` kiểm tra dữ liệu, ID/nhãn, liên kết cache, tiền xử lý, CV, lưu/tải/dự đoán và hiển thị. `test_notebook_runner.py` kiểm tra đầu ra công khai và khả năng tải dữ liệu khi máy chưa có v7. |
-| `data/` | `intermediate/`: đầu ra trung gian notebook 01; `labeled/comments_labeled.csv`: CSV mới; `labeled/comments_labeled_phase1.csv`: CSV có sẵn; `final/comments_merged.csv`: bản tool tạo; `final/labeled_v7.csv`: đầu vào thực nghiệm local. |
+| `tests/` | Các file `test_*.py` kiểm tra dữ liệu, ID/nhãn, liên kết cache, tiền xử lý, CV, lưu/tải/dự đoán và hiển thị. `test_notebook_runner.py` kiểm tra đường dẫn CSV local, đầu ra và đóng kernel. |
+| `data/` | `intermediate/`: đầu ra trung gian notebook 01; `processed/v7_preprocessed.csv`: v7 và các cột token cho mô hình; `labeled/comments_labeled.csv`: CSV mới; `labeled/comments_labeled_phase1.csv`: CSV có sẵn; `final/comments_merged.csv`: bản tool tạo; `final/labeled_v7.csv`: đầu vào thực nghiệm local. |
 | `artifacts/`, `.cache/`, `.work/` | `artifacts/spamham/`: model và kết quả huấn luyện; `.cache/collection/`: đầu vào tái lập; `.work/`: runtime/test tạm. Không đưa vào Git. `.venv/` chứa môi trường Python. |
 | `results/` | `verified_run/`: bằng chứng lần chạy hiện tại; `source_audit/`: hồ sơ kiểm chứng nguồn; `history/`: bằng chứng các phiên bản trước. |
 | `docs/` | `assignment/`: ảnh đề; `team/`: phân công; `guides/`: hướng dẫn; `presentation/`: lộ trình mở code; `provenance/`: hồ sơ nguồn; `archive/`: tài liệu cũ đã gom lại; `report/`: dành cho báo cáo. |
@@ -66,7 +66,8 @@ model và cache khỏi Git; `.env.example` là mẫu cấu hình, không chứa 
 
 5. **Chuẩn bị thực nghiệm:** notebook 02 đọc `data/final/labeled_v7.csv`, kiểm
    cấu trúc/nhãn, gọi `preprocess_for_model.py` để tách từ và tạo hai cấu hình
-   giữ/bỏ stop words. Bước này chuẩn bị đầu vào cho mô hình, không gán lại nhãn.
+   giữ/bỏ stop words. Ghi `data/processed/v7_preprocessed.csv` rồi đọc lại các cột token
+   để huấn luyện. Giữ nguyên ID, nội dung nguồn và nhãn.
 6. **Huấn luyện:** chia train/test theo khóa văn bản, CV 5 fold trên train;
    `experiments.py` huấn luyện 12 tổ hợp chính và các đối chứng cân bằng lớp/ngưỡng.
    Vectorizer, IDF và FastText chỉ được học trong phần train tương ứng.
@@ -85,7 +86,7 @@ rồi chạy notebook 02 khi cần huấn luyện/đánh giá lại.
 |---|---|
 | Notebook 01 | `data/intermediate/comments.csv`, `comments_cleaned.csv`, `annotation_predictions.json`, `annotation_review.csv`; CSV cuối `data/labeled/comments_labeled.csv`; `data/collection_manifest.json`. |
 | Tool gộp | `data/final/comments_merged.csv`, tạo từ CSV có sẵn và CSV vừa xuất. |
-| Notebook 02 | `artifacts/spamham/spam_ham_ml_only.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`. |
+| Notebook 02 | `data/processed/v7_preprocessed.csv`; `artifacts/spamham/spam_ham_ml_only.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`. |
 
 Notebook 01 không cần cookie/API. Crawler và công cụ nhãn qua dịch vụ có bộ
 requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính không đặt ở đó.
@@ -118,3 +119,61 @@ không phụ thuộc tên thư mục hay đuôi file. Cả mô hình cơ sở v�
 
 Theo phạm vi đã thống nhất, báo cáo là tài liệu nộp; notebook và các module dùng
 để trình bày/demo. Để người khác chạy lại, cần repo, môi trường và dữ liệu tương ứng.
+
+## Dữ liệu trước và sau tiền xử lý
+
+Mục 2 notebook 02 hiển thị bình luận từ v7, với ID, nhãn, text gốc, text đã làm
+sạch và loại bình luận. Mục 3 dùng cùng các ID để so sánh thêm hai cột token:
+`tokens_keep_stopwords` và `tokens_remove_stopwords`.
+
+Toàn bộ 38.233 mẫu được ghi vào `data/processed/v7_preprocessed.csv`, không chỉ
+các dòng xem trước. Notebook đọc lại file này, kiểm tra ID/nhãn giữ nguyên rồi
+đưa các cột token vào `TEXT`, là đầu vào các vòng huấn luyện. Từ vựng, IDF và
+embedding vẫn được học trong phần train của từng fold.
+
+Trong dữ liệu hiện tại, có 2 dòng token rỗng khi giữ stop words và 103 dòng khi
+loại stop words. Các dòng này vẫn giữ ID/nhãn; vectorizer biểu diễn bằng vector
+không có đặc trưng thay vì âm thầm bỏ mẫu.
+
+## Mất cân bằng nhãn
+
+V7 có 32.907 ham (86,07%) và 5.326 spam (13,93%), xấp xỉ 6,18 ham trên mỗi spam.
+Project đã thực nghiệm các cách sau:
+
+| Cách xử lý | Thực hiện ở đâu và tác dụng |
+|---|---|
+| SVM class weight | `experiments.py` thử `None` và `balanced`; balanced tăng mức phạt lỗi ở lớp ít mẫu theo thống kê của phần train đang fit. |
+| Ngưỡng Naive Bayes | `training_utils.tune_nb_threshold()` dùng dự đoán ngoài fold trên train để chọn ngưỡng theo F1 spam. |
+| Under-sampling | `training_utils.undersampled_search()` giảm số ham trong phần train đến tối đa 2 ham/1 spam; không lấy mẫu validation/test. |
+| Tiêu chí đánh giá | Tối ưu F1 spam bằng CV; đọc cùng Precision, Recall và confusion matrix để thấy spam bị bỏ sót. |
+
+Mô hình cuối hiện là TF-IDF + SVM, `class_weight=None`, vì CV F1 cao hơn cấu hình
+balanced. Trên test, balanced tăng Recall spam từ 62,78% lên 77,92%, đồng thời
+Precision giảm từ 88,18% xuống 71,39%. Cấu hình cuối được chọn bằng CV trước khi
+đánh giá test. Các biện pháp này khảo sát ảnh hưởng mất cân bằng; mô hình vẫn có
+sai số và chưa loại bỏ hoàn toàn việc bỏ sót spam.
+
+## Notebook và module có cùng luồng xử lý
+
+Notebook vừa điều phối dữ liệu/split/cấu hình, vừa gọi hàm trong `pipeline/` và
+hiển thị kết quả. Chạy cell xử lý là thực thi công việc đó. Chạy runner từ Terminal
+là một cách thực thi toàn bộ notebook; mở khối mã nguồn chỉ để xem cách viết hàm.
+
+Các module có `main()`/CLI có thể chạy rời bằng `-m` với đúng đầu vào. Các module
+thư viện như `experiments.py` không tự huấn luyện cả bài khi gọi trực tiếp file;
+cần notebook hoặc chương trình điều phối cung cấp dữ liệu và cấu hình.
+
+## Các thư mục kiểm tra và kết quả
+
+`tests/` chứa chương trình kiểm thử và các tình huống giả lập nhỏ để kiểm tra
+hành vi hàm, không phải dataset thực nghiệm v7. Các nhóm gồm:
+`test_data_pipeline.py` và `test_collection_provenance.py` kiểm luồng dữ liệu;
+`test_cached_annotations.py` kiểm nối nhãn đúng ID; `test_preprocessing_and_training.py`
+kiểm tiền xử lý, CV và sampling; `test_restructured_modules.py` kiểm module/CLI và
+lưu–tải–dự đoán; `test_notebook_display.py` kiểm hiển thị; `test_notebook_runner.py`
+kiểm cấu hình runner và đường dẫn local.
+
+`results/verified_run/` giữ chỉ số và biên bản kiểm tra mới nhất;
+`results/source_audit/` là hồ sơ đối chiếu nguồn; `results/history/` giữ kết quả
+trước đây. Hai notebook không dùng các thư mục này để nạp dữ liệu hay dự đoán.
+Mô hình để tái sử dụng nằm trong `artifacts/spamham/`, dữ liệu trong `data/`.

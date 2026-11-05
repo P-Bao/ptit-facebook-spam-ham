@@ -4,7 +4,7 @@ Liên kết gợi ý gán nhãn với các bình luận sau làm sạch.
 Đầu vào: bảng bình luận, chỉ mục annotation và cache dự đoán.
 Xử lý: đối chiếu post_id/comment_type/text, giữ ID đúng, từ chối liên kết mâu thuẫn.
 Đầu ra: bảng có ID ổn định và cache chỉ gồm các ID thuộc bảng đó.
-Liên quan: collect.snapshots; auto_accept_labels; notebook 01.
+Liên quan: auto_accept_labels; các file đầu vào local của notebook 01.
 """
 
 import hashlib

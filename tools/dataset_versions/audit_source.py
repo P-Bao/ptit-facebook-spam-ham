@@ -4,7 +4,7 @@
 Đầu vào: Folder dữ liệu phân tầng/flat, CSV train, runner PTIT và thư viện nền tùy chọn.
 Xử lý: Tái hiện flatten/clean/gộp, so metadata/cache và chênh nhãn; đọc AST không chạy crawler.
 Đầu ra: JSON kiểm chứng; không sửa nhãn và không gọi Facebook/LLM.
-Liên quan: pipeline.collect.json_to_csv; pipeline.prepare.clean_for_labeling; pipeline.collect.snapshots.
+Liên quan: pipeline.collect.json_to_csv; pipeline.prepare.clean_for_labeling; hồ sơ nguồn lưu trữ.
 """
 
 import argparse
@@ -17,7 +17,6 @@ import re
 import sys
 
 import pandas as pd
-from pipeline.collect.snapshots import snapshot_path
 
 
 SOURCE_FILES = (
@@ -25,6 +24,16 @@ SOURCE_FILES = (
     "predictions_glm_cache_phase2.json", "comments_labeled_phase2.csv",
     "comments_labeled_export.csv", "comments_labeled_merged.csv",
 )
+
+
+def source_path(folder, name):
+    """Đường dẫn của bundle lịch sử do người chạy cung cấp; không tải dữ liệu."""
+    locations = {"groups_data_phase2.json": "raw", "comments_phase2.csv": "intermediate",
+                 "comments_phase2_cleaned.csv": "intermediate", "predictions_glm_cache_phase2.json": "intermediate",
+                 "comments_labeled_phase2.csv": "labeled", "comments_labeled_export.csv": "labeled",
+                 "comments_labeled_merged.csv": "labeled"}
+    flat = Path(folder) / name
+    return flat if flat.is_file() else Path(folder) / locations[name] / name
 
 
 def sha256_file(path):
@@ -81,7 +90,7 @@ def _checked_labels(frame, name):
 def audit_source_bundle(source_dir, training_csv, clean_fn, flatten_fn, configured_groups=None):
     """Tính số liệu từ file thật; không tự sửa dữ liệu hoặc suy diễn người đã rà nhãn."""
     source_dir = Path(source_dir)
-    paths = {name: snapshot_path(source_dir, name) for name in SOURCE_FILES}
+    paths = {name: source_path(source_dir, name) for name in SOURCE_FILES}
     for name in SOURCE_FILES:
         if not paths[name].is_file():
             raise FileNotFoundError(paths[name])

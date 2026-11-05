@@ -8,7 +8,7 @@ import pytest
 
 
 @pytest.mark.parametrize("explicit_csv", [False, True])
-def test_runner_keeps_public_outputs_and_allows_default_dataset_download(tmp_path, monkeypatch, explicit_csv):
+def test_runner_passes_local_csv_and_keeps_public_outputs(tmp_path, monkeypatch, explicit_csv):
     source = Path(__file__).resolve().parents[1] / "scripts/run_notebook.py"
     spec = importlib.util.spec_from_file_location("runner_under_test", source)
     runner = importlib.util.module_from_spec(spec)
@@ -29,7 +29,7 @@ def test_runner_keeps_public_outputs_and_allows_default_dataset_download(tmp_pat
     class Client:
         def __init__(self, nb, **kwargs): self.notebook = nb
         def execute(self):
-            assert runner.os.environ["SPAMHAM_CSV"] == (str(csv_path) if explicit_csv else "")
+            assert runner.os.environ["SPAMHAM_CSV"] == str(csv_path if explicit_csv else tmp_path / "data/final/labeled_v7.csv")
             assert Path(runner.os.environ["SPAMHAM_OUTPUT_DIR"]) == tmp_path / "artifacts/spamham"
             assert Path(runner.os.environ["SPAMHAM_SOURCE_DIR"]) == tmp_path / ".cache/collection"
             self.notebook.cells[0].execution_count = 1
