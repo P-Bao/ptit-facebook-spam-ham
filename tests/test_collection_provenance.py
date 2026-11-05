@@ -89,17 +89,22 @@ def test_read_config_does_not_execute_handoff_code(tmp_path):
     assert read_configured_groups(tmp_path)[0]["id"] == "123"
 
 
-def test_real_drive_snapshot_when_available():
+def test_real_generated_data_when_available():
     root = Path(__file__).resolve().parents[1]
-    folder = root / "data"
-    if not (folder / "raw/groups_data_phase2.json").exists() or not (root / "data/final/labeled_v7.csv").exists():
-        pytest.skip("Snapshot thật không nằm trong Git; dùng tests fixture khi chưa tải")
-    configured = read_configured_groups(root / "pipeline/collect/scrape_ptit_groups.py")
-    result = audit_source_bundle(folder, root / "data/final/labeled_v7.csv", preprocess, flatten_posts, configured)
-    assert result["conversion"] == {"raw_rows": 13833, "empty_removed": 129,
-        "phase1_duplicate_removed": 4135, "flat_rows": 9569, "exact_reproduction": True}
-    assert result["cleaning"]["legacy_rows"] == 9398
-    assert result["cleaning"]["current_filter_would_remove"] == 42
-    assert result["merge"]["exact_reproduction"] and result["merge"]["rows"] == 38233
-    assert result["v7_comparison"]["changed_fields"] == {"label": 1366, "cleaned_text": 0,
-                                                       "text": 0, "comment_type": 0, "reaction_count": 0}
+    paths = [root / "data" / name for name in ["labeled/comments_labeled_phase1.csv",
+             "labeled/comments_labeled.csv", "final/comments_merged.csv", "collection_manifest.json"]]
+    if not all(path.exists() for path in paths):
+        pytest.skip("Chạy notebook 01 và tool gộp để kiểm tra dữ liệu local")
+    phase1, collected, merged = [pd.read_csv(path, dtype=str, keep_default_na=False) for path in paths[:3]]
+    manifest = json.loads(paths[3].read_text(encoding="utf-8"))
+    assert manifest["raw_rows"] == 13833 and manifest["cleaned_rows"] == 10974
+    assert len(collected) == manifest["labeled_rows"] == 6289
+    assert len(phase1) == 31931 and len(merged) == len(phase1) + len(collected) == 38220
+    assert merged.id.is_unique and merged.label.isin(["spam", "ham"]).all()
+    assert merged.source.value_counts().to_dict() == {"phase1": 31931, "phase2": 6289}
+    for source, original in [("phase1", phase1), ("phase2", collected)]:
+        expected = original.set_index(original.id.map(lambda rid: "p2_"+rid if source == "phase2" else rid))
+        observed = merged[merged.source.eq(source)].set_index("id")
+        assert set(observed.index) == set(expected.index)
+        assert (observed.loc[expected.index, ["label", "cleaned_text"]].to_numpy()
+                == expected[["label", "cleaned_text"]].to_numpy()).all()

@@ -25,7 +25,7 @@ huấn luyện mới thực thi công việc tương ứng.
 |---|---|
 | `notebooks/` | Hai notebook tổ chức quá trình trình bày, gọi module và hiển thị kết quả. |
 | `external/facebook_scraper/` | Bộ mã nền thu thập: `group_post_scraper_v2.py` lấy bài nhóm; `main.py` điều phối lấy comment/reply; `comment_scraper.py` xử lý bình luận. `post_scraper.py`, `single_post_image.py` hỗ trợ các nhánh lấy bài/ảnh; `proxy_utils.py` hỗ trợ kết nối; `facebook_ui.py` là GUI tùy chọn. README, requirements và `.env.example` hướng dẫn bộ công cụ. |
-| `pipeline/collect/` | `scrape_ptit_groups.py`: runner PTIT, cấu hình nhóm, gọi bộ nền và ghi JSON/state. `json_to_csv.py`: làm phẳng comment/reply thành bảng. `snapshots.py`: tìm/tải đầu vào và kiểm SHA-256. |
+| `pipeline/collect/` | `scrape_ptit_groups.py`: runner PTIT, cấu hình nhóm, gọi bộ nền và ghi JSON/state. `json_to_csv.py`: làm phẳng comment/reply thành bảng. `snapshots.py`: tìm/tải ba đầu vào trong `.cache/collection/`, kiểm SHA-256 và chuẩn bị CSV có nhãn có sẵn. |
 | `pipeline/prepare/` | `clean_for_labeling.py`: làm sạch bảng, khử trùng/lọc và giữ text gốc. `preprocess_for_model.py`: chuẩn hóa đầu vào mô hình, xử lý tên/URL/điện thoại/emoji, tách từ và stop words. |
 | `pipeline/label/` | `upload_to_argilla.py`: đưa record lên giao diện nhãn. `ai_assisted_spam_ham.py`: tạo gợi ý label/confidence. `auto_accept_labels.py`: tiếp nhận gợi ý theo ngưỡng. `download_labeled_data.py`: xuất nhãn đã duyệt. `label_utils.py`: kiểm ID/nhãn và metadata. `cached_annotations.py`: nối gợi ý với đúng bình luận theo nội dung, không dựa vào vị trí dòng. |
 | `pipeline/features/` | `spam_features.py`: FastTextVectorizer, học embedding và tổng hợp vector câu. BoW/TF-IDF sử dụng vectorizer của scikit-learn trong `modeling/`. |
@@ -33,17 +33,18 @@ huấn luyện mới thực thi công việc tương ứng.
 | `pipeline/inference/` | `predict.py`: nhận bình luận mới và bundle đã huấn luyện, tiền xử lý nhất quán rồi trả nhãn/score. |
 | `pipeline/presentation/` | `notebook_display.py`: bảng, mã nguồn và thông tin file có màu tương phản; không thay đổi dữ liệu hoặc dự đoán. |
 | `pipeline/modern/` | Vị trí dành cho mã mô hình hiện đại; hiện chưa triển khai. |
-| `tools/dataset_versions/` | Công cụ quản lý/kiểm tra dữ liệu nội bộ; không thuộc luồng trình bày hai notebook. |
-| `scripts/` | `run_notebook.py`: chạy notebook bằng kernel mới, lưu output, thời gian và hash mã đã thực thi. |
+| `tools/dataset_versions/` | `merge_labeled_data.py`: gộp CSV có sẵn với đầu ra notebook 01 → `data/final/comments_merged.csv`. `audit_source.py`: đối chiếu bundle nguồn khi cần kiểm tra nội bộ. |
+| `scripts/` | `run_notebook.py`: chạy notebook bằng kernel mới, tách đầu ra khỏi runtime tạm. `check_environment.py`: kiểm Python, đúng `.venv` và toàn bộ phiên bản notebook đã pin. |
 | `requirements/` | `notebook.txt`: notebook; `collection.txt`: crawler; `annotation.txt`: công cụ nhãn; `dev.txt`: kiểm thử. |
-| `tests/` | Các file `test_*.py` kiểm tra xử lý dữ liệu, ID/nhãn, liên kết cache, tiền xử lý, chia tập, huấn luyện–lưu–tải–dự đoán và hiển thị notebook. |
-| `data/` | Đầu vào local: `raw/` chứa JSON; `intermediate/` chứa bảng/cache; `labeled/` chứa dữ liệu nhãn; `final/labeled_v7.csv` dùng thực nghiệm. Không đưa dữ liệu vào Git. |
-| `artifacts/`, `.work/` | CSV, mô hình, cache và output sinh khi chạy; không đưa vào Git. `.venv/` chứa môi trường Python. |
-| `results/` | `verified_run/`: bằng chứng lần chạy hiện tại. `final_editorial/`: kiểm tra lần hoàn thiện notebook. Các thư mục còn lại lưu kiểm chứng nguồn, hiển thị và lịch sử. |
-| `docs/` | `assignment/`: ảnh đề; `team/`: phân công; `guides/`: hướng dẫn; `presentation/`: lộ trình mở code; `provenance/`: hồ sơ nguồn; `plans/`, `overview/`, `changes/`: kế hoạch và lịch sử; `report/`: dành cho báo cáo. |
+| `tests/` | Các file `test_*.py` kiểm tra dữ liệu, ID/nhãn, liên kết cache, tiền xử lý, CV, lưu/tải/dự đoán và hiển thị. `test_notebook_runner.py` kiểm tra đầu ra công khai và khả năng tải dữ liệu khi máy chưa có v7. |
+| `data/` | `intermediate/`: đầu ra trung gian notebook 01; `labeled/comments_labeled.csv`: CSV mới; `labeled/comments_labeled_phase1.csv`: CSV có sẵn; `final/comments_merged.csv`: bản tool tạo; `final/labeled_v7.csv`: đầu vào thực nghiệm local. |
+| `artifacts/`, `.cache/`, `.work/` | `artifacts/spamham/`: model và kết quả huấn luyện; `.cache/collection/`: đầu vào tái lập; `.work/`: runtime/test tạm. Không đưa vào Git. `.venv/` chứa môi trường Python. |
+| `results/` | `verified_run/`: bằng chứng lần chạy hiện tại; `source_audit/`: hồ sơ kiểm chứng nguồn; `history/`: bằng chứng các phiên bản trước. |
+| `docs/` | `assignment/`: ảnh đề; `team/`: phân công; `guides/`: hướng dẫn; `presentation/`: lộ trình mở code; `provenance/`: hồ sơ nguồn; `archive/`: tài liệu cũ đã gom lại; `report/`: dành cho báo cáo. |
 
 Các file `__init__.py` tạo package để import. `.gitignore` loại dữ liệu, môi trường,
 model và cache khỏi Git; `.env.example` là mẫu cấu hình, không chứa phiên đăng nhập.
+`pytest.ini` cấu hình thư mục kiểm thử và đường dẫn import từ gốc project.
 
 ## Luồng thực hiện
 
@@ -57,6 +58,12 @@ model và cache khỏi Git; `.env.example` là mẫu cấu hình, không chứa 
 4. **Gán nhãn:** công cụ AI tạo gợi ý; `auto_accept_labels.py` áp ngưỡng hoặc
    người duyệt trên Argilla. Xuất các mẫu đủ điều kiện → `comments_labeled.csv`.
    Notebook sử dụng gợi ý đã lưu, liên kết bằng `cached_annotations.py` trước khi tiếp nhận.
+
+**Tổng hợp dữ liệu:** sau notebook 01, chạy
+   `.\.venv\Scripts\python.exe -m tools.dataset_versions.merge_labeled_data`
+   để gộp `data/labeled/comments_labeled_phase1.csv` với `data/labeled/comments_labeled.csv`,
+   xuất `data/final/comments_merged.csv`. Đây là thao tác riêng bên ngoài notebook.
+
 5. **Chuẩn bị thực nghiệm:** notebook 02 đọc `data/final/labeled_v7.csv`, kiểm
    cấu trúc/nhãn, gọi `preprocess_for_model.py` để tách từ và tạo hai cấu hình
    giữ/bỏ stop words. Bước này chuẩn bị đầu vào cho mô hình, không gán lại nhãn.
@@ -70,41 +77,25 @@ model và cache khỏi Git; `.env.example` là mẫu cấu hình, không chứa 
 
 ## Cách chạy và đầu ra
 
-Từ thư mục gốc project, tạo môi trường Python 3.12 và cài thư viện:
+Các bước cài môi trường, chọn kernel VS Code và lệnh chạy lần lượt nằm trong
+[README ở gốc project](../../README.md). Chạy notebook 01 trước, chạy tool gộp,
+rồi chạy notebook 02 khi cần huấn luyện/đánh giá lại.
 
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements/notebook.txt
-```
-
-Mở notebook trong repo, chọn kernel `.venv`, thực hiện **Restart Kernel → Run All**.
-Notebook cần các module đi kèm trong repo. Dữ liệu thiếu được tải theo manifest
-hoặc revision/hash; nếu chạy offline phải chuẩn bị dữ liệu trước.
-
-```powershell
-.\.venv\Scripts\python.exe scripts/run_notebook.py --notebook 01 --work-dir .work/runs/collection --inplace
-.\.venv\Scripts\python.exe scripts/run_notebook.py --notebook 02 --work-dir .work/runs/training --inplace
-```
-
-Runner ghi vào `<work-dir>/artifacts/`, chỉ cập nhật output notebook gốc khi chạy
-thành công. Mở trực tiếp notebook dùng mặc định `artifacts/collection/` cho 01 và
-`artifacts/spamham/` cho 02; có thể cấu hình `SPAMHAM_OUTPUT_DIR`.
-
-| Notebook | File sinh ra |
+| Bước | Đầu ra |
 |---|---|
-| 01 | `comments.csv`, `comments_cleaned.csv`, `annotation_predictions.json`, `annotation_review.csv` là trung gian; `comments_labeled.csv` là tập có nhãn cuối; `collection_manifest.json` ghi số liệu/hash. |
-| 02 | `spam_ham_ml_only.joblib`: mô hình; `metrics.csv`: bảng chỉ số; `bootstrap_ci.csv`: khoảng tin cậy; `run_manifest.json`: cấu hình, dữ liệu và kết quả lựa chọn. |
+| Notebook 01 | `data/intermediate/comments.csv`, `comments_cleaned.csv`, `annotation_predictions.json`, `annotation_review.csv`; CSV cuối `data/labeled/comments_labeled.csv`; `data/collection_manifest.json`. |
+| Tool gộp | `data/final/comments_merged.csv`, tạo từ CSV có sẵn và CSV vừa xuất. |
+| Notebook 02 | `artifacts/spamham/spam_ham_ml_only.joblib`, `metrics.csv`, `bootstrap_ci.csv`, `run_manifest.json`. |
 
-Chạy crawler cần thêm `requirements/collection.txt` và phiên Facebook hợp lệ;
-gọi công cụ nhãn qua dịch vụ cần `requirements/annotation.txt` cùng cấu hình tương ứng.
-Không lưu cookie/token vào notebook hoặc Git. Hai notebook không tự chạy lại mọi
-file `.py`; mỗi cell chỉ gọi những hàm/CLI được viết trong cell đó.
+Notebook 01 không cần cookie/API. Crawler và công cụ nhãn qua dịch vụ có bộ
+requirements riêng. `.work/` chỉ giữ runtime/test tạm; đầu ra chính không đặt ở đó.
 
 ## Kết quả và giới hạn
 
 - Notebook 01: 5 nhóm, 2.170 bài, 13.833 comment/reply; 13.704 nội dung không rỗng,
   10.974 mẫu sau làm sạch. Có 6.571 gợi ý khớp; ngưỡng 0,75 tiếp nhận 6.289 mẫu
   (5.190 ham, 1.099 spam). Mẫu thiếu gợi ý hoặc chưa đạt ngưỡng không nằm trong CSV có nhãn.
+- CSV có sẵn có 31.931 mẫu; tool gộp với 6.289 mẫu mới tạo thành **38.220 mẫu**.
 - Notebook 02: v7 có 38.233 mẫu; train 30.759, test 7.474. TF-IDF + SVM giữ stop words
   được chọn theo CV. Test: Accuracy **94,19%**, Precision spam **88,18%**,
   Recall spam **62,78%**, F1 spam **0,7334**, AP **0,8117**.

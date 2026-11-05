@@ -1,3 +1,5 @@
+> Biên bản kiểm chứng nguồn theo phiên bản đã ghi dưới đây. Đường dẫn lưu dữ liệu hiện hành: `.cache/collection/` cho đầu vào tái lập, `data/` cho dữ liệu làm việc. Cách chạy mới nằm trong [README](../../README.md).
+
 # Kiểm chứng mã thu thập và dữ liệu Drive
 
 **Cập nhật cấu trúc 05/11/2026:** đường dẫn dưới đây theo repo mới. 12 file nền
@@ -5,7 +7,7 @@ trong `external/facebook_scraper/` giữ nguyên byte; runner PTIT chuyển sang
 `pipeline/collect/scrape_ptit_groups.py` và chỉnh import, đường dẫn, trợ giúp CLI.
 Kiểm kê mã bàn giao nguyên bản thuộc lần kiểm tra 04/11; bản lưu trước tái cấu
 trúc ở `results/history/7415098/`. Không coi runner đã chỉnh là nguyên byte mã
-đã chạy lịch sử. Chi tiết: `docs/changes/2026-11-05_TAI_CAU_TRUC_VA_DONG_BO.md`.
+đã chạy lịch sử. Chi tiết: `docs/archive/changes/2026-11-05_TAI_CAU_TRUC_VA_DONG_BO.md`.
 
 Ngày kiểm tra: 04/11/2026. Các số liệu dưới đây được tính từ file thực tế, không
 lấy số trong README làm kết quả. Không đăng nhập Facebook, không cào lại, không gọi

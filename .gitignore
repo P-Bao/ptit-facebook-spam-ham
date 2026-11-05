@@ -1,11 +1,9 @@
-# Bỏ qua thư mục data (dataset lớn, lưu trên HuggingFace)
+# Dữ liệu local; giữ mã và manifest trong Git
 data/
 
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 *.egg-info/
 dist/
 build/
@@ -31,9 +29,9 @@ Thumbs.db
 
 # Dữ liệu chạy, môi trường và bản nháp cục bộ
 .work/
+.cache/
 artifacts/
 .pytest_cache/
-**/.ipynb_checkpoints/
 # Media/phiên chạy do thư viện crawler tạo; giữ mã nền và .env.example
 group_post/
 page_post/
@@ -52,6 +50,5 @@ my-argilla/
 
 # Trained models & Cache
 *.joblib
-spam_ham_ml_only.joblib
 namedb_cache/
 

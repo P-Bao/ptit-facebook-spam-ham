@@ -49,6 +49,46 @@ def test_download_rejects_wrong_payload_before_writing(tmp_path, monkeypatch):
     assert not (tmp_path / "data/raw/groups_data_phase2.json").exists()
 
 
+def phase1_manifest(tmp_path, monkeypatch):
+    snapshot_manifest(tmp_path, monkeypatch)
+    path = tmp_path / "results/source_audit/drive_manifest.json"
+    entries = json.loads(path.read_text(encoding="utf-8"))
+    entries.append({"name": "comments_labeled_export.csv", "bytes": 6,
+                    "download_url": "https://example.invalid/labels",
+                    "sha256": hashlib.sha256(b"phase1").hexdigest()})
+    path.write_text(json.dumps(entries), encoding="utf-8")
+
+
+@pytest.mark.parametrize("content", [b"phase1", b"wrong"])
+def test_phase1_preparation_preserves_existing_file(tmp_path, monkeypatch, content):
+    phase1_manifest(tmp_path, monkeypatch)
+    target = tmp_path / "data/labeled/comments_labeled_phase1.csv"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(content)
+    monkeypatch.setattr(snapshots, "urlopen", lambda *a, **k: pytest.fail("Existing source must not be replaced"))
+    if content == b"phase1":
+        assert snapshots.prepare_phase1(tmp_path / "data") == target
+    else:
+        with pytest.raises(ValueError, match="hash"):
+            snapshots.prepare_phase1(tmp_path / "data")
+    assert target.read_bytes() == content
+
+
+def test_phase1_preparation_downloads_verified_bytes_without_duplicate_copy(tmp_path, monkeypatch):
+    phase1_manifest(tmp_path, monkeypatch)
+
+    class Response:
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def read(self, limit): return b"phase1"
+
+    monkeypatch.setattr(snapshots, "urlopen", lambda *a, **k: Response())
+    cache = tmp_path / "cache"
+    target = snapshots.prepare_phase1(tmp_path / "data", cache)
+    assert target.read_bytes() == b"phase1"
+    assert list(cache.iterdir()) == []
+
+
 @pytest.mark.parametrize("feature,algorithm", [("BoW", "Naive Bayes"), ("TF-IDF", "SVM")])
 def test_extracted_training_and_saved_bundle_inference(tmp_path, feature, algorithm):
     raw = ["học lịch thi tài liệu bạn" if i % 2 == 0 else "quảng cáo mua bán liên hệ" for i in range(24)]

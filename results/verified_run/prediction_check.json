@@ -1,0 +1,6 @@
+{
+  "test_rows": 7474,
+  "prediction_disagreements": 0,
+  "model_path": "artifacts/spamham/spam_ham_ml_only.joblib",
+  "model_sha256": "8a73266ff7fabf5fec6c04b3bfc4f166404e85968c9c83464b382597c1dd0d40"
+}

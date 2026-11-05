@@ -9,10 +9,13 @@
 | Chuẩn hóa bảng | `pipeline/collect/json_to_csv.py`: `flatten_posts` | Mỗi comment/reply thành một dòng. |
 | Làm sạch | `pipeline/prepare/clean_for_labeling.py` | Chuẩn hóa, lọc/khử trùng, giữ nội dung gốc. |
 | Gán nhãn | `pipeline/label/ai_assisted_spam_ham.py`, `cached_annotations.py`, `auto_accept_labels.py` | Gợi ý, liên kết đúng ID và áp ngưỡng tiếp nhận. |
-| Xuất CSV | Cell xuất dữ liệu | Các cột, số mẫu, tỷ lệ nhãn và file kết quả. |
+| Xuất CSV | Cell xuất dữ liệu | Các cột, số mẫu, tỷ lệ nhãn và `data/labeled/comments_labeled.csv`. |
 
 Notebook tái lập xử lý từ dữ liệu/phản hồi đã lưu. Giải thích output trước,
 mở khối mã nguồn tương ứng khi cần phân tích cách thực hiện.
+
+Khi cần tổng hợp dữ liệu, chạy `tools/dataset_versions/merge_labeled_data.py`
+theo hướng dẫn README; file kết quả nằm ở `data/final/comments_merged.csv`.
 
 ## Notebook 02 — Thực nghiệm và ứng dụng
 

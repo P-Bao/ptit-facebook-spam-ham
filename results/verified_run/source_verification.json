@@ -21,6 +21,6 @@
   "notebooks_use_project_modules": true,
   "crawler_entrypoint": "pipeline/collect/scrape_ptit_groups.py",
   "vendor_directory": "external/facebook_scraper",
-  "notebook_output_verification": "results/final_editorial/verification.json",
+  "notebook_output_verification": "results/verified_run/verification.json",
   "collection_notebook_mode": "replay_collection_and_cached_annotations"
 }

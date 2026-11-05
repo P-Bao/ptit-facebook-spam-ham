@@ -3,7 +3,7 @@ Chạy notebook trong kernel mới với module của project và output riêng.
 
 Đầu vào: --notebook 01/02, CSV v7 và snapshot tương ứng.
 Xử lý: cấu hình PYTHONPATH/seed; ghi tiến độ và hash code/module đã chạy.
-Đầu ra: notebook có output, artifacts, execution_status.json; --inplace chỉ ghi khi thành công.
+Đầu ra: CSV trong data/ (01), model trong artifacts/spamham/ (02), trạng thái trong .work/.
 Liên quan: hai notebook trong notebooks/.
 """
 
@@ -25,19 +25,23 @@ def main():
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--notebook", choices=["01", "02"], default="02")
-    parser.add_argument("--csv", type=Path, default=root / "data/final/labeled_v7.csv")
-    parser.add_argument("--source-dir", type=Path, default=root / "data")
-    parser.add_argument("--work-dir", type=Path, default=root / ".work/runs/full")
+    parser.add_argument("--csv", type=Path, help="CSV huấn luyện; mặc định dùng v7 local hoặc tải bản đã chốt")
+    parser.add_argument("--source-dir", type=Path, default=root / ".cache/collection")
+    parser.add_argument("--work-dir", type=Path, help="Thư mục tạm cho kernel và bản sao notebook")
+    parser.add_argument("--output-dir", type=Path, help="Gốc đầu ra; mặc định data/ cho 01, artifacts/spamham/ cho 02")
     parser.add_argument("--inplace", action="store_true", help="Ghi output vào notebook chính chỉ khi chạy hết thành công")
     args = parser.parse_args()
     filenames = {"01": "01_thu_thap_va_gan_nhan.ipynb", "02": "02_thuc_nghiem_va_demo.ipynb"}
     source = root / "notebooks" / filenames[args.notebook]
-    work = args.work_dir.resolve()
+    work = (args.work_dir or root / ".work/runs" / args.notebook).resolve()
     if not work.is_relative_to(root):
         raise ValueError("Thư mục kiểm tra phải nằm trong project")
     work.mkdir(parents=True, exist_ok=True)
-    output = work / "artifacts"
-    os.environ.update({"SPAMHAM_CSV": str(args.csv.resolve()), "SPAMHAM_SKIP_INSTALL": "1",
+    output = (args.output_dir or (root / "data" if args.notebook == "01" else root / "artifacts/spamham")).resolve()
+    if not output.is_relative_to(root):
+        raise ValueError("Thư mục đầu ra phải nằm trong project")
+    csv = args.csv or root / "data/final/labeled_v7.csv"
+    os.environ.update({"SPAMHAM_CSV": str(csv.resolve()) if args.csv or csv.is_file() else "", "SPAMHAM_SKIP_INSTALL": "1",
         "SPAMHAM_SOURCE_DIR": str(args.source_dir.resolve()),
         "PYTHONPATH": str(root) + os.pathsep + os.environ.get("PYTHONPATH", ""),
         "SPAMHAM_OUTPUT_DIR": str(output), "PYTHONHASHSEED": "42",
@@ -77,9 +81,10 @@ def main():
     finally:
         nbformat.write(notebook, copied)
         if manager.has_kernel:
-            manager.shutdown_kernel(now=True)
+            manager.shutdown_kernel(now=False)
         result = {"success": success, "seconds": round(time.monotonic()-start, 2),
                   "notebook": str(source.relative_to(root)), "isolated_kernel": True, "uses_project_modules": True,
+                  "output_dir": str(output.relative_to(root)),
                   "python": sys.version.split()[0],
                   "executed_code_cells": sum(c.cell_type == "code" and c.execution_count is not None for c in notebook.cells)}
         result["executed_code_sha256"] = hashlib.sha256(json.dumps(

@@ -1,8 +1,10 @@
+> Biên bản kiểm chứng nguồn theo phiên bản đã ghi dưới đây. Đường dẫn lưu dữ liệu hiện hành: `.cache/collection/` cho đầu vào tái lập, `data/` cho dữ liệu làm việc. Cách chạy mới nằm trong [README](../../README.md).
+
 # Đối chiếu Kaggle và xác minh nguồn dữ liệu
 
 Ghi chép đối chiếu ngày 04/11, trước lượt tái cấu trúc. Bản hiện tại gồm hai
 notebook import module repo; hướng dẫn mới ở `docs/guides/` và thay đổi ở
-`docs/changes/2026-11-05_TAI_CAU_TRUC_VA_DONG_BO.md`. Các so sánh phiên bản cũ
+`docs/archive/changes/2026-11-05_TAI_CAU_TRUC_VA_DONG_BO.md`. Các so sánh phiên bản cũ
 dưới đây được giữ làm lịch sử, không phải yêu cầu còn nhúng module vào notebook.
 
 Ngày truy cập: 04/11/2026. Ghi nhận từ nội dung tải được; không sửa notebook Kaggle
