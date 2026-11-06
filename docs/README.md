@@ -11,7 +11,7 @@
 | [Ảnh đề](assignment/de_bai.png) | Yêu cầu gốc và mô hình hiện đại bổ sung |
 | `provenance/` | Biên bản crawler, Drive và Kaggle theo thời điểm; không phải lệnh chạy hiện hành |
 | [Lịch sử ngưỡng SVM](guides/CAP_NHAT_NOTEBOOK_VA_NGUONG_SVM.md) | Nhật ký và kiểm chứng SVM; các mốc cũ không thay thế trạng thái hiện tại |
-| [Báo cáo học phần](report/README.md) | Nơi dành cho tài liệu nộp; chưa viết báo cáo hoàn chỉnh |
+| [Báo cáo học phần](report/README.md) | DOCX/PDF hiện hành, mục lục và phần thông tin bìa cần điền trước khi nộp |
 | [Tài liệu lưu trữ](archive/README.md) | Kế hoạch và hướng dẫn cũ, giữ để tra cứu |
 
 Trình tự đọc: **tổng quan → README chạy → notebook phụ trách → README module →
