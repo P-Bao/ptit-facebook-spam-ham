@@ -1,16 +1,19 @@
-# Báo cáo học phần — chuẩn bị sau khi chốt code
+# Báo cáo học phần
 
-Chưa viết báo cáo theo phạm vi đã thống nhất. Theo [ảnh đề](../assignment/de_bai.png),
-bố cục gồm tiêu đề, giới thiệu bài toán, cơ sở lý thuyết, thực nghiệm/kết quả
-và tài liệu tham khảo.
+Hai bản báo cáo hiện hành:
 
-Dùng ba notebook hiện hành, kết quả tại `results/verified_run/`, `results/modern/`
-và nguồn trong `docs/provenance/`. **viBERT đã fine-tune/đánh giá xong**, trình
-bày ở Notebook 03: cùng test với S3, F1 0,8493 so với 0,7552. Không dùng ghi chú
-“mô hình hiện đại chưa làm” từ bản cũ để viết báo cáo.
+- [DOCX có thể chỉnh sửa](BAO_CAO_PTIT_SPAM_HAM.docx)
+- [PDF để đọc và gửi](BAO_CAO_PTIT_SPAM_HAM.pdf)
 
-Tham khảo [tổng quan](../guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md),
-[phân công học](../team/TEAM_ASSIGNMENTS.md) và
-[cách đọc chỉ số](../guides/DOC_TOKEN_VA_KET_QUA.md) trước khi soạn tài liệu nộp.
-Code/notebook dùng để trình bày/demo; muốn chuyển sang máy khác cần thêm dữ
-liệu/model local và đúng môi trường, không chỉ một file notebook tách rời.
+Báo cáo bám [ảnh đề](../assignment/de_bai.png), gồm Mở đầu, Chương 1 cơ sở lý
+thuyết, Chương 2 thực nghiệm/kết quả, Kết luận và 25 tài liệu tham khảo. Phần
+thực nghiệm đối chiếu Notebook 01–03 và các CSV/hình trong `artifacts/`;
+hai nhánh S3 và viBERT M1 dùng cùng 7.474 mẫu test.
+
+**Trước khi nộp:** điền họ tên đầy đủ, MSSV, lớp/nhóm và giảng viên vào trang
+bìa. Hiện project chỉ có tên gọi ngắn Cương, Bảo, Phi, Phương. Nếu sửa DOCX,
+cần cập nhật mục lục/danh mục bảng/hình trong Word và xuất lại PDF để hai bản
+khớp với thông tin bìa cuối cùng.
+
+[Mục lục và kế hoạch biên soạn](MUC_LUC_VA_KE_HOACH_BAO_CAO.md) là file làm việc
+tạm; giữ lại đến khi nhóm duyệt báo cáo cuối, sau đó mới xóa.
