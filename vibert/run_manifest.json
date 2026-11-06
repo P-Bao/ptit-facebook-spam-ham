@@ -1,0 +1,47 @@
+{
+  "dataset": "p-storm/ptit-facebook-comments-spamham",
+  "file": "labeled_v7.csv",
+  "dataset_sha256": "7305d712996da3ff0dce1ea4142844b7629e9880bcac47ee38934f0b6e6cfbee",
+  "n_total": 38233,
+  "n_train": 27558,
+  "n_val": 3201,
+  "n_test": 7474,
+  "config": {
+    "SEEDS": [
+      42,
+      43,
+      44
+    ],
+    "MAX_LEN": 128,
+    "BATCH": 32,
+    "EPOCHS": 4,
+    "LR": 2e-05,
+    "WARMUP": 0.1,
+    "WEIGHT_DECAY": 0.01,
+    "PATIENCE": 2,
+    "RUNS": [
+      [
+        "vibert",
+        false
+      ]
+    ],
+    "MODELS": {
+      "vibert": {
+        "name": "NlpHUST/vibert4news-base-cased",
+        "segment": false
+      }
+    }
+  },
+  "selected_by_validation": {
+    "run": "vibert",
+    "seed": 43,
+    "thr": 0.845,
+    "val_f1": 0.8763796909492274
+  },
+  "versions": {
+    "python": "3.13.16",
+    "torch": "2.11.0+cu130",
+    "transformers": "4.57.6",
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition"
+  }
+}

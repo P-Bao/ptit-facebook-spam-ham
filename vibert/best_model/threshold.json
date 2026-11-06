@@ -1,0 +1,8 @@
+{
+  "threshold": 0.845,
+  "model": "NlpHUST/vibert4news-base-cased",
+  "segment": false,
+  "max_len": 128,
+  "run": "vibert",
+  "seed": 43
+}

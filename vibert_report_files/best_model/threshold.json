@@ -1,0 +1,8 @@
+{
+  "threshold": 0.8749999999999999,
+  "model": "vinai/phobert-base-v2",
+  "segment": true,
+  "max_len": 128,
+  "run": "phobert",
+  "seed": 43
+}
