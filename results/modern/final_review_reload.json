@@ -1,0 +1,22 @@
+{
+  "local_cpu_checked_rows": 64,
+  "label_disagreements": 0,
+  "max_probability_difference_from_gpu_fp16": 3.7617393008709116e-05,
+  "repeat_16_probabilities_identical": true,
+  "source_sample_id": "cmt_10948",
+  "source_text": "グエン・ヴィエ・ フイ cuối kỳ gánh hết",
+  "tokens": [
+    "[UNK]",
+    "[UNK]",
+    "[UNK]",
+    "[UNK]",
+    "[UNK]",
+    "cuối",
+    "kỳ",
+    "g",
+    "##ánh",
+    "hết"
+  ],
+  "unk_count": 5,
+  "model_training_repeated": false
+}

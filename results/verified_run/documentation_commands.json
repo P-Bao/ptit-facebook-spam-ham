@@ -1,0 +1,20 @@
+{
+  "offline_readme_steps_match_notebook_01": true,
+  "labeled_rows": 6289,
+  "readme_external_inference_examples_passed": [
+    "S3 .venv",
+    "viBERT .venv-modern CPU"
+  ],
+  "cli_help_verified": [
+    "pipeline.collect.scrape_ptit_groups",
+    "pipeline.collect.json_to_csv",
+    "pipeline.prepare.clean_for_labeling",
+    "pipeline.label.ai_assisted_spam_ham",
+    "pipeline.label.upload_to_argilla",
+    "pipeline.label.auto_accept_labels",
+    "pipeline.label.download_labeled_data",
+    "tools.dataset_versions.merge_labeled_data",
+    "pipeline.modern.train"
+  ],
+  "live_collection_annotation_or_training_repeated": false
+}

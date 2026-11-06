@@ -1,0 +1,57 @@
+{
+  "scope": "real viBERT fine-tuning on Colab A100; CPU reload checked separately",
+  "test_rows": 7474,
+  "test_spam": 951,
+  "validation_rows": 5944,
+  "final_train_rows": 30759,
+  "selected": {
+    "variant": "unweighted",
+    "epoch": 3,
+    "loss": 0.2114548236131668,
+    "accuracy": 0.9557537012113055,
+    "precision": 0.8573466476462197,
+    "recall": 0.7866492146596858,
+    "f1": 0.8204778156996587,
+    "ap": 0.8819395039357796
+  },
+  "metrics": {
+    "Accuracy": 0.9634733743644635,
+    "Precision": 0.8941860465116279,
+    "Recall": 0.8086225026288117,
+    "F1": 0.8492545554942021,
+    "AP": 0.9107797708888891
+  },
+  "confusion_matrix": [
+    [
+      6432,
+      91
+    ],
+    [
+      182,
+      769
+    ]
+  ],
+  "same_test_ids_as_S3": true,
+  "selection_uses_validation_not_test": true,
+  "cuda_reload_all_test_rows_matched": true,
+  "local_cpu_checked_rows": 64,
+  "local_cpu_label_disagreements": 0,
+  "local_cpu_max_probability_delta": 3.7617393008709116e-05,
+  "local_cpu_repeat_inference_unchanged": true,
+  "tests": {
+    "modern": {
+      "tests": 4,
+      "skipped": 0,
+      "errors": 0,
+      "failures": 0
+    },
+    "base": {
+      "tests": 61,
+      "skipped": 1,
+      "errors": 0,
+      "failures": 0
+    }
+  },
+  "model_path": "artifacts/modern/vibert/model",
+  "model_format": "safetensors + tokenizer + inference config"
+}

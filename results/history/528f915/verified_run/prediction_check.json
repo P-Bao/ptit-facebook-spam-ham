@@ -1,0 +1,26 @@
+{
+  "rows": 7474,
+  "source": "raw text from held-out test",
+  "selected_id": "S3",
+  "threshold": -0.17762792522140153,
+  "loaded_bundle_matches_saved_predictions": true,
+  "confusion_matrix": [
+    [
+      6396,
+      127
+    ],
+    [
+      297,
+      654
+    ]
+  ],
+  "metrics": {
+    "Accuracy": 0.9432700026759433,
+    "Precision": 0.8373879641485276,
+    "Recall": 0.6876971608832808,
+    "F1": 0.7551963048498845,
+    "AP": 0.8116912085784026
+  },
+  "raw_vs_cleaned_score_differences": 9,
+  "raw_text_average_precision": 0.8115848305724379
+}

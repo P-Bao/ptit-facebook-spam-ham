@@ -1,0 +1,58 @@
+{
+  "checked_client_date": "2026-11-06",
+  "notebooks": {
+    "01": {
+      "file": "notebooks/01_thu_thap_va_gan_nhan.ipynb",
+      "code_cells": 6,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 3.8,
+      "notebook": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "data",
+      "python": "3.12.14",
+      "executed_code_cells": 6
+    },
+    "02": {
+      "file": "notebooks/02_thuc_nghiem_va_demo.ipynb",
+      "code_cells": 19,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 613.62,
+      "notebook": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\spamham",
+      "python": "3.12.14",
+      "executed_code_cells": 19
+    },
+    "03": {
+      "file": "notebooks/03_vibert.ipynb",
+      "code_cells": 9,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 12.95,
+      "notebook": "notebooks\\03_vibert.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\modern\\vibert",
+      "python": "3.12.14",
+      "executed_code_cells": 9
+    }
+  },
+  "traditional_9_metric_rows_and_parameters_exactly_preserved_except_timing": true,
+  "traditional_training_and_preprocessing_modules_unchanged": true,
+  "modern_metrics_and_same_test_ids_verified": true,
+  "cloud_training_device": "NVIDIA A100-SXM4-80GB",
+  "local_model_available": true,
+  "local_cpu_64_label_disagreements": 0,
+  "branch": "phi",
+  "protected_local_heads": {
+    "master": "efc4fba2a6289936fdcd43f822698f251ee9e61f",
+    "cuong": "efc4fba2a6289936fdcd43f822698f251ee9e61f"
+  },
+  "notebook_01_code_unchanged_and_outputs_rerun": true,
+  "latest_review": "results/verified_run/final_review.json",
+  "all_three_notebooks_executed_in_this_review": true
+}

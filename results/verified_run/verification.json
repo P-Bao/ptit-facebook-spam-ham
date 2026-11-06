@@ -1,26 +1,52 @@
 {
-  "checked_client_date": "2026-11-05",
-  "completed_utc": "2026-11-05T14:00:39.684062+00:00",
-  "baseline_commit": "d938b0a147f81de6146875682f80fbeedcf66dd0",
+  "checked_client_date": "2026-11-06",
+  "completed_utc": "2026-11-05T17:00:45.582506+00:00",
+  "baseline_commit": "a94214fcf02117b4297df2546ddebb4164505df0",
   "notebooks": {
     "01": {
-      "path": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
-      "cells": 15,
+      "file": "notebooks/01_thu_thap_va_gan_nhan.ipynb",
       "code_cells": 6,
-      "seconds": 4.45,
-      "errors": 0,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 3.8,
+      "notebook": "notebooks\\01_thu_thap_va_gan_nhan.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
       "output_dir": "data",
-      "inherited_from": "d938b0a"
+      "python": "3.12.14",
+      "executed_code_cells": 6,
+      "mode": "offline_replay"
     },
     "02": {
-      "path": "notebooks/02_thuc_nghiem_va_demo.ipynb",
-      "cells": 34,
-      "code_cells": 18,
-      "seconds": 603.77,
-      "errors": 0
+      "file": "notebooks/02_thuc_nghiem_va_demo.ipynb",
+      "code_cells": 19,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 613.62,
+      "notebook": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\spamham",
+      "python": "3.12.14",
+      "executed_code_cells": 19,
+      "mode": "train_and_evaluate"
+    },
+    "03": {
+      "file": "notebooks/03_vibert.ipynb",
+      "code_cells": 9,
+      "errors_in_cells": 0,
+      "success": true,
+      "seconds": 12.95,
+      "notebook": "notebooks\\03_vibert.ipynb",
+      "isolated_kernel": true,
+      "uses_project_modules": true,
+      "output_dir": "artifacts\\modern\\vibert",
+      "python": "3.12.14",
+      "executed_code_cells": 9,
+      "mode": "review"
     }
   },
-  "tests_passed": 55,
+  "tests_passed": 60,
   "preserved_configurations": [
     "B1",
     "B2",
@@ -94,6 +120,17 @@
       "height": 683
     }
   },
-  "modern_model": "not_implemented",
-  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown after computational cells completed"
+  "modern_model": "completed_in_separate_colab_run",
+  "teardown_warning_observed": "joblib resource_tracker KeyError during Windows kernel shutdown after computational cells completed",
+  "all_9_configurations_reproduced_on_repeat_run": true,
+  "fresh_run_both_notebooks": true,
+  "stability_evidence": "results/verified_run/stability_check.json",
+  "tests_skipped_without_torch": 1,
+  "modern_unit_tests_passed_in_separate_environment": 4,
+  "modern_integration_run": [
+    "02",
+    "03"
+  ],
+  "fresh_run_all_three_notebooks": true,
+  "latest_review": "results/verified_run/final_review.json"
 }

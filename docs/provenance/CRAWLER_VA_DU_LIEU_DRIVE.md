@@ -3,7 +3,10 @@
 > đặt trong `.cache/collection/`. Các tên file nguồn trong biên bản dưới đây là
 > tên khi nhận dữ liệu; notebook hiện không phụ thuộc manifest/checksum.
 
-> Biên bản kiểm chứng nguồn theo phiên bản đã ghi dưới đây. Đường dẫn lưu dữ liệu hiện hành: `.cache/collection/` cho đầu vào tái lập, `data/` cho dữ liệu làm việc. Cách chạy mới nằm trong [README](../../README.md).
+> Biên bản nguồn lịch sử, không phải hướng dẫn chạy hiện hành. Project nay có
+> ba notebook và đã hoàn tất viBERT. `.cache/collection/` giữ đầu vào tái lập,
+> `data/` giữ dữ liệu làm việc. Xem [README](../../README.md) để chạy bản hiện tại;
+> các số liệu đối soát bên dưới vẫn mô tả đúng thời điểm/file được kiểm tra.
 
 # Kiểm chứng mã thu thập và dữ liệu Drive
 

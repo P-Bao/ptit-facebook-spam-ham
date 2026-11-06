@@ -1,0 +1,7 @@
+{
+  "phase1_rows": 31931,
+  "collected_rows": 6289,
+  "merged_rows": 38220,
+  "merged_file": "data/final/comments_merged.csv",
+  "training_file": "data/final/labeled_v7.csv"
+}

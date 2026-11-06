@@ -1,5 +1,13 @@
 # Cập nhật thực nghiệm và ngưỡng SVM
 
+Tài liệu ghi lại đợt hoàn thiện SVM trước bước viBERT. Nhánh viBERT được mô tả
+riêng trong [hướng dẫn Colab](HUONG_DAN_VIBERT_COLAB.md) và Notebook 03.
+
+**Trạng thái hiện hành:** viBERT đã hoàn tất (M1 test F1 0,8493); project có ba
+notebook. Các số cell/thời gian/số test và câu “chưa triển khai” bên dưới thuộc
+các lượt SVM lịch sử. Xem [tổng quan](TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md)
+và `results/verified_run/final_review.json` để biết lượt rà soát mới nhất.
+
 ## Phạm vi thay đổi
 
 Chỉnh Notebook 02 và các hàm huấn luyện/dự đoán liên quan. Giữ nguyên Notebook
@@ -94,3 +102,48 @@ Khi đóng kernel trên Windows vẫn có thông báo joblib `resource_tracker.K
 ở bước dọn bộ nhớ tạm, như phiên bản trước. Runner trả mã 0, trạng thái thành
 công; các cell, file đầu ra và phép kiểm tra mô hình đã hoàn tất. Bộ kiểm thử
 có một cảnh báo deprecation từ Argilla/Pydantic, không có kiểm thử thất bại.
+
+
+## Kiểm tra tái lập toàn bộ luồng
+
+Đã chạy lại tuần tự Notebook 01 → tool gộp → Notebook 02 bằng môi trường
+Python 3.12.14 của project. Notebook 01 hoàn tất 4.34
+giây, Notebook 02 hoàn tất 575.52 giây; mọi cell
+code đều hoàn tất, không có lỗi trong cell. Đây là luồng local: xử lý JSON và
+phản hồi nhãn đã lưu, không gọi lại Facebook/LLM/Argilla.
+
+CSV 6.289 mẫu của Notebook 01, CSV gộp 38.220 mẫu, v7 và CSV tiền xử lý giữ nguyên
+nội dung. **Cả chín dòng chỉ số, tham số và ngưỡng tái lập đúng lần trước**, chỉ
+thời gian chạy thay đổi. Các bảng CV, bootstrap và dự đoán từng mẫu test cũng
+khớp. 55 kiểm thử đạt. Bằng chứng: `results/verified_run/stability_check.json`.
+
+S3 có CV F1 và Test F1 cao nhất trong chín cấu hình hiện tại. Test F1 S3 là
+0,7552, S2 là 0,7542: chênh lệch nhỏ, chưa đủ kết luận S3 vượt trội về thống kê.
+B4 có Precision cao nhất; S1 có Recall và AP cao nhất. Không có một cấu hình
+đứng đầu mọi chỉ số.
+
+Ngưỡng −0,1776 là ngưỡng **decision score**, không phải xác suất âm. SVM mặc
+định dùng ngưỡng 0. Nhánh S3 giữ nguyên mô hình, chọn ngưỡng theo F1 validation
+của điểm OOF trên train. Trên test, vùng điểm (−0,1776; 0] có 104 bình luận
+đổi từ dự đoán ham sang spam: bắt thêm 57 spam và nhận nhầm thêm 47 ham. Đó là
+lý do Recall/F1 tăng còn Precision giảm; không phải mô hình được huấn luyện
+lại bằng nhãn test.
+
+Đối chứng luôn dự đoán ham **không bị lỗi**: tập test có 6.523 ham/7.474 mẫu,
+Accuracy = 87,28%, Recall/F1 spam = 0. Precision spam khi không dự đoán mẫu spam
+nào là không xác định về phép chia; bảng cũ dùng quy ước hiển thị 0. Để tập trung
+vào B1–B6, bảng riêng được rút thành ghi chú. Ma trận nhầm lẫn dùng chữ sáng
+trên ô tối và chữ tối trên ô sáng.
+
+Cell lưu đã ghi lại `.joblib` trong lượt chạy mới. Bundle giữ đúng pipeline,
+ngưỡng, cấu hình từ dừng; dự đoán khớp trên toàn bộ 7.474 mẫu test sau khi tải
+lại. Đã thử thêm hai chu kỳ lưu–nạp trên file tạm: nhãn và score giữ nguyên.
+Khác biệt score ở chín đầu vào raw/cleaned đã ghi ở trên vẫn giữ nguyên, không
+đổi nhãn. Hai notebook sẵn sàng làm cơ sở cho bước viBERT; chưa triển khai
+viBERT trong lượt kiểm tra này.
+
+Khi chạy tay, dùng Restart Kernel → Run All hoặc runner; cùng dữ liệu, môi
+trường, seed và số luồng. Cell chạy riêng phụ thuộc biến của phần trước; sau
+khi huấn luyện lại cần chạy tiếp đánh giá/lưu. Không bảo đảm trùng mọi chữ số
+trên mọi máy hoặc khi đổi phiên bản/tham số. Model được ghi khi chạy cell có
+`joblib.dump()`, không phải khi mở notebook để xem output.

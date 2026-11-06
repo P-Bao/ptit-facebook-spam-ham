@@ -1,10 +1,10 @@
 {
   "success": true,
-  "seconds": 603.77,
+  "seconds": 613.62,
   "notebook": "notebooks\\02_thuc_nghiem_va_demo.ipynb",
   "isolated_kernel": true,
   "uses_project_modules": true,
   "output_dir": "artifacts\\spamham",
   "python": "3.12.14",
-  "executed_code_cells": 18
+  "executed_code_cells": 19
 }

@@ -12,6 +12,7 @@ build/
 
 # Môi trường ảo
 .venv/
+.venv-modern/
 venv/
 env/
 .env
