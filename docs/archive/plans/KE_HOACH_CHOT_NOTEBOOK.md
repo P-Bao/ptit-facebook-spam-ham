@@ -11,7 +11,7 @@ Ngày: **04/11/2026**. Căn cứ mã nguồn hiện tại: Git HEAD `efc4fba`.
 - Hoàn thiện code, chạy và chốt notebook trước; viết báo cáo học phần sau.
 - Tài liệu này là danh sách công việc và phương án thực hiện, chưa phải xác nhận đã sửa code hoặc đã chạy các thí nghiệm mới.
 
-**Kết luận:** giữ nền tảng BoW/TF-IDF/FastText + Naive Bayes/SVM hiện có. Bổ sung một mô hình phân loại hiện đại; sửa các lỗi ảnh hưởng tiền xử lý, đánh giá, dự đoán và khả năng chạy notebook. Không mặc định yêu cầu sửa hoặc chạy lại tất cả script chuẩn bị dữ liệu.
+**Kết luận:** giữ nền tảng BoW/TF-IDF + Naive Bayes/SVM hiện có. Bổ sung một mô hình phân loại hiện đại; sửa các lỗi ảnh hưởng tiền xử lý, đánh giá, dự đoán và khả năng chạy notebook. Không mặc định yêu cầu sửa hoặc chạy lại tất cả script chuẩn bị dữ liệu.
 
 ## Cách đọc mức độ quan trọng
 
@@ -73,16 +73,12 @@ Không cần crawl lại Facebook trong mỗi lần Run All. Mục thu thập c�
 | N18 | NÊN — vừa | Có baseline dự đoán toàn ham | Giải thích dễ hiểu tác động mất cân bằng và vì sao Accuracy chưa đủ |
 | N19 | NÊN — vừa | Hiện cảnh báo quan trọng, ghi thời gian từng nhánh; không tắt toàn bộ warnings | Phát hiện lỗi hội tụ, biết tài nguyên thực tế và thuận tiện giải thích quá trình |
 | N20 | NÊN — vừa | Xuất metrics/config hoặc dự đoán test ra CSV/JSON; thử tải lại mô hình nếu lưu | Đối chiếu và tái sử dụng dễ hơn; file này là đầu ra, không nhất thiết phải nộp kèm nếu không yêu cầu |
-| N21 | TÙY CHỌN — thấp | Giữ bootstrap CI, OOV, phân tích riêng FastText nếu còn hữu ích | Làm bài sâu hơn nhưng không thay thế yêu cầu mô hình hiện đại. Nếu giữ CI cần diễn giải đúng, không kết luận tương đương chỉ từ CI chồng lấp |
-| N22 | TÙY CHỌN — thấp | Chạy nhiều seed, thử thêm mô hình, ensemble TF-IDF + FastText, khảo sát nhiều ngưỡng | Có thể đánh giá sâu hơn; chưa cần cho mục tiêu chốt bài này |
+| N21 | TÙY CHỌN — thấp | Giữ bootstrap CI nếu còn hữu ích | Làm bài sâu hơn nhưng không thay thế yêu cầu mô hình hiện đại. Nếu giữ CI cần diễn giải đúng, không kết luận tương đương chỉ từ CI chồng lấp |
+| N22 | TÙY CHỌN — thấp | Chạy nhiều seed, thử thêm mô hình, khảo sát nhiều ngưỡng | Có thể đánh giá sâu hơn; chưa cần cho mục tiêu chốt bài này |
 
 Không cần thêm website, API, Docker triển khai, crawler định kỳ, hệ thống tài khoản hay huấn luyện lại LLM gán nhãn để đáp ứng đề đang xét.
 
 ### 1.4. Chốt cách nộp một notebook
-
-Notebook đang tự tạo `spam_features.py` bằng cell 3 trước khi import ở cell 4. Hai bản lớp FastText hiện giống nhau. Vì vậy không có căn cứ nói tách notebook chắc chắn lỗi thiếu file Python này.
-
-Phương án ít thay đổi nhất: giữ cell sinh module để dùng Pipeline/GridSearchCV, bảo đảm nó chạy trước import và thư mục cho phép ghi. Không buộc phải chuyển lớp vào cell thông thường vì còn liên quan cách chạy đa tiến trình/cache và lưu mô hình.
 
 Với dữ liệu, có hai lựa chọn rõ ràng:
 
@@ -109,7 +105,6 @@ Nếu CSV đạt kiểm tra phù hợp và không có bằng chứng lỗi ở l
 
 | File | Mức và quyết định cho bản nộp | Khi nào phải sửa/chạy lại? | Tác dụng của việc sửa nếu cần |
 |---|---|---|---|
-| `spam_features.py` | Liên quan trực tiếp; hiện **không có lỗi bắt buộc sửa đã xác nhận**. Notebook có bản nhúng giống file | Nếu thay đổi lớp FastText thì đồng bộ bản nhúng hoặc xác định một nguồn chuẩn; chạy lại nhánh bị thay đổi | Tránh notebook và file ngoài dùng hai transformer khác nhau |
 | `clean_data_facebook_spamham.py` | Giữ nếu CSV cuối đúng; đưa các hàm cần cho demo vào notebook mà không bắt buộc import file này | Nếu phát hiện chính bước clean đã xóa/méo văn bản cần thiết; khi đó sửa và tái tạo cleaned text từ raw text phù hợp | Khôi phục nội dung đầu vào đúng; không nhất thiết gán nhãn lại tất cả |
 | `convert_phase2_json.py` | Chưa thấy lý do bắt buộc sửa cho tập đã có | Nếu đối chiếu JSON thật phát hiện mất comments/replies hoặc sai metadata cần dùng. File hiện chỉ duyệt một tầng replies | Khôi phục phần dữ liệu bị bỏ sót; xác định phần nào cần gán nhãn bổ sung |
 | `upload_to_argilla.py` | Không cần sửa nếu không upload lại và ID dữ liệu đã đúng | Nếu phải upload bổ sung mà ID có nguy cơ đụng nhau hoặc không nối được nguồn | Giữ ánh xạ dữ liệu, tránh cập nhật nhầm record |
@@ -153,7 +148,7 @@ Bình luận PTIT + nhãn spam/ham đã có
   → fine-tune trên train
   → chọn checkpoint theo F1 spam trên validation
   → đo các chỉ số trên test đã chốt
-  → so sánh với BoW/TF-IDF/FastText + NB/SVM
+  → so sánh với BoW/TF-IDF + NB/SVM
 ```
 
 **Vì sao phù hợp:** mô hình ngôn ngữ tiếng Việt có biểu diễn theo ngữ cảnh, bổ sung một hướng khác với vector từ trung bình và đặc trưng tần suất. Có thể kiểm tra nó có giảm lỗi ở các bình luận chào mời ngắn hay không; đây là giả thuyết cần đo, chưa phải kết quả đã biết.
@@ -194,7 +189,7 @@ Nếu muốn ưu tiên mô hình được thiết kế cho văn bản mạng xã
 3. Sửa tiền xử lý, nhóm dữ liệu/CV, lựa chọn mô hình và hàm dự đoán; chốt giữ/bỏ các phần nâng cao.
 4. Bổ sung một nhánh hiện đại, chạy thử cấu trúc và cấu hình tài nguyên; số thử nhanh không dùng thay cho kết quả đầy đủ.
 5. Chạy đầy đủ trên dữ liệu/split đã chốt; lưu kết quả thật; sửa nhận xét và bảng tổng hợp theo output.
-6. Xác nhận notebook Run All từ kernel mới, không cần chuẩn bị sẵn `spam_features.py` hay chạy lại Argilla.
+6. Xác nhận notebook Run All từ kernel mới, không cần chạy lại Argilla.
 7. Chốt notebook nộp chính. Sau đó mới dùng code/kết quả đã chốt để viết báo cáo học phần.
 
 ## 5. Điều kiện để gọi là đã chốt phần code

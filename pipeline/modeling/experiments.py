@@ -2,9 +2,9 @@
 Định nghĩa pipeline đặc trưng/mô hình và các phép đo thực nghiệm.
 
 Đầu vào: văn bản đã tách từ, nhãn train, folds và cấu hình seed/cache/jobs.
-Xử lý: BoW/TF-IDF/FastText + NB/SVM; chọn bằng CV train, đánh giá riêng trên test.
+Xử lý: BoW/TF-IDF + NB/SVM; chọn bằng CV train, đánh giá riêng trên test.
 Đầu ra: record mô hình/tham số/chỉ số; bootstrap F1 là phân tích bổ sung.
-Liên quan: features.spam_features; modeling.training_utils; notebook 02.
+Liên quan: modeling.training_utils; notebook 02.
 """
 
 import time
@@ -13,17 +13,15 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import accuracy_score, average_precision_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import GridSearchCV
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVC
 
-from pipeline.features.spam_features import FastTextVectorizer
 from pipeline.modeling.training_utils import predict_record
 
 TOKEN_PATTERN = r"(?u)\b\w+\b|[^\w\s]"
 NGRAMS = [(1, 1), (1, 2)]
-FEATURES = ("BoW", "TF-IDF", "FastText")
+FEATURES = ("BoW", "TF-IDF")
 MODELS = ("Naive Bayes", "SVM")
 CV_SCORING = {"precision": "precision", "recall": "recall", "f1": "f1"}
 
@@ -32,27 +30,16 @@ def make_pipe(feat, model_name, *, seed=42, cache=None, n_jobs=2, class_weight=N
     """Tạo cấu hình cơ sở; bật balanced riêng cho đối chứng TF-IDF + SVM."""
     if feat not in FEATURES or model_name not in MODELS:
         raise ValueError("Đặc trưng/thuật toán không nằm trong cấu hình thực nghiệm")
-    if feat == "FastText":
-        vectorizer = FastTextVectorizer(seed=seed, workers=1)
-        vector_grid = {"vec__pooling": ["mean", "tfidf"]}
-        if model_name == "Naive Bayes":
-            steps = [("clf", GaussianNB())]
-            model_grid = {"clf__var_smoothing": [1e-9, 1e-7, 1e-5, 1e-3]}
-        else:
-            steps = [("sc", StandardScaler()), ("clf", LinearSVC(dual=False, max_iter=20000, random_state=seed))]
-            model_grid = {"clf__C": [0.01, 0.1, 1.0], "clf__class_weight": [class_weight]}
-        jobs = 1
+    vectorizer = (CountVectorizer(token_pattern=TOKEN_PATTERN, min_df=2) if feat == "BoW"
+                  else TfidfVectorizer(token_pattern=TOKEN_PATTERN, min_df=2, sublinear_tf=True))
+    vector_grid = {"vec__ngram_range": NGRAMS}
+    if model_name == "Naive Bayes":
+        steps = [("clf", MultinomialNB())]
+        model_grid = {"clf__alpha": [0.1, 0.3, 1.0]}
     else:
-        vectorizer = (CountVectorizer(token_pattern=TOKEN_PATTERN, min_df=2) if feat == "BoW"
-                      else TfidfVectorizer(token_pattern=TOKEN_PATTERN, min_df=2, sublinear_tf=True))
-        vector_grid = {"vec__ngram_range": NGRAMS}
-        if model_name == "Naive Bayes":
-            steps = [("clf", MultinomialNB())]
-            model_grid = {"clf__alpha": [0.1, 0.3, 1.0]}
-        else:
-            steps = [("clf", LinearSVC(dual=False, max_iter=20000, random_state=seed))]
-            model_grid = {"clf__C": [0.1, 0.3, 1.0, 3.0], "clf__class_weight": [class_weight]}
-        jobs = n_jobs
+        steps = [("clf", LinearSVC(dual=False, max_iter=20000, random_state=seed))]
+        model_grid = {"clf__C": [0.1, 0.3, 1.0, 3.0], "clf__class_weight": [class_weight]}
+    jobs = n_jobs
     return Pipeline([("vec", vectorizer), *steps], memory=cache), {**vector_grid, **model_grid}, jobs
 
 

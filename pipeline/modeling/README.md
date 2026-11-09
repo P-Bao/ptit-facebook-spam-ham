@@ -11,15 +11,15 @@ Thứ tự trong Notebook 02:
 1. **Mục 4:** khóa nhóm từ `cleaned_text`; bucket test theo khóa, giữ các văn bản
    cùng khóa trong cùng tập. Train 30.759 mẫu, test 7.474; train chia năm fold.
    Đây là chia theo văn bản, không phải chia theo tác giả hoặc theo thời gian.
-2. **Mục 5:** BoW/TF-IDF/FastText × NB/SVM, đối chiếu giữ/loại từ dừng bằng CV.
-   Chọn giữ từ dừng cho luồng tiếp. Sáu tổ hợp B1–B6 dùng train nguyên bản và
-   ngưỡng mặc định, SVM không dùng trọng số lớp. NB là MultinomialNB cho đếm từ
-   và GaussianNB cho embedding có thể âm; FastText+SVM có StandardScaler.
+2. **Mục 5:** BoW/TF-IDF × NB/SVM, đối chiếu giữ/loại từ dừng bằng CV.
+   Chọn giữ từ dừng cho luồng tiếp. Bốn tổ hợp B1–B4 dùng train nguyên bản và
+   ngưỡng mặc định, SVM không dùng trọng số lớp. NB là MultinomialNB cho đặc trưng
+   đếm từ/TF-IDF, SVM là LinearSVC.
 3. **Mục 5.1:** cố định TF-IDF+SVM, dùng B4 làm đối chứng; thử S1 balanced, S2
    under-sampling ham:spam 2:1 và S3 chỉnh ngưỡng decision score. Không cộng dồn
    ba chiến lược. Vectorizer/sampling đều nằm trong phần train của mỗi fold.
-4. **Mục 6–7:** test, FP/FN, ma trận, PR/AP, bootstrap và phân tích lỗi. Bảng sáu
-   tổ hợp và bảng bốn chiến lược có chung B4, tổng cộng **chín** ứng viên.
+4. **Mục 6–7:** test, FP/FN, ma trận, PR/AP, bootstrap và phân tích lỗi. Bảng bốn
+   tổ hợp và bảng bốn chiến lược có chung B4, tổng cộng **bảy** ứng viên.
 5. **Mục 8:** notebook lưu ứng viên được chọn theo CV vào bundle `.joblib`;
    `inference/predict.py` sử dụng bundle đó.
 

@@ -6,7 +6,6 @@
     "pipeline/step_02_preprocess/clean_data_facebook_spamham.py": "pipeline/prepare/clean_for_labeling.py",
     "pipeline/step_02_preprocess/text_preprocessing.py": "pipeline/prepare/preprocess_for_model.py",
     "pipeline/step_04_merge/merge_labeled_data.py": "tools/dataset_versions/merge_labeled_data.py",
-    "pipeline/step_05_features/spam_features.py": "pipeline/features/spam_features.py",
     "pipeline/step_06_train_evaluate/training_utils.py": "pipeline/modeling/training_utils.py",
     "docs/references/CRAWLER_VA_DU_LIEU_DRIVE.md": "docs/provenance/CRAWLER_VA_DU_LIEU_DRIVE.md",
     "docs/references/KAGGLE_VA_NGUON_DU_LIEU.md": "docs/provenance/KAGGLE_VA_NGUON_DU_LIEU.md",

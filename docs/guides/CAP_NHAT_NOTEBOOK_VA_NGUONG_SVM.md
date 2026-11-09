@@ -19,13 +19,13 @@ hiện đại vẫn dành cho bước tiếp theo, chưa triển khai trong lầ
 | Nội dung | Trước | Sau | Mục đích |
 |---|---|---|---|
 | Thiết kế thực nghiệm | Có train/test/CV nhưng giải thích ngắn, trọng số đặt sớm. | Mục 4 định nghĩa train, validation, CV, test; trọng số chuyển sang 5.1. | Phân biệt lựa chọn cấu hình và đánh giá cuối. |
-| Từ dừng | In kết quả khi huấn luyện; bảng đối chiếu ở phụ lục. | Bảng CV ở mục 5, chọn tiền xử lý rồi trình bày sáu tổ hợp; bỏ phụ lục. | Luồng lựa chọn liền mạch, không lặp phần cuối. |
-| Sáu tổ hợp cơ sở | SVM tìm cả None/balanced; tên “chính” không thể hiện cách xử lý. | SVM cơ sở không trọng số, không lấy mẫu lại; tên “Không điều chỉnh”, mã B1–B6. | Có đối chứng rõ ràng trước khi khảo sát chiến lược. |
+| Từ dừng | In kết quả khi huấn luyện; bảng đối chiếu ở phụ lục. | Bảng CV ở mục 5, chọn tiền xử lý rồi trình bày bốn tổ hợp; bỏ phụ lục. | Luồng lựa chọn liền mạch, không lặp phần cuối. |
+| Bốn tổ hợp cơ sở | SVM tìm cả None/balanced; tên “chính” không thể hiện cách xử lý. | SVM cơ sở không trọng số, không lấy mẫu lại; tên “Không điều chỉnh”, mã B1–B4. | Có đối chứng rõ ràng trước khi khảo sát chiến lược. |
 | Khảo sát mất cân bằng | SVM dùng trọng số/lấy mẫu, NB chỉnh ngưỡng; bảng năm nhánh. | Cùng TF-IDF + SVM: không điều chỉnh, balanced, lấy mẫu 2:1, chỉnh ngưỡng. | Cố định biểu diễn và bộ phân loại để dễ đối chiếu. |
 | Chỉnh ngưỡng | Chỉ NB sử dụng ngưỡng tùy chọn; SVM gọi predict mặc định. | SVM chọn ngưỡng decision score bằng OOF trên train; cùng ngưỡng trong đánh giá và demo. | Ngưỡng được thực thi nhất quán, không chỉ hiển thị trong bảng. |
-| Đánh giá | Có bảng rộng và tên cấu hình lặp; hình tập trung sáu tổ hợp. | Tách sáu tổ hợp và bốn chiến lược, có ma trận và PR cho hai phạm vi. | So sánh theo câu hỏi thực nghiệm, giảm bảng quá nhiều cột. |
+| Đánh giá | Có bảng rộng và tên cấu hình lặp; hình tập trung bốn tổ hợp. | Tách bốn tổ hợp và bốn chiến lược, có ma trận và PR cho hai phạm vi. | So sánh theo câu hỏi thực nghiệm, giảm bảng quá nhiều cột. |
 | Phân tích lỗi | Bảng lỗi dùng ứng viên cuối nhưng đặc trưng lấy từ SVM cơ sở. | Ghi rõ ứng viên được chọn; cùng mô hình cho đặc trưng, lỗi và demo; giữ ID/text gốc. | Đối chiếu được từng dự đoán với đúng cấu hình. |
-| Khảo sát OOV | Có mục riêng sau phân tích lỗi. | Bỏ mục riêng, giữ FastText trong sáu tổ hợp và giải thích subword ngắn. | Tập trung vào phân loại và kết quả liên quan. |
+| Khảo sát OOV | Có mục riêng sau phân tích lỗi. | Bỏ mục riêng để tập trung vào phân loại và kết quả liên quan. | Tập trung vào phân loại và kết quả liên quan. |
 
 ## Mã nguồn thay đổi
 
@@ -42,8 +42,8 @@ hiện đại vẫn dành cho bước tiếp theo, chưa triển khai trong lầ
   ngưỡng SVM, cấu hình cơ sở và ngưỡng được giữ khi lưu–nạp–dự đoán.
 - `README.md`, hướng dẫn tổng quan và lộ trình trình bày: cập nhật luồng và đầu ra.
 
-Không tạo mô-đun Python mới cho chức năng huấn luyện. Sáu tổ hợp cơ sở và ba
-cấu hình bổ sung tương ứng chín ứng viên ở cấu hình từ dừng được chọn. Cấu hình
+Không tạo mô-đun Python mới cho chức năng huấn luyện. Bốn tổ hợp cơ sở và ba
+cấu hình bổ sung tương ứng bảy ứng viên ở cấu hình từ dừng được chọn. Cấu hình
 TF-IDF + SVM cơ sở được dùng lại trong bảng bốn chiến lược, không tính thành một
 ứng viên mới. Các lần fit tìm tham số/fold không phải các thuật toán mới.
 
@@ -62,7 +62,7 @@ cùng lưới, nên bảng so sánh chiến lược đã tinh chỉnh, không ph
 số trong khi giữ tất cả tham số còn lại cố định.
 
 Kết luận lựa chọn giới hạn trong các cấu hình đã thử. Chưa thử mọi chiến lược
-trên cả sáu tổ hợp. Không chọn lại mô hình chỉ vì thấy một dòng có Test F1 cao
+trên cả bốn tổ hợp. Không chọn lại mô hình chỉ vì thấy một dòng có Test F1 cao
 hơn. Cấu hình có CV F1 lớn nhất được lưu trong bundle `.joblib`, bao gồm ngưỡng
 để dùng nhất quán trong demo.
 
@@ -74,10 +74,10 @@ cập nhật được giữ tại `results/history/d938b0a/verified_run/`.
 
 
 Lượt chạy đầy đủ ngày 05/11/2026 hoàn tất trong **603,77 giây**, 34 cell gồm 18
-cell code, không có lỗi trong cell. **55 kiểm thử đạt**. Tám cấu hình giữ lại
-(sáu cơ sở, balanced, under-sampling) có CV F1, chỉ số test và tham số khớp bản
+cell code, không có lỗi trong cell. **55 kiểm thử đạt**. Sáu cấu hình giữ lại
+(bốn cơ sở, balanced, under-sampling) có CV F1, chỉ số test và tham số khớp bản
 trước; không so sánh thời gian chạy. Nhánh từ dừng bị loại khỏi luồng test và
-nhánh ngưỡng NB cũ không nằm trong chín ứng viên hiện tại.
+nhánh ngưỡng NB cũ không nằm trong bảy ứng viên hiện tại.
 
 | TF-IDF + SVM | CV F1 | Test Precision | Test Recall | Test F1 | FP | FN |
 |---|---:|---:|---:|---:|---:|---:|
@@ -113,11 +113,11 @@ code đều hoàn tất, không có lỗi trong cell. Đây là luồng local: x
 phản hồi nhãn đã lưu, không gọi lại Facebook/LLM/Argilla.
 
 CSV 6.289 mẫu của Notebook 01, CSV gộp 38.220 mẫu, v7 và CSV tiền xử lý giữ nguyên
-nội dung. **Cả chín dòng chỉ số, tham số và ngưỡng tái lập đúng lần trước**, chỉ
+nội dung. **Cả bảy dòng chỉ số, tham số và ngưỡng tái lập đúng lần trước**, chỉ
 thời gian chạy thay đổi. Các bảng CV, bootstrap và dự đoán từng mẫu test cũng
 khớp. 55 kiểm thử đạt. Bằng chứng: `results/verified_run/stability_check.json`.
 
-S3 có CV F1 và Test F1 cao nhất trong chín cấu hình hiện tại. Test F1 S3 là
+S3 có CV F1 và Test F1 cao nhất trong bảy cấu hình hiện tại. Test F1 S3 là
 0,7552, S2 là 0,7542: chênh lệch nhỏ, chưa đủ kết luận S3 vượt trội về thống kê.
 B4 có Precision cao nhất; S1 có Recall và AP cao nhất. Không có một cấu hình
 đứng đầu mọi chỉ số.
@@ -132,7 +132,7 @@ lại bằng nhãn test.
 Đối chứng luôn dự đoán ham **không bị lỗi**: tập test có 6.523 ham/7.474 mẫu,
 Accuracy = 87,28%, Recall/F1 spam = 0. Precision spam khi không dự đoán mẫu spam
 nào là không xác định về phép chia; bảng cũ dùng quy ước hiển thị 0. Để tập trung
-vào B1–B6, bảng riêng được rút thành ghi chú. Ma trận nhầm lẫn dùng chữ sáng
+vào B1–B4, bảng riêng được rút thành ghi chú. Ma trận nhầm lẫn dùng chữ sáng
 trên ô tối và chữ tối trên ô sáng.
 
 Cell lưu đã ghi lại `.joblib` trong lượt chạy mới. Bundle giữ đúng pipeline,

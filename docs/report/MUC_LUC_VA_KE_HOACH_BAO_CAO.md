@@ -38,7 +38,7 @@ cáo sẽ đổi thành số tài liệu theo thứ tự trích dẫn, không gi
 | Bối cảnh và lý do chọn đề tài | Bình luận trong cộng đồng sinh viên; nội dung chào mời/rác ảnh hưởng việc trao đổi; nhu cầu hỗ trợ phân loại |
 | Bài toán và mục tiêu | Đầu vào là văn bản bình luận, đầu ra ham/spam; xây dựng quy trình dữ liệu, so sánh biểu diễn và bộ phân loại, bổ sung viBERT |
 | Đối tượng, dữ liệu và phạm vi | Bình luận/comment-reply PTIT trên Facebook; dataset v7 dùng thực nghiệm; phân loại dựa trên text, giới hạn về ngữ cảnh và nhãn |
-| Phương pháp và sản phẩm | Làm sạch/tách từ; BoW/TF-IDF/FastText với NB/SVM; fine-tune viBERT; đánh giá test, lưu mô hình và demo bình luận mới |
+| Phương pháp và sản phẩm | Làm sạch/tách từ; BoW/TF-IDF với NB/SVM; fine-tune viBERT; đánh giá test, lưu mô hình và demo bình luận mới |
 | Bố cục báo cáo | Vai trò Chương 1, Chương 2 và Kết luận; nêu ngắn, không diễn giải trước mọi kết quả |
 
 Mở đầu dùng văn xuôi, khoảng 1–2 trang. Không biến thành phần hướng dẫn cài đặt
@@ -75,24 +75,17 @@ hoặc liệt kê toàn bộ file của repo.
   ưu điểm và hạn chế về thứ tự/ngữ cảnh. `[R01, R04]`
 - **1.3.2. TF-IDF:** TF, DF, IDF, sublinear TF, làm trơn IDF, chuẩn hóa L2;
   phân biệt công thức tổng quát với cấu hình scikit-learn được dùng. `[R01, R04]`
-- **1.3.3. FastText:** word embedding, skip-gram, character n-gram/subword,
-  từ ngoài từ vựng (OOV); từ vector từ đến vector câu bằng mean hoặc trung
-  bình có trọng số TF-IDF. Cách pooling là thiết kế của project, không mặc
-  nhiên là một bộ phân loại do bài báo FastText đề xuất. `[R05]`
-- **1.3.4. Đối chiếu ba biểu diễn:** thưa/dày, số chiều, khả năng biểu diễn từ
+- **1.3.3. Đối chiếu hai biểu diễn:** số chiều, trọng số tần suất, khả năng biểu diễn từ
   hiếm và ngữ cảnh, chi phí; bảng khái niệm, chưa đưa điểm test vào đây.
 
 #### 1.4. Các mô hình phân loại truyền thống
 
 - **1.4.1. Naive Bayes:** định lý Bayes, prior/likelihood/posterior, giả định
   độc lập có điều kiện, quyết định theo hậu nghiệm. `[R01, R06]`
-- **1.4.2. MultinomialNB và GaussianNB:** mô hình đếm và làm trơn cộng alpha
-  (Laplace khi alpha = 1); phân phối Gaussian theo từng đặc trưng và tham số
-  làm trơn phương sai. Giải thích lựa chọn cho BoW/TF-IDF và embedding, không
-  coi giả định Gaussian tự động đúng chỉ vì vector có giá trị âm. `[R06]`
+- **1.4.2. MultinomialNB:** mô hình đếm và làm trơn cộng alpha
+  (Laplace khi alpha = 1) cho đặc trưng rời rạc/trọng số không âm BoW và TF-IDF. `[R06]`
 - **1.4.3. SVM tuyến tính:** siêu phẳng, margin, regularization, C, hinge và
-  squared hinge, decision score, ngưỡng quyết định; StandardScaler cho nhánh
-  FastText. Công thức khi viết phải khớp `LinearSVC` với loss mặc định
+  squared hinge, decision score, ngưỡng quyết định. Công thức khi viết phải khớp `LinearSVC` với loss mặc định
   `squared_hinge`, không trình bày như nhóm dùng kernel RBF. `[R07–R09]`
 
 #### 1.5. Mô hình ngôn ngữ tiền huấn luyện và viBERT
@@ -117,7 +110,7 @@ hoặc liệt kê toàn bộ file của repo.
 #### 1.6. Thiết kế thực nghiệm và xử lý mất cân bằng
 
 - **1.6.1. Train, validation, test và rò rỉ dữ liệu:** phân chia theo nhóm văn
-  bản, fit/transform trong Pipeline; vocabulary, IDF, scaler và embedding chỉ
+  bản, fit/transform trong Pipeline; vocabulary và IDF chỉ
   học trên phần train được phép. `[R17]`
 - **1.6.2. CV, tìm siêu tham số và OOF:** k-fold CV, GridSearchCV, trung bình
   F1 fold, dự đoán out-of-fold, lựa chọn loss/epoch bằng validation, seed và
@@ -176,20 +169,18 @@ Tương ứng **Notebook 01**, mục 1–4 của **Notebook 02** và phần chia
 
 - **2.2.1. Cấu hình BoW và TF-IDF:** vocabulary trong fold, min_df, n-gram,
   sublinear TF; bảng lưới tham số sử dụng.
-- **2.2.2. Cấu hình FastText:** skip-gram 100 chiều, subword 3–5 ký tự, học
-  trong fold, mean/TF-IDF pooling; scaler khi ghép SVM.
-- **2.2.3. Sáu tổ hợp cơ sở B1–B6:** ba biểu diễn × hai họ mô hình; chỉ rõ
-  MultinomialNB/GaussianNB/LinearSVC, ngưỡng mặc định và SVM không trọng số.
-- **2.2.4. Tìm tham số và chọn tiền xử lý:** bảng CV của giữ/bỏ từ dừng,
+- **2.2.2. Bốn tổ hợp cơ sở B1–B4:** hai biểu diễn × hai họ mô hình; chỉ rõ
+  MultinomialNB/LinearSVC, ngưỡng mặc định và SVM không trọng số.
+- **2.2.3. Tìm tham số và chọn tiền xử lý:** bảng CV của giữ/bỏ từ dừng,
   GridSearchCV và refit F1 spam; giữ từ dừng cho các bước tiếp, không tạo phụ
   lục đối chiếu lặp lại hoặc chấm test cho cả hai nhánh.
-- **2.2.5. Khảo sát chiến lược trên TF-IDF+SVM:** B4 đối chứng, S1 balanced,
+- **2.2.4. Khảo sát chiến lược trên TF-IDF+SVM:** B4 đối chứng, S1 balanced,
   S2 under-sampling 2:1, S3 ngưỡng OOF; hình số mẫu/trọng số, bảng CV và căn cứ
-  chọn S3. Ba chiến lược thử riêng, chưa khảo sát mọi kết hợp trên cả sáu tổ hợp.
+  chọn S3. Ba chiến lược thử riêng, chưa khảo sát mọi kết hợp trên cả bốn tổ hợp.
 
 Tương ứng **Notebook 02 mục 5 và 5.1**. Bảng ở đây dùng **CV**, chưa phải bảng
-test của mục 2.4. Tổng số ứng viên ở tiền xử lý đã chọn là **6 + 3 = 9**;
-B4 dùng lại làm đối chứng, không tính thành một mô hình thứ mười.
+test của mục 2.4. Tổng số ứng viên ở tiền xử lý đã chọn là **4 + 3 = 7**;
+B4 dùng lại làm đối chứng, không tính thành một mô hình thứ tám.
 
 #### 2.3. Xây dựng và fine-tune viBERT
 
@@ -207,14 +198,14 @@ B4 dùng lại làm đối chứng, không tính thành một mô hình thứ m�
 
 Tương ứng **Notebook 03 mục 1–5**. Phần xây dựng mô hình hiện đại bổ sung được
 trình bày như một nhánh phân loại hoàn chỉnh, không phải viBERT ghép lần lượt
-với BoW/TF-IDF/FastText.
+với BoW/TF-IDF.
 
 #### 2.4. Đánh giá và so sánh kết quả
 
 - **2.4.1. Giao thức đánh giá:** cùng 7.474 ID/nhãn test; spam là lớp dương;
   Accuracy/Precision/Recall/F1/AP và FP/FN; cấu hình đã chốt trước đánh giá test.
-- **2.4.2. Sáu tổ hợp truyền thống:** bảng B1–B6, đối chiếu biểu diễn/bộ phân
-  loại, ma trận sáu tổ hợp; kết luận theo từng chỉ số.
+- **2.4.2. Bốn tổ hợp truyền thống:** bảng B1–B4, đối chiếu biểu diễn/bộ phân
+  loại, ma trận bốn tổ hợp; kết luận theo từng chỉ số.
 - **2.4.3. Tác động của các chiến lược SVM:** bảng B4/S1/S2/S3 trên test, FP/FN,
   ma trận/đường PR theo phạm vi phù hợp; đối chiếu với điểm CV đã dùng chọn.
 - **2.4.4. Kết quả viBERT và đối chiếu S3:** bảng chung S3/M1, ma trận M1,
@@ -283,8 +274,8 @@ không cần phụ lục đối chiếu từ dừng đã được trình bày t�
 |---|---|
 | Nguồn bình luận PTIT và phân loại spam/ham | Mở đầu, 1.1, 2.1 |
 | Thu thập dữ liệu | 2.1.2–2.1.5 |
-| Tiền xử lý, tách từ, từ dừng | 1.2, 2.1.6, 2.2.4 |
-| Ít nhất hai phương pháp biểu diễn | 1.3, 2.2.1–2.2.3: thực hiện ba phương pháp |
+| Tiền xử lý, tách từ, từ dừng | 1.2, 2.1.6, 2.2.3 |
+| Ít nhất hai phương pháp biểu diễn | 1.3, 2.2.1–2.2.2: thực hiện hai phương pháp (BoW, TF-IDF) |
 | NB/SVM, chia huấn luyện và kiểm tra | 1.4, 1.6, 2.1.7, 2.2 |
 | Accuracy, Precision, Recall, F1, Confusion Matrix; so sánh | 1.7, 2.4 |
 | Mô hình hiện đại bổ sung | 1.5, 2.3, 2.4.4, 2.5 |
@@ -318,7 +309,7 @@ Chương 2 khoảng 12–16 trang; Mở đầu/Kết luận ngắn. Đây không
 | Thu thập/chuyển bảng | `notebooks/01_thu_thap_va_gan_nhan.ipynb`, `pipeline/collect/`, `external/facebook_scraper/`, `data/collection_manifest.json` |
 | Làm sạch/nhãn | `pipeline/prepare/clean_for_labeling.py`, `pipeline/label/`, `data/intermediate/`, `data/labeled/comments_labeled.csv` |
 | Dataset/tiền xử lý/split | `data/final/labeled_v7.csv`, `data/processed/v7_preprocessed.csv`, `pipeline/prepare/preprocess_for_model.py`, `pipeline/modeling/training_utils.py` |
-| Truyền thống và CV | Notebook 02, `pipeline/features/spam_features.py`, `pipeline/modeling/experiments.py`, `artifacts/spamham/stopword_cv.csv`, `imbalance_cv.csv` |
+| Truyền thống và CV | Notebook 02, `pipeline/modeling/experiments.py`, `artifacts/spamham/stopword_cv.csv`, `imbalance_cv.csv` |
 | Test/CI/lỗi S3 | `artifacts/spamham/metrics.csv`, `imbalance_comparison.csv`, `bootstrap_ci.csv`, `test_predictions.csv`, các hình ma trận/PR |
 | viBERT phát triển và test | Notebook 03, `pipeline/modern/`, `artifacts/modern/vibert/run_config.json`, `validation_metrics.csv`, `selected.json`, lịch sử và `test_predictions.csv` |
 | So sánh và kiểm chứng | `results/modern/comparison_with_svm.csv`, `results/verified_run/final_review.json`, `results/modern/local_validation.json` |
@@ -346,19 +337,19 @@ lệ phần trăm hai chữ số; không trộn hai cách trong cùng một cộ
 ### B5. Bảng, hình và công thức dự kiến
 
 **Bảng chính:** quy ước nhãn/ví dụ; schema và số lượng xử lý; thống kê v7/split;
-ví dụ tiền xử lý; lưới tham số/ma trận B1–B6; đối chiếu từ dừng bằng CV;
-B4/S1/S2/S3 bằng CV; cấu hình viBERT và hai loss validation; test B1–B6;
+ví dụ tiền xử lý; lưới tham số/ma trận B1–B4; đối chiếu từ dừng bằng CV;
+B4/S1/S2/S3 bằng CV; cấu hình viBERT và hai loss validation; test B1–B4;
 test các chiến lược SVM; test S3/M1; FP/FN và demo mới. Gộp bảng khi giúp giảm
 lặp; lưới dài/CI đầy đủ có thể chuyển phụ lục.
 
 **Hình chính:** sơ đồ hệ thống; phân bố nhãn; số mẫu/trọng số chiến lược;
-loss/validation F1 viBERT; ma trận sáu cơ sở, bốn chiến lược và M1; PR S3–M1.
+loss/validation F1 viBERT; ma trận bốn cơ sở, bốn chiến lược và M1; PR S3–M1.
 Các đường PR truyền thống còn lại chọn lọc hoặc để phụ lục, không thu nhỏ
 nhiều biểu đồ đến mức không đọc được. Nguồn hình lấy từ artifacts đã kiểm tra;
 sơ đồ nguyên lý tự vẽ lại và dẫn tài liệu gốc nếu dựa theo bài báo.
 
-**Công thức cần chuẩn bị:** TF/IDF và chuẩn hóa; pooling FastText; Bayes/MNB/
-Gaussian; decision function và mục tiêu LinearSVC phù hợp; attention, softmax,
+**Công thức cần chuẩn bị:** TF/IDF và chuẩn hóa; Bayes/MNB;
+decision function và mục tiêu LinearSVC phù hợp; attention, softmax,
 cross-entropy; trọng số balanced; Accuracy/Precision/Recall/F1/AP và CV mean.
 Mọi biến được giải thích ngay sau công thức; không cần khai triển mọi phép
 cập nhật AdamW hoặc chứng minh tối ưu SVM.
@@ -418,12 +409,9 @@ bản thảo, đọc đúng phần tương ứng; ưu tiên bài báo/sách và 
 - **[R04]** scikit-learn 1.6.1, *Feature extraction*, mục text feature extraction.
   [Tài liệu](https://scikit-learn.org/1.6/modules/feature_extraction.html).
   Dùng cho CountVectorizer/TF-IDF, n-gram và công thức triển khai.
-- **[R05]** P. Bojanowski, E. Grave, A. Joulin, T. Mikolov (2017), *Enriching
-  Word Vectors with Subword Information*, TACL, 5, 135–146.
-  [Bài báo/PDF và BibTeX](https://aclanthology.org/Q17-1010/), DOI: 10.1162/tacl_a_00051.
 - **[R06]** scikit-learn 1.6.1, *Naive Bayes*.
   [Tài liệu](https://scikit-learn.org/1.6/modules/naive_bayes.html).
-  Dùng cho giả định độc lập, GaussianNB/MultinomialNB, additive smoothing.
+  Dùng cho giả định độc lập, MultinomialNB, additive smoothing.
 - **[R07]** C. Cortes, V. Vapnik (1995), *Support-vector networks*, Machine
   Learning, 20, 273–297. [Trang bài báo](https://link.springer.com/article/10.1007/BF00994018),
   DOI: 10.1007/BF00994018. Trang công khai có metadata/abstract; bản toàn văn
@@ -514,8 +502,8 @@ Không dùng blog tổng hợp thay bài gốc khi đã có nguồn chính thứ
 
 - Nội dung bắt buộc trong ảnh đề đều có vị trí; phần viBERT bổ sung được viết
   đầy đủ cả xây dựng/huấn luyện/đánh giá, không chỉ giới thiệu tên mô hình.
-- Lý thuyết đúng biến thể code; công thức TF-IDF, loss SVM, prior/smoothing NB,
-  weighted loss và pooling phải đối chiếu implementation.
+- Lý thuyết đúng biến thể code; công thức TF-IDF, loss SVM, prior/smoothing NB và
+  weighted loss phải đối chiếu implementation.
 - Mọi bảng có nguồn CSV cụ thể, ghi đúng CV/validation/test và lớp dương;
   B4 không bị đếm hai lần, S3 được chọn theo CV trước test.
 - Thống kê thu thập/CSV minh họa/v7 không bị dùng thay thế nhau; không bổ sung

@@ -93,23 +93,23 @@ không phải bước bắt buộc trước mỗi lần chạy Notebook 02.
 | 1–2. Môi trường/khảo sát | Cell notebook và checker ở `scripts/` | Kiểm phiên bản, ID/nhãn, hiện bình luận thật, tỷ lệ và độ dài |
 | 3. Tiền xử lý | `prepare/preprocess_for_model.py`: `preprocess` | Chuẩn hóa, xử lý tên/URL/điện thoại/emoji, underthesea; lưu toàn bộ hai cột giữ/bỏ từ dừng vào `data/processed/v7_preprocessed.csv` và đọc lại |
 | 4. Thiết kế | `modeling/training_utils.py`: `norm_key`, `bucket`, `grouped_folds` | Nhóm văn bản, chia 30.759 train/7.474 test; CV năm fold trên train |
-| 5. Huấn luyện | `modeling/experiments.py`: `make_pipe`, `fit_experiment`; `features/spam_features.py`: `FastTextVectorizer` | Đối chiếu từ dừng bằng CV; chọn giữ từ dừng, so sánh B1–B6: BoW/TF-IDF/FastText × NB/SVM |
+| 5. Huấn luyện | `modeling/experiments.py`: `make_pipe`, `fit_experiment` | Đối chiếu từ dừng bằng CV; chọn giữ từ dừng, so sánh B1–B4: BoW/TF-IDF × NB/SVM |
 | 5.1. Mất cân bằng | `fit_experiment`, `undersampled_search`, `tune_svm_threshold` | Cố định TF-IDF+SVM; B4 đối chứng, S1 balanced, S2 giảm ham 2:1, S3 chỉnh ngưỡng OOF |
 | 5.2. viBERT | Trích `modern/train.py`: `load_pretrained` | Giới thiệu nhánh hiện đại; không train viBERT trong Notebook 02 |
-| 6–6.3. Đánh giá | `experiments.evaluate`, `boot_ci` và cell vẽ hình | Test, FP/FN, ma trận, PR/AP và bootstrap F1 cho chín ứng viên |
+| 6–6.3. Đánh giá | `experiments.evaluate`, `boot_ci` và cell vẽ hình | Test, FP/FN, ma trận, PR/AP và bootstrap F1 cho bảy ứng viên |
 | 6.4. Đối chiếu M1 | Đọc `results/modern/` ở gốc repo | Bảng test viBERT–S3 đã xác nhận, không gọi fine-tune |
 | 7. Phân tích | Cell hệ số/lỗi | Ví dụ của **cấu hình được chọn bằng CV**, giữ ID/text/nhãn/score |
 | 8–9. Lưu/demo/nhận xét | `joblib.dump/load`; `inference/predict.py`: `predict_spam` | Lưu S3, nạp lại kiểm tra và phân loại bình luận mới bằng cùng ngưỡng |
 
 **CV và test:** mỗi lượt CV học trên bốn fold train, đo fold validation còn
 lại; trung bình F1 spam dùng chọn cấu hình. Sau đó fit toàn bộ train và đo test
-để báo cáo. Từ vựng, IDF, FastText, scaler và lấy mẫu chỉ học/thực hiện trong
+để báo cáo. Từ vựng, IDF và lấy mẫu chỉ học/thực hiện trong
 phần train được phép. CV phục vụ lựa chọn, chưa phải nested CV độc lập.
 
 **Mất cân bằng:** ba chiến lược được thử riêng. Balanced tăng trọng số lỗi của
 spam; under-sampling giảm ham chỉ trong train; ngưỡng thay đổi quyết định,
-không thay đổi số mẫu. B4 xuất hiện ở cả bảng sáu tổ hợp và bảng bốn chiến lược
-nhưng chỉ là một ứng viên: **6 + 3 = 9**, không phải mười mô hình khác nhau.
+không thay đổi số mẫu. B4 xuất hiện ở cả bảng bốn tổ hợp và bảng bốn chiến lược
+nhưng chỉ là một ứng viên: **4 + 3 = 7**, không phải tám mô hình khác nhau.
 
 S3 được chọn theo CV F1 **0,7876**, giữ từ dừng, C=0,3, n-gram=(1,2), ngưỡng
 **−0,1776**; không trọng số và không lấy mẫu lại. Ngưỡng âm là decision score
@@ -167,7 +167,7 @@ minh loại hết mọi dạng rò rỉ hoặc ngữ cảnh chung.
 | `data/final/labeled_v7.csv` | Đầu vào cố định của 02/03 |
 | `data/processed/v7_preprocessed.csv` | Toàn bộ v7 kèm hai chuỗi token truyền thống |
 | `data/processed/vibert_split.csv` | ID và vai trò tập dữ liệu của viBERT |
-| `artifacts/spamham/` | S3 `.joblib` và dự đoán theo ID của S3; metrics/CV/bootstrap của chín cấu hình, manifest và hình |
+| `artifacts/spamham/` | S3 `.joblib` và dự đoán theo ID của S3; metrics/CV/bootstrap của bảy cấu hình, manifest và hình |
 | `artifacts/modern/vibert/` | `model/`, lịch sử hai loss/final train, split, metrics, dự đoán theo ID, hình và trạng thái |
 | `results/verified_run/` | Bằng chứng chạy/kiểm thử truyền thống; xem phạm vi/thời điểm từng JSON |
 | `results/modern/` | Bảng so sánh/kiểm tra viBERT; không chứa trọng số |
@@ -184,8 +184,8 @@ hoặc thu thập/gán nhãn/huấn luyện lại qua dịch vụ.
 ## 8. Đối chiếu đề bài
 
 Theo [ảnh đề](../assignment/de_bai.png): đã có nguồn bình luận PTIT và nhãn
-spam/ham; làm sạch/tách từ và khảo sát từ dừng; ba biểu diễn (vượt mức ít nhất
-hai); NB/SVM, chia train/test; Accuracy/Precision/Recall/F1, confusion matrix
+spam/ham; làm sạch/tách từ và khảo sát từ dừng; hai biểu diễn (BoW, TF-IDF);
+NB/SVM, chia train/test; Accuracy/Precision/Recall/F1, confusion matrix
 và so sánh phương pháp; viBERT cho phần mô hình hiện đại bổ sung.
 
 CV, bootstrap, PR/AP và các chiến lược cân bằng/ngưỡng là phần tăng chất lượng
@@ -202,7 +202,7 @@ và 03 review (9 cell code)**, không có lỗi trong cell. 01 hoàn tất 3,80 
 02 khoảng 613,62 giây, 03 review 12,95 giây trên máy hiện tại; thời gian không
 phải chỉ số chất lượng mô hình.
 
-- Cả chín dòng chỉ số/tham số truyền thống khớp lần trước, bỏ qua thời gian;
+- Cả bảy dòng chỉ số/tham số truyền thống khớp lần trước, bỏ qua thời gian;
   CSV có nhãn, CSV token và 7.474 dự đoán S3 giữ nguyên.
 - Tính lại metrics viBERT từ toàn bộ dự đoán test cho đúng bảng đã báo cáo;
   nạp lại CPU trên 64 mẫu không khác nhãn so GPU, suy luận lặp 16 mẫu giữ điểm.

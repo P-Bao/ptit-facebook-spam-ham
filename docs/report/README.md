@@ -6,7 +6,7 @@ Hai bản báo cáo hiện hành:
 - [PDF để đọc và gửi](BAO_CAO_PTIT_SPAM_HAM.pdf)
 
 Báo cáo bám [ảnh đề](../assignment/de_bai.png), gồm Mở đầu, Chương 1 cơ sở lý
-thuyết, Chương 2 thực nghiệm/kết quả, Kết luận và 25 tài liệu tham khảo. Phần
+thuyết, Chương 2 thực nghiệm/kết quả, Kết luận và 24 tài liệu tham khảo. Phần
 thực nghiệm đối chiếu Notebook 01–03 và các CSV/hình trong `artifacts/`;
 hai nhánh S3 và viBERT M1 dùng cùng 7.474 mẫu test.
 

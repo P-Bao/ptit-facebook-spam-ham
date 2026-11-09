@@ -30,10 +30,10 @@ Tool tổng hợp dữ liệu là tiện ích riêng, không phải mô hình ho
 |---|---|---|
 | 1–3 / Cương | Cell đọc `data/final/labeled_v7.csv`; `pipeline/prepare/preprocess_for_model.py`: `preprocess` | 38.233 mẫu, tỷ lệ ham/spam, comment gốc/sau xử lý cùng ID; lưu toàn bộ CSV token |
 | 4 / Cương | `pipeline/modeling/training_utils.py`: `norm_key`, `bucket`, `grouped_folds` | 30.759 train/7.474 test, năm fold trong train; tránh văn bản cùng khóa ở hai tập; CV chọn/test báo cáo |
-| 5 / Phi | `pipeline/modeling/experiments.py`: `make_pipe`, `fit_experiment`; `pipeline/features/spam_features.py`: `FastTextVectorizer` | Ba đặc trưng × hai họ mô hình; bảng đối chiếu từ dừng bằng CV; luồng tiếp giữ từ dừng |
+| 5 / Phi | `pipeline/modeling/experiments.py`: `make_pipe`, `fit_experiment` | Hai đặc trưng × hai họ mô hình; bảng đối chiếu từ dừng bằng CV; luồng tiếp giữ từ dừng |
 | 5.1 / Phi | `sample_training_indices`, `undersampled_search`, `tune_svm_threshold` | B4 đối chứng, S1 trọng số, S2 giảm mẫu, S3 chỉnh ngưỡng; bảng CV và hình số mẫu/trọng số, không dùng test chọn |
 | 5.2 / Phi | Trích `pipeline/modern/train.py`: `load_pretrained` | Dẫn nhập viBERT; chi tiết ở Notebook 03, không fine-tune trong 02 |
-| 6–6.1 / Bảo | `experiments.evaluate`; cell bảng | Test B1–B6 và B4/S1/S2/S3; tổng chín ứng viên, so sánh Precision/Recall/F1/FP/FN |
+| 6–6.1 / Bảo | `experiments.evaluate`; cell bảng | Test B1–B4 và B4/S1/S2/S3; tổng bảy ứng viên, so sánh Precision/Recall/F1/FP/FN |
 | 6.2–6.3 / Bảo | Cell ma trận/PR, `boot_ci` | Đọc một FP/FN; PR dùng score, đổi ngưỡng không đổi AP; khoảng bootstrap không chứng minh ưu thế thống kê |
 | 7 / Bảo | Cell dùng `best`, đặc trưng hệ số và bảng lỗi | Cấu hình phân tích là S3, không phải mô hình tùy ý; text/nhãn/prediction/score/threshold cùng mẫu |
 | 8–9 / Phi | `joblib.dump/load`, `pipeline/inference/predict.py`: `predict_spam` | S3 `.joblib` giữ pipeline/ngưỡng; nạp lại/demo; đánh đổi Precision–Recall và giới hạn |
@@ -68,7 +68,7 @@ luận trong phạm vi một dataset/split/seed; chưa bảo đảm mọi nhóm 
 - Dùng `.venv` cho 01/02, `.venv-modern` cho 03; 03 giữ `MODE="review"`.
 - Có thể chạy toàn bộ bằng runner trước buổi trình bày để lưu output. Trong
   buổi demo, mở kết quả và chạy lại cell suy luận sau phần khởi tạo phù hợp;
-  không chạy lại GridSearch/FastText hoặc fine-tune chỉ để hiện bảng.
+  không chạy lại GridSearch hoặc fine-tune chỉ để hiện bảng.
 - Với Notebook 02, cell mục 8 cần các biến sau huấn luyện trong cùng kernel;
   nếu đã restart và chỉ cần dự đoán, dùng đoạn nạp `.joblib` ở README mục 8
   thay vì nhảy thẳng tới cell lưu model. Với 03 review, có thể chạy cell cấu

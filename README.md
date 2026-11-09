@@ -1,7 +1,7 @@
 # Phân loại Spam/Ham bình luận sinh viên PTIT
 
 Project của Bảo, Cương, Phi, Phương: thu thập và chuẩn bị bình luận Facebook,
-thực nghiệm BoW/TF-IDF/FastText với NB/SVM, fine-tune viBERT, đánh giá và dự
+thực nghiệm BoW/TF-IDF với NB/SVM, fine-tune viBERT, đánh giá và dự
 đoán bình luận mới. S3 và viBERT được so sánh trên cùng 7.474 mẫu test.
 
 - [Tổng quan folder, file và toàn bộ luồng](docs/guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md).
@@ -109,11 +109,10 @@ Nếu cần tạo lại file tổng hợp ngoài luồng model:
 Đầu ra là `data/final/comments_merged.csv`; lệnh không ghi đè v7. Không bắt
 buộc chạy lại tool mỗi khi huấn luyện 02 hoặc xem 03.
 
-Runner đặt seed, hash seed và số luồng BLAS trước khi mở kernel. Muốn đối
-chiếu tái lập FastText, ưu tiên runner và giữ cùng dữ liệu/cấu hình/phiên bản.
+Runner đặt seed, hash seed và số luồng BLAS trước khi mở kernel.
 Không mở hai lượt chạy cùng notebook/output đồng thời.
 
-`experiments.py`, `training_utils.py`, `spam_features.py` và
+`experiments.py`, `training_utils.py` và
 `preprocess_for_model.py` là thư viện cung cấp hàm/class, không có CLI tự chạy
 cả thí nghiệm. Muốn chạy đầy đủ phần model từ Terminal, dùng runner 02 ở trên;
 không lần lượt mở từng file thư viện rồi bấm Run Python File.
