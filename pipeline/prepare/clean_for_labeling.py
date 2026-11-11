@@ -138,7 +138,7 @@ def clean_facebook_comments(
     keep_punctuation_only: bool = False,
 ):
     stats = {"per_file": [], "total": 0, "dedup": 0, "url": 0, "phone": 0}
-    
+
     # --- Gộp + khử trùng: dòng trùng (post_id, comment_type, text) chỉ giữ 1 bản ---
     merged = []
     seen = set()

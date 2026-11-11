@@ -125,4 +125,3 @@ def test_svm_default_threshold_keeps_zero_on_ham_side():
 
     pred, _ = predict_record({"_model": ZeroMargin()}, [0, 1, 2])
     assert pred.tolist() == [0, 0, 1]
-
