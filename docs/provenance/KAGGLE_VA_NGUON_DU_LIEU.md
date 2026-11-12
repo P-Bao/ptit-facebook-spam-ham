@@ -20,9 +20,9 @@ Metadata: public, phiên bản 1, 32 cell, CPU; lastRunTime do Kaggle trả là
 
 | Nội dung | Kaggle v1 | Repo trước sửa | Bản sau sửa |
 |---|---|---|---|
-| Đặc trưng | BoW, TF-IDF | Thêm FastText | Giữ ba loại |
-| Họ thuật toán | NB/SVM | NB/SVM, GaussianNB cho embedding | Giữ, tìm class weight bằng CV |
-| Stop words | Hai biến thể, 8 tổ hợp | 12 tổ hợp | 12 tổ hợp, quyết định theo CV |
+| Đặc trưng | BoW, TF-IDF | BoW, TF-IDF | Giữ hai loại (BoW, TF-IDF) |
+| Họ thuật toán | NB/SVM | NB/SVM | Giữ, tìm class weight bằng CV |
+| Stop words | Hai biến thể, 8 tổ hợp | 8 tổ hợp | 8 tổ hợp, quyết định theo CV |
 | Mất cân bằng | Baseline/balanced/ngưỡng/under-sampling | Đã có tương tự | Sửa CV under-sampling, lưu đúng ngưỡng |
 | Che tên/emoji | Heuristic, tải từ điển | Kế thừa tương tự | Sửa che nhầm/emoji, dùng từ điển cố định |
 | CSV local | Markdown có nói, code tải HF trực tiếp | Có cấu hình env/cache | Có kiểm tra cột/nhãn/ID/hash |

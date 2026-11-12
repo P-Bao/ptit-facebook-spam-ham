@@ -25,7 +25,6 @@ Trước đây script, notebook, phân công, ảnh và tài liệu nằm cùng 
 | `clean_data_facebook_spamham.py` | `pipeline/step_02_preprocess/` | Nhóm làm sạch; thêm `text_preprocessing.py` dùng chung train/demo |
 | Bốn script upload/AI/duyệt/download | `pipeline/step_03_label/` | Nhóm gán nhãn; thêm helper đối soát ID |
 | `merge_labeled_data.py` | `pipeline/step_04_merge/` | Tách bước tích hợp hai phase |
-| `spam_features.py` | `pipeline/step_05_features/` | Bản chuẩn lớp FastText |
 | Logic CV/ngưỡng/under-sampling rải trong notebook | `pipeline/step_06_train_evaluate/training_utils.py`, được nhúng trong notebook | Dễ kiểm tra và vẫn tách notebook chạy được |
 | Các Markdown kiểm tra/kế hoạch/phân công | `docs/overview`, `docs/plans`, `docs/team` | Tách tài liệu khỏi code; bản cũ được ghi là lịch sử |
 | Ảnh đề bài | `docs/assignment/de_bai.png` | Tên dễ dùng, cùng tài liệu đề |
@@ -55,7 +54,7 @@ Trước đây script, notebook, phân công, ảnh và tài liệu nằm cùng 
 | Gọi AP là PR-AUC không giải thích | Đặt cột AP, giữ PR curve | Diễn giải đúng chỉ số; phần thêm ngoài đề |
 | Output cũ chưa chứng minh code mới chạy được | Chạy riêng notebook từ kernel mới, kiểm tra load–predict và lưu manifest | Bằng chứng chạy đầy đủ |
 
-Giữ **3 đặc trưng × 2 họ thuật toán × 2 kiểu stop words = 12 tổ hợp chính**, cộng các thí nghiệm phụ. Không thêm mô hình hiện đại hoặc số liệu giả cho phần chờ.
+Giữ **2 đặc trưng × 2 họ thuật toán × 2 kiểu stop words = 8 tổ hợp chính**, cộng các thí nghiệm phụ. Không thêm mô hình hiện đại hoặc số liệu giả cho phần chờ.
 
 ## 3. File ngoài đã sửa những gì?
 
@@ -64,7 +63,6 @@ Giữ **3 đặc trưng × 2 họ thuật toán × 2 kiểu stop words = 12 tổ
 - **Upload/AI:** dùng ID sẵn có; `--no-upload` của AI không kết nối Argilla; cấu hình Argilla từ môi trường được dùng; score thiếu của suggestion không bị nâng lên 1.0; phản hồi AI chỉ nhận ID thuộc batch.
 - **Download:** export rỗng có schema; lookup bằng ID hoặc vị trí legacy có kiểm tra; sai text/ID/mixed phase không bị âm thầm bỏ dòng hoặc ghép nhầm.
 - **Merge:** giữ ID official export; chặn ID rỗng trước khi thêm prefix; kiểm tra ID/nhãn/text của Phase 1 và tập gộp. Không tự viết lại quy tắc nhãn hoặc xóa mọi text trùng.
-- **FastText:** một worker mặc định để giảm bất định; kiểm tra pooling hợp lệ; notebook nhúng đúng mã nguồn.
 - **Tài liệu/ignore:** phân công được chia sẻ, cập nhật cách chạy, bỏ qua data/cache/artifacts sinh ra.
 
 **Không gọi OpenRouter hoặc cập nhật Argilla thật. Không crawl/gán nhãn/export/merge lại dataset v7.** CSV thật đã có đủ ID/nhãn Phase 2 và không có lỗi ID/text rỗng nêu trên; không có căn cứ buộc làm lại dữ liệu. Các nhánh script sửa được kiểm tra cục bộ; tính tích hợp máy chủ Argilla vẫn chưa được kiểm chứng.
@@ -86,7 +84,7 @@ CSV có **27 nhóm text giống nhau nhưng nhãn khác**. Giữ nguyên để n
 
 ## 5. Kaggle và nguồn dữ liệu
 
-Đã tải và đọc notebook public Cương, phiên bản 1, 32 cell. Bản đó cũ hơn, có BoW/TF-IDF và các phần mất cân bằng, chưa có FastText. Không có kỹ thuật bắt buộc quan trọng mà repo trước sửa hoàn toàn thiếu; có một số nhận xét/số liệu không khớp nên không chép nguyên.
+Đã tải và đọc notebook public Cương, phiên bản 1, 32 cell. Bản đó cũ hơn, có BoW/TF-IDF và các phần mất cân bằng. Không có kỹ thuật bắt buộc quan trọng mà repo trước sửa hoàn toàn thiếu; có một số nhận xét/số liệu không khớp nên không chép nguyên.
 
 Chi tiết và link căn cứ: `docs/references/KAGGLE_VA_NGUON_DU_LIEU.md`. HF card cung cấp mô tả chung về nguồn/gán nhãn, nhưng chưa có thông tin group, thời gian/công cụ crawl và lịch sử v7 được nhóm xác nhận. Đã để ô trống trong notebook và tài liệu theo trả lời của người dùng; bổ sung nếu tìm được, không tự bịa.
 

@@ -5,7 +5,6 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from pipeline.prepare.preprocess_for_model import (
     EMOJI, clean_text, mask_names, preprocess,
 )
-from pipeline.features.spam_features import FastTextVectorizer
 from pipeline.modeling.training_utils import (
     grouped_folds, norm_key, sample_training_indices, undersampled_search,
     tune_svm_threshold, predict_record,
@@ -126,12 +125,3 @@ def test_svm_default_threshold_keeps_zero_on_ham_side():
 
     pred, _ = predict_record({"_model": ZeroMargin()}, [0, 1, 2])
     assert pred.tolist() == [0, 0, 1]
-
-
-def test_fasttext_oov_and_empty_sentence():
-    vec = FastTextVectorizer(vector_size=8, min_count=1, epochs=2, bucket=2000, workers=1)
-    vec.fit(["xin chào bạn", "học môn mới", "xin tài liệu", "chào bạn học"])
-    transformed = vec.transform(["inboxxx", ""])
-    assert transformed.shape == (2, 8)
-    assert np.isfinite(transformed).all()
-    assert np.all(transformed[1] == 0)

@@ -13,7 +13,6 @@ bày. Không thay dataset v7, snapshot Drive, grid NB/SVM hoặc các phép đo 
 | `step_02_preprocess/clean_data_facebook_spamham.py` | `pipeline/prepare/clean_for_labeling.py` | Làm rõ đây là clean trước gán nhãn; giữ text gốc. |
 | `step_02_preprocess/text_preprocessing.py` | `pipeline/prepare/preprocess_for_model.py` | Làm rõ tiền xử lý cho train/demo, gồm tách từ và stop words. |
 | `step_03_label/*.py` | `pipeline/label/` | Giữ tên năm module và logic ID/AI/chốt/export; cập nhật import/CLI. |
-| `step_05_features/spam_features.py` | `pipeline/features/spam_features.py` | Module FastText được notebook/modeling import trực tiếp. |
 | `step_06_train_evaluate/training_utils.py` | `pipeline/modeling/training_utils.py` | Helper CV, sampling, ngưỡng và dự đoán giữ nguyên logic. |
 | Hàm tạo pipeline/fit/đánh giá/bootstrap trong notebook | `pipeline/modeling/experiments.py` | Nhận rõ X/y/folds/seed/cache/jobs thay cho biến global của notebook. |
 | Hàm `predict_spam()` trong notebook | `pipeline/inference/predict.py` | Một đường raw text → preprocess → predict, dùng lại khi demo. |
@@ -68,8 +67,8 @@ Hướng dẫn gọi hiện tại ở `external/README.md`, root README và `pip
 
 - **44 test đạt** sau chuyển đường dẫn. Lượt đầu phát hiện fixture còn dùng vị
   trí cũ và lỗi mã hóa trợ giúp crawler; đã sửa rồi chạy lại suite thành công.
-- So sánh AST với `7415098`: tiền xử lý model, lớp FastText và helper train giữ
-  nguyên. Cả 6 factory BoW/TF-IDF/FastText × NB/SVM giữ estimator/tham số/grid/jobs.
+- So sánh AST với `7415098`: tiền xử lý model và helper train giữ
+  nguyên. Cả 4 factory BoW/TF-IDF × NB/SVM giữ estimator/tham số/grid/jobs.
   Bằng chứng `results/restructure/equivalence.json`.
 - Kiểm tra cache tải sai hash không ghi đè file, payload sai không được lưu;
   train–lưu–tải–predict bằng module mới; CLI crawler `--help` không ghi dữ liệu.

@@ -162,7 +162,6 @@ pipeline/
     auto_accept_labels.py
     download_labeled_data.py
     label_utils.py
-  features/spam_features.py
   modeling/
     training_utils.py
     experiments.py
@@ -214,7 +213,6 @@ Quy ước `G/` = `facebook_post_comment_scraper_code/facebook_post_comment_scra
 | `master`/`cuong`: `auto_accept_labels.py` | `pipeline/step_03_label/auto_accept_labels.py` | `pipeline/label/auto_accept_labels.py` | Chuyển, giữ kiểm tra ID/cache/fallback đã sửa. |
 | `master`/`cuong`: `download_labeled_data.py` | `pipeline/step_03_label/download_labeled_data.py` | `pipeline/label/download_labeled_data.py` | Chuyển, giữ luồng export nhãn đã chốt. |
 | Module bổ sung trên phi trong lượt ổn định pipeline | `pipeline/step_03_label/label_utils.py` | `pipeline/label/label_utils.py` | Chuyển helper ID/metadata; không có file này ở root nhánh gốc đã kiểm tra. |
-| `master`/`cuong`: `spam_features.py` | `pipeline/step_05_features/spam_features.py` | `pipeline/features/spam_features.py` | Chuyển module FastText, giữ bản đã sửa trên phi. |
 | Notebook gốc có split/huấn luyện; phi đã bổ sung/tách helper | `pipeline/step_06_train_evaluate/training_utils.py` | `pipeline/modeling/training_utils.py` | Chuyển helper CV/threshold/sampling; không phải nguyên file có sẵn trên master. |
 | Notebook hiện tại | Các hàm `make_pipe`, `fit_experiment`, `evaluate`, `boot_ci` trong notebook | `pipeline/modeling/experiments.py` | Tách hàm cần dùng lại; chưa di chuyển trong lượt đề xuất. Biểu đồ/bảng chính vẫn ở notebook. |
 | Notebook gốc có `predict_spam`; bản hiện tại đã sửa tính nhất quán train/demo | Hàm `predict_spam` và lưu/tải bundle trong notebook | `pipeline/inference/predict.py` | Tách phần dự đoán cần dùng lại; không tách từ runner crawler. |
@@ -250,7 +248,7 @@ kiểm tra truy cập. Notebook này không tự tạo lại toàn bộ v7.
 1. Nạp v7 từ local hoặc nguồn đã chốt, kiểm tra schema/hash/phân bố.
 2. Tiền xử lý cho mô hình và đối chứng giữ/bỏ stop words — ý 2.
 3. Chia train/test và folds theo nhóm — ý 4.
-4. BoW/TF-IDF/FastText, fit trong train/fold — ý 3.
+4. BoW/TF-IDF, fit trong train/fold — ý 3.
 5. NB/SVM, tìm tham số/chọn trên CV — ý 4.
 6. Mục mô hình hiện đại — giữ chỗ cho ý 4 bổ sung, triển khai sau.
 7. Accuracy/Precision/Recall/F1/Confusion Matrix và so sánh — ý 5.

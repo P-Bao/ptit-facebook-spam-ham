@@ -12,7 +12,7 @@ Thứ tự sử dụng:
    JSON. Khóa khử trùng gồm `post_id`, `comment_type`, `text`. URL/số điện thoại
    được thay bằng `urltoken`/`phonetoken`, không xóa mất tín hiệu. Sau đó nối ID
    annotation và chuyển sang bước gán nhãn.
-2. **Notebook 02 mục 3:** `preprocess()` chuẩn bị đầu vào BoW/TF-IDF/FastText:
+2. **Notebook 02 mục 3:** `preprocess()` chuẩn bị đầu vào BoW/TF-IDF:
    chuẩn hóa, che một số tên theo quy tắc, chuyển chữ thường, tách từ, thêm tín
    hiệu emoji. Lưu toàn bộ v7 và hai cột token vào
    `data/processed/v7_preprocessed.csv`; mục 5 chọn giữ từ dừng bằng CV.

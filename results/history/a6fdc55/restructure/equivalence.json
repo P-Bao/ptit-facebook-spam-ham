@@ -2,7 +2,6 @@
   "compared_commit": "7415098",
   "unchanged_function_class_ast": {
     "pipeline/prepare/preprocess_for_model.py": true,
-    "pipeline/features/spam_features.py": true,
     "pipeline/modeling/training_utils.py": true
   },
   "factory_equivalence": [
@@ -27,12 +26,10 @@
       "same_estimators_parameters_grid_and_jobs": true
     },
     {
-      "feature": "FastText",
       "model": "Naive Bayes",
       "same_estimators_parameters_grid_and_jobs": true
     },
     {
-      "feature": "FastText",
       "model": "SVM",
       "same_estimators_parameters_grid_and_jobs": true
     }

@@ -41,7 +41,6 @@
     "pipeline/collect/json_to_csv.py",
     "pipeline/collect/scrape_ptit_groups.py",
     "pipeline/collect/snapshots.py",
-    "pipeline/features/spam_features.py",
     "pipeline/inference/predict.py",
     "pipeline/label/ai_assisted_spam_ham.py",
     "pipeline/label/auto_accept_labels.py",

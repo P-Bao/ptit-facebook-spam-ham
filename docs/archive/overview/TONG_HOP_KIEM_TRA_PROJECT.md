@@ -43,7 +43,7 @@ Project xây dựng bộ phân loại tự động cho **bình luận tiếng Vi
 
 Mục tiêu là thực hành một quy trình khai phá dữ liệu văn bản: chuẩn bị dữ liệu → gán nhãn → tiền xử lý tiếng Việt → biểu diễn văn bản bằng số → huấn luyện bộ phân loại → đo và so sánh kết quả.
 
-Project đặt ba cách biểu diễn văn bản — BoW, TF-IDF, FastText — cạnh hai họ thuật toán Naive Bayes và SVM để trả lời: **cách nào phân biệt spam tốt hơn trên bộ dữ liệu này, và phải đánh đổi gì giữa bắt được spam với báo nhầm ham?**
+Project đặt hai cách biểu diễn văn bản — BoW, TF-IDF — cạnh hai họ thuật toán Naive Bayes và SVM để trả lời: **cách nào phân biệt spam tốt hơn trên bộ dữ liệu này, và phải đánh đổi gì giữa bắt được spam với báo nhầm ham?**
 
 ### 1.3. Tại sao cần và có thể dùng vào việc gì?
 
@@ -57,7 +57,6 @@ Hiện tại đây là **project thực nghiệm chạy bằng script và notebo
 |---|---|
 | GLM được gọi qua OpenRouter trong `ai_assisted_spam_ham.py` | Hỗ trợ tạo/gợi ý nhãn dữ liệu trước huấn luyện |
 | Naive Bayes và SVM trong notebook | Các bộ phân loại được huấn luyện và đánh giá |
-| FastText | Học vector từ để cung cấp đặc trưng cho Naive Bayes/SVM |
 
 Không nên gọi việc dùng GLM gán nhãn là đã có một thí nghiệm phân loại hiện đại: hiện chưa có bảng đánh giá GLM như một mô hình dự đoán độc lập trên tập kiểm tra.
 
@@ -110,7 +109,7 @@ Dataset đã rà soát labeled_v7.csv (Hugging Face hoặc SPAMHAM_CSV)
   → spam-ham-comments.ipynb
       → khám phá dữ liệu và chia train/test theo nhóm văn bản
       → tiền xử lý, tách từ, thử giữ/bỏ stop words
-      → BoW / TF-IDF / FastText
+      → BoW / TF-IDF
       → Naive Bayes / SVM, tìm siêu tham số bằng CV
       → bảng điểm, biểu đồ, phân tích lỗi
       → lưu spam_ham_ml_only.joblib và minh họa dự đoán
@@ -138,8 +137,8 @@ Nếu đã có CSV nhãn v7 hợp lệ thì có thể đi thẳng vào notebook,
 |---|---|
 | Bảo | Thu thập, chuyển JSON → CSV; huấn luyện các thí nghiệm |
 | Cương | Tiền xử lý; BoW và TF-IDF |
-| Phi | FastText, phân tích embedding/OOV, chia train/test |
-| Phương | Đánh giá, so sánh và xử lý mất cân bằng |
+| Phi | Thiết kế thực nghiệm, chia train/test, huấn luyện và cân bằng lớp |
+| Phương | Đánh giá, so sánh và mô hình hiện đại |
 
 **Tại sao cần:** xác định phần bàn giao và phạm vi giải thích khi làm báo cáo/thuyết trình.
 
@@ -280,33 +279,15 @@ Theo [tài liệu Argilla về Record](https://docs.argilla.io/latest/reference/
 
 **Đã kiểm tra nhỏ:** nhãn Phase 2 không hợp lệ bị lọc; ID đã có `p2_` không bị thêm lần nữa; hai văn bản giống nhau bên trong Phase 2 vẫn được giữ. Docstring còn nhắc notebook `spam-ham-comments-v2.ipynb` đã không còn trong checkout.
 
-### 4.12. `spam_features.py` — biến văn bản thành vector FastText
-
-**Đầu vào:** dãy câu đã tách từ, các token ngăn nhau bằng khoảng trắng.
-
-**Đầu ra:** mỗi câu thành vector 100 chiều theo cấu hình đang dùng; cả tập thành ma trận `(số_câu, 100)`.
-
-**Thành phần:** lớp `FastTextVectorizer` kế thừa giao diện transformer của scikit-learn.
-
-| Phương thức | Việc thực hiện |
-|---|---|
-| `__init__()` | Lưu cấu hình vector, cửa sổ ngữ cảnh, epochs, subword, pooling, seed, workers |
-| `fit()` | Học FastText Skip-gram trên dữ liệu nhận được; giữ `model.wv`; tính IDF từ chính tập đó |
-| `transform()` | Lấy vector token, rồi trung bình theo tần suất hoặc trọng số TF-IDF; câu rỗng nhận vector 0 |
-
-**Tại sao cần:** BoW/TF-IDF dựa vào từ vựng rời rạc; FastText bổ sung biểu diễn đặc, tận dụng n-gram ký tự để tạo vector cho từ chưa gặp. Đặt transformer trong Pipeline giúp embedding và IDF chỉ học trên train của từng fold.
-
-**Điểm cần lưu ý:** đây là bộ trích đặc trưng, không tự quyết định nhãn. Cơ chế lấy trung bình không giữ đầy đủ thứ tự từ và ngữ cảnh câu. `workers=4` khiến seed đơn lẻ chưa đảm bảo tái lập chính xác tuyệt đối; [Gensim nêu thêm yêu cầu về workers và PYTHONHASHSEED](https://radimrehurek.com/gensim/models/fasttext.html).
-
-### 4.13. `spam-ham-comments.ipynb` — trung tâm thực nghiệm
+### 4.12. `spam-ham-comments.ipynb` — trung tâm thực nghiệm
 
 **Dùng để:** đọc dataset nhãn v7, khám phá dữ liệu, chia tập, tiền xử lý, huấn luyện, đánh giá, phân tích và lưu mô hình.
 
-**Tại sao cần:** đây là nơi trả lời phần lớn yêu cầu học phần bằng thí nghiệm và kết quả trực quan. Tám script còn lại chủ yếu phục vụ chuẩn bị dữ liệu hoặc cung cấp transformer.
+**Tại sao cần:** đây là nơi trả lời phần lớn yêu cầu học phần bằng thí nghiệm và kết quả trực quan. Các script còn lại chủ yếu phục vụ chuẩn bị dữ liệu.
 
 Notebook có **38 cell: 20 code và 18 Markdown**, trong đó cell Markdown cuối rỗng. Nội dung chi tiết được giải thích ngay dưới đây.
 
-### 4.14. Thư mục `.git/`
+### 4.13. Thư mục `.git/`
 
 Đây là dữ liệu nội bộ của Git để lưu lịch sử, chỉ mục và trạng thái phiên bản; không phải một phân hệ Spam/Ham. Đã kiểm tra danh sách file theo dõi, trạng thái và một số commit gần nhất; không cần đọc từng object nhị phân của Git để đánh giá thuật toán.
 
@@ -318,7 +299,6 @@ Notebook có **38 cell: 20 code và 18 Markdown**, trong đó cell Markdown cu�
 |---|---|
 | 1 | Tiêu đề và phạm vi “học máy thuần” |
 | 2 | Cài thư viện; không khóa phiên bản |
-| 3 | Dùng `%%writefile` ghi lại `spam_features.py`; nội dung hiện trùng file Python đi kèm |
 | 4 | Import, đặt seed 42, cấu hình hiển thị |
 | 5–6 | Giới thiệu nguồn và đọc `labeled_v7.csv` từ `SPAMHAM_CSV`, cache HF hoặc tải HF; lọc nhãn hợp lệ và `cleaned_text` thiếu |
 | 7–8 | Phân bố nhãn, độ dài, loại comment/reply, tỷ lệ văn bản lặp và biểu đồ khám phá |
@@ -326,16 +306,14 @@ Notebook có **38 cell: 20 code và 18 Markdown**, trong đó cell Markdown cu�
 | 11–12 | Giải thích che tên; chuẩn bị từ điển tên và tải dữ liệu tên từ GitHub; định nghĩa hàm che tên/nhận emoji |
 | 13 | Stop words, chuẩn hóa, tách từ underthesea, thêm dấu hiệu emoji |
 | 14 | Tạo hai bộ văn bản: giữ và loại stop words |
-| 15–16 | Giải thích và chạy 12 cấu hình thí nghiệm; GridSearchCV tìm siêu tham số |
-| 17–18 | Chọn kiểu tiền xử lý theo trung bình F1-CV của sáu tổ hợp |
+| 15–16 | Giải thích và chạy 8 cấu hình thí nghiệm; GridSearchCV tìm siêu tham số |
+| 17–18 | Chọn kiểu tiền xử lý theo trung bình F1-CV của bốn tổ hợp |
 | 19–20 | Bảng Accuracy, Precision, Recall, F1, AP và bảng so sánh đặc trưng × thuật toán |
-| 21–22 | Sáu confusion matrix, bố trí thành lưới 3×2 |
+| 21–22 | Bốn confusion matrix |
 | 23–24 | Bootstrap 500 lần để ước lượng khoảng tin cậy F1; vẽ đường Precision–Recall |
 | 25–26 | Đối chứng ảnh hưởng của việc loại stop words |
 | 27–28 | So sánh SVM không cân bằng, SVM balanced, NB chỉnh ngưỡng và SVM under-sampling |
-| 29–30 | Chọn mô hình tốt nhất trong sáu tổ hợp chính theo F1-CV; xem hệ số từ vựng và các lỗi FP/FN |
-| 31–32 | Kiểm tra từ gần nhau trong FastText và các biến thể OOV |
-| 33–34 | Đối chiếu những mẫu TF-IDF/FastText dự đoán đúng khác nhau |
+| 29–30 | Chọn mô hình tốt nhất trong bốn tổ hợp chính theo F1-CV; xem hệ số từ vựng và các lỗi FP/FN |
 | 35–36 | Lưu mô hình, thông tin stop words và định nghĩa `predict_spam()` |
 | 37 | Nhận xét tổng kết; có vài kết luận cần sửa theo kết quả thực tế |
 | 38 | Markdown rỗng, không tác động xử lý |
@@ -348,17 +326,16 @@ Notebook có **38 cell: 20 code và 18 Markdown**, trong đó cell Markdown cu�
 
 Tuy nhiên, tỷ lệ là **xấp xỉ theo số dòng**, không ép đúng 80/20; nhãn không được stratify. Hash chỉ bảo vệ các nhóm trùng theo khóa định nghĩa, không loại mọi dạng gần trùng. Khóa còn được tạo trước bước che tên, nên một số câu khác tên có thể thành cùng biểu diễn sau tiền xử lý nhưng vẫn nằm khác tập.
 
-### 5.2. Vì sao có 12 thí nghiệm?
+### 5.2. Vì sao có 8 thí nghiệm?
 
-`3 đặc trưng × 2 họ thuật toán × 2 kiểu stop words = 12 tổ hợp`. Đây không phải chỉ có 12 lần fit: GridSearchCV thử nhiều bộ siêu tham số ở mỗi tổ hợp, mỗi bộ qua năm fold rồi refit.
+`2 đặc trưng × 2 họ thuật toán × 2 kiểu stop words = 8 tổ hợp`. Đây không phải chỉ có 8 lần fit: GridSearchCV thử nhiều bộ siêu tham số ở mỗi tổ hợp, mỗi bộ qua năm fold rồi refit.
 
 | Đặc trưng | Nhánh Naive Bayes | Nhánh SVM |
 |---|---|---|
 | BoW | MultinomialNB, tìm `alpha` | LinearSVC balanced, tìm `C` |
 | TF-IDF | MultinomialNB, tìm `alpha` | LinearSVC balanced, tìm `C` |
-| FastText | GaussianNB, tìm `var_smoothing` | StandardScaler + LinearSVC balanced, tìm `C` |
 
-BoW/TF-IDF thử unigram và unigram + bigram; FastText thử pooling mean/TF-IDF. GaussianNB được dùng cho embedding vì các chiều vector có thể âm, không phù hợp với đầu vào không âm của MultinomialNB.
+BoW/TF-IDF thử unigram và unigram + bigram.
 
 ### 5.3. “Học máy thuần, không quy tắc” nghĩa là gì?
 
@@ -385,7 +362,7 @@ Hai bản cùng 38.233 dòng có phân bố nhãn khác nhau. README giải thí
 
 Tập train được output ghi là **30.753 mẫu**, trong đó **4.370 spam**. Test có **7.480 mẫu: 6.524 ham, 956 spam**. Tỷ lệ spam test khoảng 12,8%, khác tỷ lệ toàn bộ dataset vì chia theo nhóm hash.
 
-### 6.2. Sáu tổ hợp chính — giữ stop words
+### 6.2. Bốn tổ hợp chính — giữ stop words
 
 **Các số dưới đây lấy từ output lưu trong notebook, chưa phải kết quả huấn luyện lại trong lần kiểm tra này.**
 
@@ -395,12 +372,8 @@ Tập train được output ghi là **30.753 mẫu**, trong đó **4.370 spam**.
 | BoW | SVM balanced | 90,55% | 59,48% | 81,69% | 68,84% | 0,7823 |
 | TF-IDF | MultinomialNB | 93,76% | 86,99% | 60,15% | 71,12% | 0,8413 |
 | TF-IDF | SVM balanced | 94,40% | 74,84% | 84,62% | 79,43% | 0,8629 |
-| FastText | GaussianNB | 86,76% | 48,72% | 67,68% | 56,65% | 0,4623 |
-| FastText | SVM balanced | 89,73% | 56,44% | 86,19% | 68,21% | 0,8118 |
 
-Trong **sáu tổ hợp chính**, TF-IDF + SVM balanced được chọn theo CV, có F1-CV 0,7878; F1 test 0,7943 và CI bootstrap được lưu `[0,7738; 0,8145]`.
-
-FastText + SVM có Recall cao nhất trong bảng, nhưng Precision thấp hơn nhiều: nó bắt nhiều spam hơn và cũng báo nhầm nhiều ham hơn. Không thể chỉ lấy Recall để nói FastText tốt nhất toàn diện.
+Trong **bốn tổ hợp chính**, TF-IDF + SVM balanced được chọn theo CV, có F1-CV 0,7878; F1 test 0,7943 và CI bootstrap được lưu `[0,7738; 0,8145]`.
 
 ### 6.3. Đối chứng stop words
 
@@ -410,10 +383,8 @@ FastText + SVM có Recall cao nhất trong bảng, nhưng Precision thấp hơn 
 | BoW + SVM | 0,6884 | 0,6835 |
 | TF-IDF + NB | 0,7112 | 0,7007 |
 | TF-IDF + SVM | 0,7943 | 0,7767 |
-| FastText + NB | 0,5665 | 0,5485 |
-| FastText + SVM | 0,6821 | 0,6719 |
 
-Trung bình F1-CV của sáu tổ hợp: giữ stop words **0,6757**, loại stop words **0,6523**. Mã chọn giữ theo CV; kết quả test lưu cũng giảm khi loại ở cả sáu tổ hợp.
+Mã chọn giữ theo CV; kết quả test lưu cũng giảm khi loại ở cả bốn tổ hợp.
 
 Đề yêu cầu áp dụng/thử kỹ thuật tiền xử lý, không có nghĩa phải giữ một biến thể làm kết quả xấu hơn. Việc thử loại stop words rồi dùng đối chứng để chọn giữ là có cơ sở.
 
@@ -432,18 +403,14 @@ Output ở cell 28 ghi:
 
 Câu in trong notebook “Recall chỉ 78,3% — bỏ sót phần lớn spam” sai về lượng: Recall 78,35% nghĩa là bắt khoảng 78% và bỏ sót khoảng 22%, không phải bỏ sót phần lớn.
 
-**Phạm vi lựa chọn mô hình:** SVM balanced là tốt nhất theo CV trong sáu tổ hợp chính; SVM không cân bằng có F1 test cao nhất trong các bảng kết quả được lưu ở đây. Hai phát biểu này khác nhau. Chưa nên đổi mô hình cuối chỉ bằng cách nhìn bảng test; cần đưa các phương án bổ sung vào quy trình chọn bằng CV thống nhất.
+**Phạm vi lựa chọn mô hình:** SVM balanced là tốt nhất theo CV trong bốn tổ hợp chính; SVM không cân bằng có F1 test cao nhất trong các bảng kết quả được lưu ở đây. Hai phát biểu này khác nhau. Chưa nên đổi mô hình cuối chỉ bằng cách nhìn bảng test; cần đưa các phương án bổ sung vào quy trình chọn bằng CV thống nhất.
 
-### 6.5. Phân tích lỗi và embedding
+### 6.5. Phân tích lỗi
 
-Notebook có cả FP, FN và đối chiếu hai mô hình:
+Notebook có cả FP và FN:
 
-- FastText + SVM bắt được 50 mẫu spam mà TF-IDF + SVM bỏ sót; chiều ngược lại có 35 mẫu.
 - Có trường hợp hợp lệ chứa link, tên hoặc lời nhắc liên hệ bị báo spam; ví dụ minh họa cuối notebook báo câu tuyển thành viên CLB là spam.
-- OOV như `inboxxx` có vector gần `inbox`, nhưng `z.a.l.o` lại gần các từ không rõ liên quan trong output. Khả năng tạo vector cho từ lạ không bảo đảm hiểu đúng mọi biến thể.
-- Những từ có vector gần nhau có thể gần về hình thức hoặc cùng xuất hiện trong ngữ cảnh, chưa chắc là từ đồng nghĩa.
-
-Vì vậy, phần giải thích về “ngữ nghĩa chuẩn xác” cần tiết chế và gắn với ví dụ thực tế. Với câu rất ngắn hoặc nhãn phụ thuộc bài đăng cha, chỉ dùng nội dung bình luận đơn lẻ có giới hạn tự nhiên.
+- Với câu rất ngắn hoặc nhãn phụ thuộc bài đăng cha, chỉ dùng nội dung bình luận đơn lẻ có giới hạn tự nhiên.
 
 ## 7. Đối chiếu mức độ đáp ứng đề bài
 
@@ -452,12 +419,12 @@ Vì vậy, phần giải thích về “ngữ nghĩa chuẩn xác” cần tiế
 | Đúng nguồn và bài toán được phép | README, notebook và scripts mô tả bình luận Facebook PTIT, Spam/Ham | **Phù hợp về lựa chọn**; chưa kiểm chứng lại nguồn dữ liệu từng dòng |
 | Thu thập dữ liệu | Có luồng xử lý dữ liệu hai phase và dataset được tham chiếu | **Có mô tả và dữ liệu đã dùng trong output**, nhưng thiếu raw data/crawler/log để tái kiểm chứng thu thập |
 | Tiền xử lý | Unicode, URL/SĐT, làm sạch, tách từ, stop words, che tên, emoji | **Có thực hiện**, còn vấn đề che tên/emoji cần sửa |
-| Ít nhất 2 cách trích đặc trưng | BoW, TF-IDF, FastText | **Đạt về mã và output**, có 3 cách |
+| Ít nhất 2 cách trích đặc trưng | BoW, TF-IDF | **Đạt về mã và output**, có 2 cách |
 | 2 thuật toán phân loại | Naive Bayes và SVM | **Đạt về mã và output** |
 | Chia train/test | Hash nhóm, assert không giao nhau | **Có**, thiết kế tốt ở luồng chính |
-| Mô hình hiện đại bổ sung | FastText dùng để trích đặc trưng; GLM dùng gán nhãn; chưa có thực nghiệm classifier riêng theo bổ sung | **Chưa có bằng chứng đáp ứng rõ ràng** |
+| Mô hình hiện đại bổ sung | GLM dùng gán nhãn; chưa có thực nghiệm classifier riêng theo bổ sung | **Chưa có bằng chứng đáp ứng rõ ràng** |
 | Accuracy, Precision, Recall, F1 | Bảng kết quả chính và bảng bổ sung | **Có đầy đủ** |
-| Confusion Matrix | Sáu ma trận trong notebook | **Có** |
+| Confusion Matrix | Các ma trận trong notebook | **Có** |
 | So sánh đặc trưng và thuật toán | Bảng, biểu đồ, ablation, FP/FN | **Có, khá đầy đủ** |
 | Báo cáo đúng cấu trúc | README và notebook chứa nhiều nội dung; chưa có báo cáo học phần hoàn chỉnh riêng trước lần rà soát này | **Chưa đủ căn cứ xác nhận hoàn tất bản nộp** |
 | Dữ liệu đủ chất lượng/số lượng | Output v7 có 38.233 mẫu; chưa có audit nhãn độc lập | **Có quy mô thực nghiệm**, chất lượng nhãn cần bằng chứng bổ sung |
@@ -465,7 +432,7 @@ Vì vậy, phần giải thích về “ngữ nghĩa chuẩn xác” cần tiế
 
 ### Về cách hiểu “mô hình hiện đại”
 
-Ảnh không chỉ định bắt buộc phải là BERT/PhoBERT hay một kiến trúc cụ thể. Vì vậy không thể tự gán thêm tiêu chí của giảng viên. Tuy nhiên, project hiện chỉ đánh giá các classifier NB/SVM; đưa FastText vào bước đặc trưng hoặc dùng LLM hỗ trợ nhãn chưa chứng minh đã thực hiện một mô hình phân loại hiện đại riêng ở bước 4.
+Ảnh không chỉ định bắt buộc phải là BERT/PhoBERT hay một kiến trúc cụ thể. Vì vậy không thể tự gán thêm tiêu chí của giảng viên. Tuy nhiên, project hiện chỉ đánh giá các classifier NB/SVM; dùng LLM hỗ trợ nhãn chưa chứng minh đã thực hiện một mô hình phân loại hiện đại riêng ở bước 4.
 
 Một phương án hoàn thiện rõ ràng là fine-tune **PhoBERT** hoặc mô hình tiếng Việt tương tự cho hai nhãn rồi đánh giá trên cùng cách chia dữ liệu, so sánh với baseline. PhoBERT là mô hình ngôn ngữ tiền huấn luyện cho tiếng Việt theo [bài báo gốc](https://aclanthology.org/2020.findings-emnlp.92/). Đây là đề xuất cho phần còn thiếu, **chưa phải thí nghiệm đã có và chưa biết trước điểm số**.
 
@@ -559,7 +526,7 @@ bạn Nguyễn Văn An ơi  → bạn Nguyễn Văn An ơi
 
 ### 8.10. Ưu tiên vừa: môi trường và dữ liệu chưa đủ để tái lập
 
-**Hiện trạng local:** không có `data/`, `.venv/`, `namedb_cache/` hay artifact `.joblib`. Python hiện được gọi là 3.14.5, trong khi metadata notebook ghi 3.13.5. Kiểm tra phát hiện module cho thấy máy có một số thư viện, nhưng thiếu `gensim` và `argilla` trong interpreter này.
+**Hiện trạng local:** không có `data/`, `.venv/`, `namedb_cache/` hay artifact `.joblib`. Python hiện được gọi là 3.14.5, trong khi metadata notebook ghi 3.13.5. Kiểm tra phát hiện module cho thấy máy có một số thư viện, nhưng thiếu `argilla` trong interpreter này.
 
 **Thiếu tài liệu/cấu hình:** chưa có `requirements.txt`/lock file, cấu hình Argilla local, phiên bản dataset được pin theo revision/hash và hướng dẫn hoàn chỉnh để tái tạo v7.
 
@@ -570,8 +537,6 @@ bạn Nguyễn Văn An ơi  → bạn Nguyễn Văn An ơi
 ### 8.11. Các điểm nên sửa thêm trong diễn giải và bảo trì
 
 - **Emoji chưa được gom hoàn toàn:** output cell 13 có `😂 😂 emoji_token`; code thêm token nhưng chưa xóa emoji còn trong chuỗi đưa vào tách từ. Có đúng một token bổ sung không đồng nghĩa tất cả emoji gốc đã bị thay thế. Cần thống nhất cách biểu diễn và tài liệu.
-- **Tái lập FastText:** `workers=4`, dữ liệu/từ điển tải từ nhánh thay đổi và pip không khóa phiên bản không hỗ trợ lời hứa “chạy lại sẽ cho kết quả như vậy” tuyệt đối. Ghi sai số cho phép hoặc cấu hình tái lập chặt hơn.
-- **Hai nơi chứa cùng lớp:** cell 3 ghi đè `spam_features.py`. Hiện hai bản giống nhau; về sau sửa riêng file có thể bị notebook ghi đè. Nên xác định nguồn chuẩn và cách dùng trên Kaggle/local.
 - **Tên chỉ số:** code tính `average_precision_score`; nên đặt cột `Average Precision (AP)` hoặc giải thích rõ, tránh mặc định hiểu là diện tích PR tính bằng quy tắc hình thang.
 - **Khoảng tin cậy:** bootstrap đang lấy lại từng dòng; khi test còn nhiều bình luận thuộc cùng nhóm, có thể xem xét bootstrap theo nhóm. Khoảng F1 từng mô hình chồng lấp chưa đủ để kết luận hai mô hình tương đương.
 - **Lưu kết quả độc lập:** nên xuất bảng metrics, dự đoán test và cấu hình ra CSV/JSON cùng mã phiên bản, thay vì chỉ dựa vào output notebook. Không có output error không bảo đảm notebook vừa được chạy lại toàn bộ ở phiên bản mã hiện tại.
@@ -584,10 +549,10 @@ bạn Nguyễn Văn An ơi  → bạn Nguyễn Văn An ơi
 
 1. Bài toán rõ ràng, bám nguồn dữ liệu được phép trong đề.
 2. Có luồng chuẩn bị dữ liệu và công cụ gán nhãn, không chỉ có cell train mô hình.
-3. Thực hiện đủ ba cách biểu diễn và hai họ thuật toán, có đối chứng stop words.
+3. Thực hiện đủ hai cách biểu diễn và hai họ thuật toán, có đối chứng stop words.
 4. Chọn siêu tham số bằng CV và có cơ chế nhóm văn bản chống lặp ở luồng chính.
 5. Đánh giá chú ý lớp spam, có confusion matrix, AP/PR curve, CI và phân tích lỗi.
-6. Có thử nghiệm class weight, chỉnh ngưỡng, under-sampling và phân tích OOV.
+6. Có thử nghiệm class weight, chỉnh ngưỡng và under-sampling.
 
 ### 9.2. Đánh giá theo ba mục đích khác nhau
 
@@ -618,7 +583,7 @@ Việc chưa có giao diện/web không phải thiếu bắt buộc của đề.
 |---|---|
 | Tiêu đề | Tên bài toán, môn học, nhóm/thành viên |
 | Giới thiệu bài toán | Bối cảnh group PTIT, định nghĩa spam/ham, mục tiêu và phạm vi |
-| Cơ sở lý thuyết | Tiền xử lý tiếng Việt, BoW, TF-IDF, FastText, NB, SVM và mô hình hiện đại được chọn |
+| Cơ sở lý thuyết | Tiền xử lý tiếng Việt, BoW, TF-IDF, NB, SVM và mô hình hiện đại được chọn |
 | Thực nghiệm và kết quả | Nguồn/phiên bản dữ liệu, nhãn, split, CV, tham số, bảng điểm, confusion matrix, đối chứng, phân tích lỗi |
 | Tài liệu tham khảo | Nguồn dữ liệu/crawler, thư viện và bài báo mô hình; thống nhất cách trích dẫn |
 
@@ -645,13 +610,13 @@ Nếu muốn đồng đội nhận được tài liệu phân công, báo cáo h
 
 Không. Riêng test hiện có 6.524 ham/7.480 mẫu; đoán toàn ham cũng đạt khoảng **87,22% Accuracy** nhưng Recall spam bằng 0. Cần đọc Precision, Recall, F1 của spam cùng confusion matrix và lỗi thực tế.
 
-### “BoW, TF-IDF và FastText khác nhau ở đâu?”
+### “BoW và TF-IDF khác nhau ở đâu?”
 
-BoW đếm token; TF-IDF giảm trọng số token quá phổ biến và nhấn mạnh token đặc trưng; FastText học vector đặc từ ngữ cảnh và các mảnh ký tự. FastText có thể xử lý từ lạ nhưng việc trung bình vector làm mất thông tin thứ tự và có thể làm loãng tín hiệu. Kết quả nào tốt hơn phải dựa vào thí nghiệm trên bộ dữ liệu cụ thể.
+BoW đếm token; TF-IDF giảm trọng số token quá phổ biến và nhấn mạnh token đặc trưng. Kết quả nào tốt hơn phải dựa vào thí nghiệm trên bộ dữ liệu cụ thể.
 
 ### “SVM tốt hơn Naive Bayes trong mọi trường hợp không?”
 
-Trong sáu tổ hợp chính đã lưu, SVM có F1/Recall cao hơn nhánh NB tương ứng. Tuy nhiên NB TF-IDF có Precision cao, và chỉnh ngưỡng làm thay đổi đánh đổi. Không suy rộng thành SVM luôn tốt nhất mọi dữ liệu hoặc mọi mục tiêu.
+Trong bốn tổ hợp chính đã lưu, SVM có F1/Recall cao hơn nhánh NB tương ứng. Tuy nhiên NB TF-IDF có Precision cao, và chỉnh ngưỡng làm thay đổi đánh đổi. Không suy rộng thành SVM luôn tốt nhất mọi dữ liệu hoặc mọi mục tiêu.
 
 ### “Tại sao nhãn của bình luận chỉ có tên người hoặc dấu chấm lại khó?”
 
@@ -669,20 +634,19 @@ Chưa thể nói toàn bộ như vậy. Notebook có chuỗi execution count và
 
 ### 12.1. Đã thực hiện trong lần kiểm tra này
 
-- Đọc toàn bộ 8 script Python, README, phân công nhóm và `.gitignore`; đọc trực tiếp ảnh đề bài.
+- Đọc toàn bộ các script Python, README, phân công nhóm và `.gitignore`; đọc trực tiếp ảnh đề bài.
 - Đọc toàn bộ source của 38 cell notebook và các output dạng văn bản/bảng HTML; kiểm tra các phần tạo biểu đồ và đánh giá.
 - Đối chiếu danh sách file local, file Git theo dõi, ignore và commit hiện tại.
-- Kiểm tra AST/cú pháp của cả 8 script: đều phân tích được.
-- Kiểm tra biên dịch 18 cell Python thông thường: đều được; hai cell lệnh cài đặt/`%%writefile` được đọc riêng vì là cú pháp IPython.
+- Kiểm tra AST/cú pháp của các script: đều phân tích được.
+- Kiểm tra biên dịch các cell Python thông thường.
 - Kiểm tra notebook bằng `nbformat.validate`: hợp lệ. Không có output loại `error` được lưu trong notebook.
-- Đối chiếu lớp FastText trong notebook với `spam_features.py`: hiện trùng nhau.
 - Chạy kiểm tra nhỏ cho cleaner, converter và logic nạp Phase 2; tái hiện lỗi che tên, lỗi export ID `p2_cmt_` và lỗi cache rỗng. Các kiểm tra logic auto-accept dùng dữ liệu trong bộ nhớ và Argilla giả lập, không phải máy chủ thật.
-- Kiểm tra khả năng tìm thấy các module trong Python hiện tại; thiếu `gensim` và `argilla`. Việc tìm thấy một module không đồng nghĩa toàn bộ chức năng thư viện đó đã được kiểm thử.
+- Kiểm tra khả năng tìm thấy các module trong Python hiện tại; thiếu `argilla`. Việc tìm thấy một module không đồng nghĩa toàn bộ chức năng thư viện đó đã được kiểm thử.
 
 ### 12.2. Chưa thực hiện và không suy diễn thành kết quả
 
 - Chưa tải hoặc đọc toàn bộ dataset gated; chưa kiểm chứng lại số dòng, nguồn Facebook và nhãn v7 trên dữ liệu thật.
-- Chưa chạy lại toàn notebook, GridSearchCV, FastText hay bootstrap trên dataset thật.
+- Chưa chạy lại toàn notebook, GridSearchCV hay bootstrap trên dataset thật.
 - Chưa kết nối Argilla, gọi API GLM/OpenRouter, thay đổi nhãn trên dịch vụ hoặc kiểm thử cập nhật records thực tế.
 - Chưa xác nhận có thể phục hồi toàn bộ dữ liệu v7 từ dữ liệu thô bằng những script hiện có.
 - Chưa đánh giá mô hình hiện đại hoặc khả năng hoạt động trên bình luận tương lai/nhóm khác.

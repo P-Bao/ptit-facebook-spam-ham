@@ -9,7 +9,6 @@ README của từng thư mục để dễ mở và đọc.
 | [collect](collect/README.md) | Nhóm Facebook → lấy bài/comment/reply, làm phẳng JSON → bảng bình luận | Notebook 01, hoặc CLI thu thập |
 | [prepare](prepare/README.md) | Bảng bình luận → làm sạch cho nhãn; v7 → token cho mô hình truyền thống | Notebook 01 và 02 |
 | [label](label/README.md) | Bình luận sạch → gợi ý AI/duyệt nhãn → CSV ham/spam | Notebook 01 hoặc CLI/API |
-| [features](features/README.md) | Chuỗi token → học FastText trong train → vector câu | Notebook 02 qua `modeling` |
 | [modeling](modeling/README.md) | Văn bản/nhãn/fold → huấn luyện, CV, chiến lược ngưỡng/cân bằng → mô hình và chỉ số | Notebook 02 |
 | [inference](inference/README.md) | Bình luận mới + bundle `.joblib` → nhãn và decision score | Notebook 02 |
 | [modern](modern/README.md) | V7 → tokenizer và fine-tune viBERT → trọng số, test và dự đoán | Colab, Notebook 03 |

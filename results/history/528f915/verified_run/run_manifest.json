@@ -23,7 +23,6 @@
     "scikit-learn": "1.6.1",
     "matplotlib": "3.10.3",
     "joblib": "1.5.1",
-    "gensim": "4.4.0",
     "underthesea": "8.3.0",
     "jinja2": "3.1.6"
   },

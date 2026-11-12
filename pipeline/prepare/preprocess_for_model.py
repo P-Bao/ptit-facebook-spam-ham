@@ -4,7 +4,7 @@ Tiền xử lý dùng chung cho huấn luyện và dự đoán.
 Đầu vào: cleaned_text, text gốc và lựa chọn giữ/bỏ stop words.
 Xử lý: Chuẩn hóa, che tên bảo thủ, tách từ underthesea, xử lý emoji/stop words; không đổi nhãn.
 Đầu ra: Chuỗi token đầu vào bộ tạo đặc trưng.
-Liên quan: pipeline.features; pipeline.modeling; pipeline.inference.predict.
+Liên quan: pipeline.modeling; pipeline.inference.predict.
 """
 
 import html

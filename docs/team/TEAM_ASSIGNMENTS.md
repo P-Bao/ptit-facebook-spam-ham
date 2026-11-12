@@ -10,7 +10,7 @@ thích**, không phải khẳng định ai là tác giả mọi file được gi
 |---|---|---|---|
 | **Cương** | Dữ liệu, crawler, hai lớp tiền xử lý và thiết kế chia tập | 01 mục 1–4; 02 mục 1–4; 03 mục 2 | Bảng sạch/ID; CSV token; train/test/fold và split viBERT |
 | **Bảo** | Gán nhãn, kiểm chất lượng nhãn và đánh giá/phân tích lỗi truyền thống | 01 mục 5–6 và nhận xét; 02 mục 6–6.3, 7 | CSV có nhãn; cách đọc test, FP/FN, PR/AP, bootstrap |
-| **Phi** | Ba đặc trưng, NB/SVM, lựa chọn theo CV và ba chiến lược trên SVM; lưu/demo S3 | 02 mục 5, 5.1, 5.2 ở mức dẫn nhập, 8–9 | B1–B6/S1–S3; cấu hình S3 và bundle `.joblib` |
+| **Phi** | Hai đặc trưng, NB/SVM, lựa chọn theo CV và ba chiến lược trên SVM; lưu/demo S3 | 02 mục 5, 5.1, 5.2 ở mức dẫn nhập, 8–9 | B1–B4/S1–S3; cấu hình S3 và bundle `.joblib` |
 | **Phương** | viBERT: tokenization, fine-tune, chọn loss/epoch, test chung và ứng dụng | 03 mục 1, 3–9; 02 mục 6.4 | M1 safetensors/tokenizer, bảng S3–M1, giới hạn và demo |
 
 Mỗi phần có một khối lý thuyết, một khối code và một thực hành. Cương có nhiều
@@ -101,7 +101,7 @@ khóa nằm ở hai tập?”, “Run All 01 có đăng nhập Facebook không?�
 - **01 mục 5–6:** 6.571 gợi ý khớp và 6.289 mẫu đủ điều kiện (5.190 ham, 1.099
   spam); chỉ ra ID, text, cleaned_text, label, confidence trong CSV. Notebook
   dùng phản hồi đã lưu, không gọi lại GLM. Mẫu chưa đủ điều kiện không vào CSV.
-- **02 mục 6–6.3:** bảng B1–B6, bảng chiến lược B4/S1/S2/S3, FP/FN, hai nhóm
+- **02 mục 6–6.3:** bảng B1–B4, bảng chiến lược B4/S1/S2/S3, FP/FN, hai nhóm
   ma trận và hai nhóm PR. B4 được dùng lại; đổi ngưỡng không đổi thứ tự score/AP.
 - **02 mục 7:** giải thích một FP và một FN của S3, liên hệ dữ liệu/nhãn/ngữ
   cảnh. Không gán nguyên nhân chắc chắn khi chưa đủ căn cứ.
@@ -120,11 +120,8 @@ Phải trả lời: “0,75 khác ngưỡng SVM/viBERT ở đâu?”, “FN cao 
 
 ### Kiến thức cần học
 
-- BoW, TF-IDF (TF/IDF, sublinear TF), n-gram; biểu diễn thưa và embedding dày.
-- FastText skip-gram/subword, 100 chiều, pooling mean/TF-IDF; có vector OOV
-  không đồng nghĩa luôn hiểu đúng teencode/ngữ cảnh.
-- NB là họ mô hình: MultinomialNB cho đếm/TF-IDF không âm, GaussianNB cho
-  embedding có thể âm. SVM tuyến tính, margin, C, scaler cho FastText.
+- BoW, TF-IDF (TF/IDF, sublinear TF), n-gram; biểu diễn ma trận thưa.
+- MultinomialNB cho đặc trưng đếm/TF-IDF không âm, làm trơn alpha. SVM tuyến tính (`LinearSVC`), margin, siêu tham số C.
 - scikit-learn Pipeline/fit/transform, GridSearchCV năm fold, multi-metric và
   refit F1; học đặc trưng trong fold, không fit trước trên cả train+test.
 - Balanced: `n/(2*n_lớp)`; under-sampling 2:1 chỉ train; OOF decision score và
@@ -137,23 +134,22 @@ Phải trả lời: “0,75 khác ngưỡng SVM/viBERT ở đâu?”, “FN cao 
 
 | File | Đoạn trọng tâm |
 |---|---|
-| `pipeline/features/spam_features.py` | `FastTextVectorizer.__init__/fit/transform`, học IDF, sinh vector và pooling |
-| `pipeline/modeling/experiments.py` | `make_pipe`, các lưới ngram/alpha/C/pooling/var_smoothing; `fit_experiment`, refit F1 và các trường record |
+| `pipeline/modeling/experiments.py` | `make_pipe`, các lưới ngram/alpha/C; `fit_experiment`, refit F1 và các trường record |
 | `pipeline/modeling/training_utils.py` | `sample_training_indices`, `undersampled_search`, `mean_cv_scores`, `tune_svm_threshold`, `predict_record` |
 | `pipeline/inference/predict.py` | `predict_spam`: tiền xử lý theo bundle, score_type, áp ngưỡng đã lưu |
 | Notebook 02 mục 5/5.1/8 | Đối chiếu từ dừng, đánh mã B/S, `CANDIDATES`, chọn `best`, `joblib.dump/load`, manifest và kiểm dự đoán |
 
 ### Nội dung notebook/output phải trình bày được
 
-- **02 mục 5:** sáu tổ hợp × hai cách từ dừng được xem xét ở CV, không phải
-  mười hai mô hình cuối; nhánh giữ từ dừng đi tiếp. Bảng có CV Precision/Recall/F1.
+- **02 mục 5:** bốn tổ hợp × hai cách từ dừng được xem xét ở CV, không phải
+  tám mô hình cuối; nhánh giữ từ dừng đi tiếp. Bảng có CV Precision/Recall/F1.
 - **02 mục 5.1:** TF-IDF+SVM dẫn đầu cơ sở theo CV nên khảo sát sâu trên cùng
   mô hình. B4 không điều chỉnh; S1 balanced; S2 under-sampling; S3 ngưỡng OOF.
-  Chưa khảo sát mọi chiến lược trên cả sáu tổ hợp.
+  Chưa khảo sát mọi chiến lược trên cả bốn tổ hợp.
 - S3: C=0,3, ngram=(1,2), ngưỡng −0,1776279252, CV F1 0,7876. Score > ngưỡng
   → spam; ngưỡng âm không phải số xác suất lỗi. S3 chỉ nhỉnh hơn S2 trên test.
 - **02 mục 5.2:** dẫn nhập sang viBERT, không giải thích M1 như thuật toán thứ
-  ba ghép vào BoW/TF-IDF/FastText. Phương trình bày chi tiết nhánh đó.
+  ba ghép vào BoW/TF-IDF. Phương trình bày chi tiết nhánh đó.
 - **02 mục 8–9:** bundle là S3 trong phạm vi truyền thống, không bị M1 ghi đè;
   demo dùng cùng ngưỡng và tiền xử lý. Nêu rõ đánh đổi Precision/Recall.
 
@@ -162,7 +158,7 @@ Phải trả lời: “0,75 khác ngưỡng SVM/viBERT ở đâu?”, “FN cao 
 Chạy 02 bằng runner, tìm `stopword_cv.csv`, `imbalance_cv.csv`, `metrics.csv`
 và `.joblib`; nạp model, dự đoán câu mới. Đọc
 `tests/test_preprocessing_and_training.py` và phần model trong
-`test_restructured_modules.py`. Phải trả lời: “6+3 vì sao không phải 10?”,
+`test_restructured_modules.py`. Phải trả lời: “4+3 vì sao không phải 8?”,
 “OOF là gì?”, “Vì sao không chọn bằng test?”, “Tại sao score âm vẫn có thể là spam?”.
 
 ## 5. Phương — Fine-tune, đánh giá và ứng dụng viBERT

@@ -36,7 +36,7 @@ def test_extracted_training_and_saved_bundle_inference(tmp_path, feature, algori
         assert predict_spam(raw[:2], joblib.load(path)).du_doan.tolist() == ["ham", "ham"]
 
 
-@pytest.mark.parametrize("feature", ["BoW", "TF-IDF", "FastText"])
+@pytest.mark.parametrize("feature", ["BoW", "TF-IDF"])
 def test_svm_baselines_do_not_mix_class_weights(feature):
     _, baseline_grid, _ = make_pipe(feature, "SVM")
     _, balanced_grid, _ = make_pipe(feature, "SVM", class_weight="balanced")
