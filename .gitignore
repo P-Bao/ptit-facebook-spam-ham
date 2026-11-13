@@ -13,6 +13,7 @@ build/
 # Môi trường ảo
 .venv/
 .venv-modern/
+.venv-label/
 venv/
 env/
 .env
@@ -41,6 +42,7 @@ spam-ham-comments-v2.ipynb
 .cache/
 artifacts/
 .pytest_cache/
+pytest-cache-files-*/
 # Media/phiên chạy do thư viện crawler tạo; giữ mã nền và .env.example
 group_post/
 page_post/

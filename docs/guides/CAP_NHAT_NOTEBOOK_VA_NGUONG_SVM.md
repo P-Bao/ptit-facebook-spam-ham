@@ -36,7 +36,7 @@ hiện đại vẫn dành cho bước tiếp theo, chưa triển khai trong lầ
 - `pipeline/modeling/training_utils.py`: under-sampling trả đủ chỉ số CV;
   `tune_svm_threshold()` tạo score OOF và chọn ngưỡng; `predict_record()` áp dụng
   ngưỡng SVM. Hàm ngưỡng NB không còn được sử dụng nên được thay thế.
-- `pipeline/inference/predict.py`: chuyển ngưỡng bundle cho hàm dự đoán, dùng
+- `pipeline/modeling/predict.py`: chuyển ngưỡng bundle cho hàm dự đoán, dùng
   mặc định theo loại mô hình khi bundle không khai báo ngưỡng.
 - Hai file kiểm thử về huấn luyện/module: kiểm OOF không fit lên validation,
   ngưỡng SVM, cấu hình cơ sở và ngưỡng được giữ khi lưu–nạp–dự đoán.

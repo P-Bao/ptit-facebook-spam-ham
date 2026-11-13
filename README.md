@@ -9,6 +9,7 @@ thực nghiệm BoW/TF-IDF với NB/SVM, fine-tune viBERT, đánh giá và dự
 - [Phân công học cho bốn thành viên](docs/team/TEAM_ASSIGNMENTS.md).
 - [Hướng dẫn train viBERT trên Colab](docs/guides/HUONG_DAN_VIBERT_COLAB.md).
 - [Cách đọc token và chỉ số](docs/guides/DOC_TOKEN_VA_KET_QUA.md).
+- [Hướng dẫn tự chạy Terminal, từng cell và cài AI–Argilla](docs/guides/HUONG_DAN_TU_CHAY_VA_GAN_NHAN.md).
 
 ## 1. Chọn cách chạy
 
@@ -16,6 +17,7 @@ thực nghiệm BoW/TF-IDF với NB/SVM, fine-tune viBERT, đánh giá và dự
 |---|---|---|
 | Tạo lại CSV từ dữ liệu/nhãn đã lưu | Notebook 01 hoặc các lệnh offline mục 5 | Không |
 | Huấn luyện/đánh giá lại mô hình truyền thống | Notebook 02 hoặc runner mục 3 | Không |
+| Kiểm tra toàn bộ cấu hình GridSearchCV | Notebook 04, tùy chọn, sau Notebook 02 | Không |
 | Xem kết quả viBERT và dự đoán tại máy | Notebook 03, `MODE="review"`, mục 3–4 | Không khi đủ model/kết quả local |
 | Thu thập/gán nhãn cho dữ liệu mới | CLI mục 6 | Facebook/API, Argilla nếu dùng giao diện |
 | Fine-tune viBERT lại | Colab GPU, mục 7 | GPU, tải pretrained và lưu Drive |
@@ -84,20 +86,32 @@ Chạy từng lệnh, chờ thành công trước khi chuyển lệnh tiếp the
 .\.venv\Scripts\python.exe scripts/run_notebook.py --notebook 01 --inplace
 .\.venv\Scripts\python.exe scripts/run_notebook.py --notebook 02 --inplace
 .\.venv-modern\Scripts\python.exe scripts/run_notebook.py --notebook 03 --inplace
+.\.venv\Scripts\python.exe scripts/run_notebook.py --notebook 04 --inplace
 ```
 
 03 mặc định `MODE="review"`: đọc kết quả đã train, xử lý dữ liệu/tokenization,
 nạp model và suy luận; không fine-tune lại. Không dùng `.venv` của 01/02 cho 03.
+04 là kiểm tra bổ sung các cấu hình CV và ghi bảng vào `artifacts/grid_audit/`;
+chạy bằng `.venv` của 01/02. Có thể bỏ qua 04 khi chỉ cần luồng chính 01–03.
 
 | Lệnh | Đầu ra chính |
 |---|---|
 | 01 | `data/intermediate/`, `data/labeled/comments_labeled.csv`, `data/collection_manifest.json` |
 | 02 | `data/processed/v7_preprocessed.csv`; S3 `.joblib`, metrics/CV/test/hình trong `artifacts/spamham/` |
 | 03 review | Cập nhật output notebook, hiện lịch sử/test; dự đoán demo bằng checkpoint đã lưu |
+| 04 tùy chọn | Bảng toàn bộ cấu hình CV và cấu hình tốt nhất theo nhóm trong `artifacts/grid_audit/` |
+
+Để **học và chạy riêng phần Phi** từ CSV đã có nhãn/token, không cần chạy lại các cell tạo dữ liệu của Notebook 02:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_phi_pipeline.py --jobs 2
+```
+
+Script tự chia train/test, chạy BoW/TF-IDF với Naive Bayes/SVM, khảo sát B4 và S1–S3, chấm test rồi lưu `metrics.csv`, `test_predictions.csv`, `run_summary.json` và `spam_ham_ml_only.joblib` vào `artifacts/spamham/phi_pipeline/`. Thư mục này tách khỏi đầu ra chính của Notebook 02. Đọc [luồng code Phi](docs/team/PHI_DOC_CODE_THEO_LUONG.md) để đối chiếu từng lệnh với module thực hiện; [giải thích bốn lớp scikit-learn](docs/team/PHI_HIEU_4_LOP_SCIKIT_LEARN.md) chỉ đúng phương thức nguồn cần đọc bằng Ctrl+Click.
 
 `--inplace` chỉ ghi lại output notebook gốc nếu tất cả cell thành công. Kernel,
 bản notebook thực thi và `execution_status.json` nằm ở `.work/runs/01/`, `02/`,
-`03/`. Notebook 02 chạy nhiều cấu hình và có thể cần khoảng 10 phút trên máy
+`03/`, `04/`. Notebook 02 chạy nhiều cấu hình và có thể cần khoảng 10 phút trên máy
 hiện tại; không ngắt giữa chừng khi đang fit.
 
 Nếu cần tạo lại file tổng hợp ngoài luồng model:
@@ -129,6 +143,8 @@ không lần lượt mở từng file thư viện rồi bấm Run Python File.
 5. Mở [Notebook 03](notebooks/03_vibert.ipynb), đổi kernel sang
    **`.venv-modern\Scripts\python.exe`**. Giữ `MODE="review"` tại mục 1 rồi Run All.
    Mục 5 đọc lịch sử đã train; mục 8 nạp viBERT và tính dự đoán mới.
+6. Nếu muốn rà toàn bộ lưới tham số, mở [Notebook 04](notebooks/04_kiem_tra_grid_search.ipynb),
+   chọn lại kernel `.venv` và Run All. Đây là kiểm tra bổ sung, không thay mô hình đã chọn.
 
 Kiểm tra kernel bằng cell tạm nếu cần:
 
@@ -246,8 +262,11 @@ biên bản nguồn. Crawler chưa tạo nhãn hoặc v7.
 
 ### 6.2. AI và tiếp nhận nhãn không dùng Argilla
 
+Tạo môi trường gán nhãn riêng (chỉ cần làm lần đầu):
+
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements/annotation.txt
+uv venv --python 3.12.14 --seed .venv-label
+.\.venv-label\Scripts\python.exe -m pip install -r requirements/annotation.txt
 ```
 
 Cấu hình `OPENROUTER_API_KEY` hoặc `OPENAI_API_KEY`, endpoint/model trong `.env`
@@ -256,8 +275,8 @@ local. Đặt model API còn được nhà cung cấp hỗ trợ; mặc định 
 phát sinh chi phí; chỉ chạy khi muốn gán nhãn mới:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pipeline.label.ai_assisted_spam_ham --csv data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --no-upload
-.\.venv\Scripts\python.exe -m pipeline.label.auto_accept_labels --csv-in data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --threshold 0.75 --skip-argilla --export-csv data/intermediate/new_run/annotation_review.csv
+.\.venv-label\Scripts\python.exe -m pipeline.label.ai_assisted_spam_ham --csv data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --no-upload
+.\.venv-label\Scripts\python.exe -m pipeline.label.auto_accept_labels --csv-in data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --threshold 0.75 --skip-argilla --export-csv data/intermediate/new_run/annotation_review.csv
 ```
 
 Lọc `official_label` như mục 5.3, đổi đường dẫn theo lần mới. Dùng cache/ID của
@@ -266,14 +285,18 @@ hai CLI cùng dùng tiền tố mặc định `cmt_`; nếu đổi tiền tố c
 
 ### 6.3. Nếu nhóm muốn duyệt bằng Argilla
 
+Làm theo [hướng dẫn cài server và cấu hình key](docs/guides/HUONG_DAN_TU_CHAY_VA_GAN_NHAN.md)
+trước. Truyền URL/key đúng của server vào mỗi CLI; các mặc định của code có
+thể khác Compose vừa cài. Lệnh đầy đủ đã có trong hướng dẫn đó.
+
 Cần Argilla server đang hoạt động và cùng dataset/API URL/key. Cấu hình theo
 `--help` của từng CLI, không dùng `--reset` nếu cần giữ nhãn cũ:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pipeline.label.upload_to_argilla --csv data/intermediate/new_run/comments_cleaned.csv --dataset comments_spamham_new
-.\.venv\Scripts\python.exe -m pipeline.label.ai_assisted_spam_ham --csv data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --dataset comments_spamham_new
-.\.venv\Scripts\python.exe -m pipeline.label.auto_accept_labels --csv-in data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --dataset comments_spamham_new --threshold 0.75 --export-csv data/intermediate/new_run/annotation_review.csv
-.\.venv\Scripts\python.exe -m pipeline.label.download_labeled_data --dataset comments_spamham_new --csv-lookup data/intermediate/new_run/comments_cleaned.csv --output data/labeled/comments_new.csv
+.\.venv-label\Scripts\python.exe -m pipeline.label.upload_to_argilla --csv data/intermediate/new_run/comments_cleaned.csv --dataset comments_spamham_new
+.\.venv-label\Scripts\python.exe -m pipeline.label.ai_assisted_spam_ham --csv data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --dataset comments_spamham_new
+.\.venv-label\Scripts\python.exe -m pipeline.label.auto_accept_labels --csv-in data/intermediate/new_run/comments_cleaned.csv --cache data/intermediate/new_run/predictions.json --dataset comments_spamham_new --threshold 0.75 --export-csv data/intermediate/new_run/annotation_review.csv
+.\.venv-label\Scripts\python.exe -m pipeline.label.download_labeled_data --dataset comments_spamham_new --csv-lookup data/intermediate/new_run/comments_cleaned.csv --output data/labeled/comments_new.csv
 ```
 
 Sau auto-accept, có thể duyệt phần còn lại trên giao diện trước khi download.
@@ -320,7 +343,7 @@ S3, từ PowerShell ở gốc project:
 ```powershell
 @'
 import joblib
-from pipeline.inference.predict import predict_spam
+from pipeline.modeling.predict import predict_spam
 bundle = joblib.load('artifacts/spamham/spam_ham_ml_only.joblib')
 print(predict_spam(['Cho minh hoi lich thi', 'Lien he https://example.com'], bundle).to_string(index=False))
 '@ | .\.venv\Scripts\python.exe -

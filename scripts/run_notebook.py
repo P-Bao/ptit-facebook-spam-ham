@@ -1,10 +1,11 @@
 """scripts/run_notebook.py
 Chạy notebook trong kernel mới với module của project và output riêng.
 
-Đầu vào: --notebook 01/02/03, CSV v7 và các file thu thập/model local.
+Đầu vào: --notebook 01/02/03/04, CSV v7 và các file thu thập/model local.
 Xử lý: cấu hình PYTHONPATH/seed; ghi tiến độ và trạng thái chạy.
-Đầu ra: data/ (01), artifacts/spamham/ (02), artifacts/modern/vibert/ (03), trạng thái .work/.
-Liên quan: ba notebook; 03 mặc định review checkpoint đã huấn luyện.
+Đầu ra: data/ (01), artifacts/spamham/ (02), artifacts/modern/vibert/ (03),
+artifacts/grid_audit/ (04), trạng thái .work/.
+Liên quan: bốn notebook; 03 mặc định review checkpoint đã huấn luyện.
 """
 
 import argparse
@@ -23,21 +24,22 @@ from jupyter_client import KernelManager
 def main():
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--notebook", choices=["01", "02", "03"], default="02")
+    parser.add_argument("--notebook", choices=["01", "02", "03", "04"], default="02")
     parser.add_argument("--csv", type=Path, help="CSV huấn luyện local; mặc định data/final/labeled_v7.csv")
     parser.add_argument("--source-dir", type=Path, default=root / ".cache/collection")
     parser.add_argument("--work-dir", type=Path, help="Thư mục tạm cho kernel và bản sao notebook")
-    parser.add_argument("--output-dir", type=Path, help="Gốc đầu ra; data/ (01), artifacts/spamham/ (02), artifacts/modern/vibert/ (03)")
+    parser.add_argument("--output-dir", type=Path, help="Gốc đầu ra; data/ (01), artifacts/spamham/ (02), artifacts/modern/vibert/ (03), artifacts/grid_audit/ (04)")
     parser.add_argument("--inplace", action="store_true", help="Ghi output vào notebook chính chỉ khi chạy hết thành công")
     args = parser.parse_args()
     filenames = {"01": "01_thu_thap_va_gan_nhan.ipynb", "02": "02_thuc_nghiem_va_demo.ipynb",
-                 "03": "03_vibert.ipynb"}
+                 "03": "03_vibert.ipynb", "04": "04_kiem_tra_grid_search.ipynb"}
     source = root / "notebooks" / filenames[args.notebook]
     work = (args.work_dir or root / ".work/runs" / args.notebook).resolve()
     if not work.is_relative_to(root):
         raise ValueError("Thư mục kiểm tra phải nằm trong project")
     work.mkdir(parents=True, exist_ok=True)
-    defaults = {"01": root / "data", "02": root / "artifacts/spamham", "03": root / "artifacts/modern/vibert"}
+    defaults = {"01": root / "data", "02": root / "artifacts/spamham", "03": root / "artifacts/modern/vibert",
+                "04": root / "artifacts/grid_audit"}
     output = (args.output_dir or defaults[args.notebook]).resolve()
     if not output.is_relative_to(root):
         raise ValueError("Thư mục đầu ra phải nằm trong project")

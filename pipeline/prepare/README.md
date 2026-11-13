@@ -16,7 +16,7 @@ Thứ tự sử dụng:
    chuẩn hóa, che một số tên theo quy tắc, chuyển chữ thường, tách từ, thêm tín
    hiệu emoji. Lưu toàn bộ v7 và hai cột token vào
    `data/processed/v7_preprocessed.csv`; mục 5 chọn giữ từ dừng bằng CV.
-3. **Khi dự đoán S3:** `pipeline.inference.predict` gọi lại cùng `preprocess()`
+3. **Khi dự đoán S3:** `pipeline.modeling.predict` gọi lại cùng `preprocess()`
    theo lựa chọn từ dừng trong bundle. Không fit lại vectorizer.
 
 Đây là hai mục đích xử lý khác nhau: chuẩn bị bảng cho người/AI gán nhãn và tạo

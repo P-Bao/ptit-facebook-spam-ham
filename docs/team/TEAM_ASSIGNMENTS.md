@@ -136,7 +136,7 @@ Phải trả lời: “0,75 khác ngưỡng SVM/viBERT ở đâu?”, “FN cao 
 |---|---|
 | `pipeline/modeling/experiments.py` | `make_pipe`, các lưới ngram/alpha/C; `fit_experiment`, refit F1 và các trường record |
 | `pipeline/modeling/training_utils.py` | `sample_training_indices`, `undersampled_search`, `mean_cv_scores`, `tune_svm_threshold`, `predict_record` |
-| `pipeline/inference/predict.py` | `predict_spam`: tiền xử lý theo bundle, score_type, áp ngưỡng đã lưu |
+| `pipeline/modeling/predict.py` | `predict_spam`: tiền xử lý theo bundle, score_type, áp ngưỡng đã lưu |
 | Notebook 02 mục 5/5.1/8 | Đối chiếu từ dừng, đánh mã B/S, `CANDIDATES`, chọn `best`, `joblib.dump/load`, manifest và kiểm dự đoán |
 
 ### Nội dung notebook/output phải trình bày được

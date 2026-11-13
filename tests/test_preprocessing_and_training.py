@@ -1,14 +1,17 @@
 import numpy as np
 import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 from pipeline.prepare.preprocess_for_model import (
     EMOJI, clean_text, mask_names, preprocess,
 )
 from pipeline.modeling.training_utils import (
-    grouped_folds, norm_key, sample_training_indices, undersampled_search,
+    grouped_folds, norm_key, split_train_test, sample_training_indices, undersampled_search,
     tune_svm_threshold, predict_record,
 )
+from pipeline.modeling.experiments import fit_experiment
+from pipeline.modeling.text_features import TOKEN_PATTERN, make_vectorizer
 
 
 @pytest.mark.parametrize("text", ["Máy Tính học tốt", "Mạng Máy Tính khó quá", "Người tham gia ẩn danh 123"])
@@ -51,6 +54,49 @@ def test_grouped_cv_keeps_duplicates_together():
         assert not set(keys[train]) & set(keys[valid])
         coverage[valid] += 1
     assert (coverage == 1).all()
+
+
+def test_split_train_test_keeps_same_content_on_one_side():
+    texts = [f"Bình luận {chr(97 + i // 26)}{chr(97 + i % 26)}"
+             for i in range(80) for _ in range(2)]
+    labels = [i % 2 for i in range(80) for _ in range(2)]
+    keys, train, test = split_train_test(texts, labels)
+    assert set(train).isdisjoint(test)
+    assert len(train) + len(test) == len(texts)
+    assert not set(keys[train]) & set(keys[test])
+
+
+@pytest.mark.parametrize("feature,cls", [
+    ("BoW", CountVectorizer), ("TF-IDF", TfidfVectorizer),
+])
+@pytest.mark.parametrize("ngram_range", [(1, 1), (1, 2)])
+def test_project_vectorizer_uses_expected_library_and_token_rules(feature, cls, ngram_range):
+    train = ["a mua sách!", "a mua hàng!", "lịch thi PTIT", "lịch thi ngày mai"]
+    new = ["a mua lịch!", "từ chưa gặp"]
+    vectorizer, grid = make_vectorizer(feature)
+    assert isinstance(vectorizer, cls)
+    assert vectorizer.token_pattern == TOKEN_PATTERN
+    assert vectorizer.min_df == 2
+    assert ngram_range in grid["vec__ngram_range"]
+    vectorizer.set_params(ngram_range=ngram_range)
+    matrix = vectorizer.fit_transform(train)
+    assert matrix.shape == (len(train), len(vectorizer.get_feature_names_out()))
+    assert vectorizer.transform(new).shape[1] == matrix.shape[1]
+    if feature == "TF-IDF":
+        assert vectorizer.sublinear_tf and vectorizer.smooth_idf and vectorizer.norm == "l2"
+
+
+def test_library_vectorizer_runs_inside_training_pipeline():
+    X = np.array(["lich thi ptit", "lich thi truong", "mua sim gia re",
+                  "mua sim gia tot", "lich hoc ptit", "lich hoc truong",
+                  "ban hang online", "ban hang nhanh"])
+    y = np.array([0, 0, 1, 1, 0, 0, 1, 1])
+    folds = [(np.array([0, 2, 4, 6]), np.array([1, 3, 5, 7])),
+             (np.array([1, 3, 5, 7]), np.array([0, 2, 4, 6]))]
+    record = fit_experiment("giữ stop words", "TF-IDF", "SVM", X, y, folds, n_jobs=1)
+    assert isinstance(record["_model"].named_steps["vec"], TfidfVectorizer)
+    assert 0 <= record["CV F1 (spam)"] <= 1
+    assert len(record["_model"].predict(X)) == len(X)
 
 
 def test_sampling_only_uses_allowed_training_indices():

@@ -160,4 +160,4 @@ def test_presentation_notebooks_use_project_modules():
     code = "\n".join("".join(c["source"]) for c in experiment["cells"] if c["cell_type"] == "code")
     assert "SPAMHAM_SOURCE_DIR" not in code
     assert "collection_audit" not in code
-    assert "from pipeline.inference.predict import predict_spam" in code
+    assert "from pipeline.modeling.predict import predict_spam" in code
