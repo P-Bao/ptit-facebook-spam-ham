@@ -99,7 +99,7 @@ không phải bước bắt buộc trước mỗi lần chạy Notebook 02.
 | 6–6.3. Đánh giá | `experiments.evaluate`, `boot_ci` và cell vẽ hình | Test, FP/FN, ma trận, PR/AP và bootstrap F1 cho bảy ứng viên |
 | 6.4. Đối chiếu M1 | Đọc `results/modern/` ở gốc repo | Bảng test viBERT–S3 đã xác nhận, không gọi fine-tune |
 | 7. Phân tích | Cell hệ số/lỗi | Ví dụ của **cấu hình được chọn bằng CV**, giữ ID/text/nhãn/score |
-| 8–9. Lưu/demo/nhận xét | `joblib.dump/load`; `inference/predict.py`: `predict_spam` | Lưu S3, nạp lại kiểm tra và phân loại bình luận mới bằng cùng ngưỡng |
+| 8–9. Lưu/demo/nhận xét | `joblib.dump/load`; `modeling/predict.py`: `predict_spam` | Lưu S3, nạp lại kiểm tra và phân loại bình luận mới bằng cùng ngưỡng |
 
 **CV và test:** mỗi lượt CV học trên bốn fold train, đo fold validation còn
 lại; trung bình F1 spam dùng chọn cấu hình. Sau đó fit toàn bộ train và đo test

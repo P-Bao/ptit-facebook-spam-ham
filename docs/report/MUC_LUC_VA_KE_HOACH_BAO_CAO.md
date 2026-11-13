@@ -313,7 +313,7 @@ Chương 2 khoảng 12–16 trang; Mở đầu/Kết luận ngắn. Đây không
 | Test/CI/lỗi S3 | `artifacts/spamham/metrics.csv`, `imbalance_comparison.csv`, `bootstrap_ci.csv`, `test_predictions.csv`, các hình ma trận/PR |
 | viBERT phát triển và test | Notebook 03, `pipeline/modern/`, `artifacts/modern/vibert/run_config.json`, `validation_metrics.csv`, `selected.json`, lịch sử và `test_predictions.csv` |
 | So sánh và kiểm chứng | `results/modern/comparison_with_svm.csv`, `results/verified_run/final_review.json`, `results/modern/local_validation.json` |
-| Lưu và dự đoán mới | `pipeline/inference/predict.py`, `pipeline/modern/predict.py`, hai thư mục model trong `artifacts/` |
+| Lưu và dự đoán mới | `pipeline/modeling/predict.py`, `pipeline/modern/predict.py`, hai thư mục model trong `artifacts/` |
 
 Trong báo cáo chỉ trích code ngắn nếu giúp giải thích thuật toán/luồng; không
 chép toàn bộ notebook hoặc README. Kết quả là số liệu thực nghiệm của nhóm,
@@ -408,7 +408,7 @@ bản thảo, đọc đúng phần tương ứng; ưu tiên bài báo/sách và 
   ví dụ chung. Chữ ký và hành vi thực tế kiểm theo underthesea 8.3.0 của project.
 - **[R04]** scikit-learn 1.6.1, *Feature extraction*, mục text feature extraction.
   [Tài liệu](https://scikit-learn.org/1.6/modules/feature_extraction.html).
-  Dùng cho CountVectorizer/TF-IDF, n-gram và công thức triển khai.
+  Dùng để đối chiếu công thức BoW/TF-IDF, n-gram với `CountVectorizer` và `TfidfVectorizer` nhóm đang sử dụng.
 - **[R06]** scikit-learn 1.6.1, *Naive Bayes*.
   [Tài liệu](https://scikit-learn.org/1.6/modules/naive_bayes.html).
   Dùng cho giả định độc lập, MultinomialNB, additive smoothing.

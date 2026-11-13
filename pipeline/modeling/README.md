@@ -1,37 +1,23 @@
-# Huấn luyện và đánh giá mô hình truyền thống
+# Mô hình truyền thống — đọc theo giai đoạn
 
-| File | Hàm và vai trò |
-|---|---|
-| `experiments.py` | `make_pipe`: pipeline/lưới tham số; `fit_experiment`: GridSearchCV theo F1 spam; `evaluate`: đo test; `boot_ci`: khoảng tin cậy bootstrap F1 |
-| `training_utils.py` | `norm_key/bucket/grouped_folds`: chia nhóm; `sample_training_indices/undersampled_search`: lấy mẫu chỉ trong train; `tune_svm_threshold`: ngưỡng OOF; `predict_record`: áp ngưỡng nhất quán |
-| `__init__.py` | Khai báo package |
+Các file này là **module Python chạy được khi được import và gọi hàm**. [Notebook 02](../../notebooks/02_thuc_nghiem_va_demo.ipynb) điều phối chúng theo thứ tự dưới đây. Để đọc một luồng code chạy từ trên xuống, mở [scripts/run_phi_pipeline.py](../../scripts/run_phi_pipeline.py); script nhận CSV đã có nhãn/token, tự chia tập, huấn luyện, đánh giá và lưu `.joblib` vào thư mục riêng. Chạy riêng `python pipeline/modeling/text_features.py` sẽ chỉ nạp định nghĩa, không tự huấn luyện.
 
-Thứ tự trong Notebook 02:
+| Giai đoạn | File | Hàm chính | Nhận → trả |
+|---|---|---|---|
+| 0: chia tập | `training_utils.py` | `split_train_test`, `grouped_folds` | CSV đã sạch/nhãn → vị trí train/test và năm lượt train/validation. `norm_key`/`bucket` giữ câu trùng cùng phía. |
+| 1a: đặc trưng | `text_features.py` | `make_vectorizer` | Tạo `CountVectorizer` hoặc `TfidfVectorizer` chưa fit, kèm lưới n-gram 1 hoặc 1–2; ma trận thưa chỉ được tạo khi Pipeline fit/transform. |
+| 1b: phân loại | `classifiers.py` | `make_classifier` | Tạo NB/SVM **chưa fit**, kèm các alpha hoặc C để thử bằng CV. Không học mô hình tại đây. |
+| 1c: huấn luyện | `experiments.py` | `make_pipe`, `fit_experiment` | Đặc trưng + classifier + train/folds → Pipeline, điểm CV, tham số, model đã fit. |
+| 2: lệch lớp | `imbalance.py` | `fit_balanced_svm`, `undersampled_search`, `tune_svm_threshold` | B4 + train/folds → S1 trọng số, S2 giảm mẫu, S3 đổi ngưỡng; ba cách riêng. |
+| 3: đánh giá | `evaluation.py` | `predict_record`, `evaluate`, `boot_ci` | Model đã chốt + test → nhãn, score, chỉ số và khoảng F1. Không fit lại. |
+| 4: suy luận | `predict.py` | `predict_spam` | Bình luận mới + bundle đã nạp → tiền xử lý, score, nhãn ham/spam. Không huấn luyện hoặc ghi `.joblib`. |
 
-1. **Mục 4:** khóa nhóm từ `cleaned_text`; bucket test theo khóa, giữ các văn bản
-   cùng khóa trong cùng tập. Train 30.759 mẫu, test 7.474; train chia năm fold.
-   Đây là chia theo văn bản, không phải chia theo tác giả hoặc theo thời gian.
-2. **Mục 5:** BoW/TF-IDF × NB/SVM, đối chiếu giữ/loại từ dừng bằng CV.
-   Chọn giữ từ dừng cho luồng tiếp. Bốn tổ hợp B1–B4 dùng train nguyên bản và
-   ngưỡng mặc định, SVM không dùng trọng số lớp. NB là MultinomialNB cho đặc trưng
-   đếm từ/TF-IDF, SVM là LinearSVC.
-3. **Mục 5.1:** cố định TF-IDF+SVM, dùng B4 làm đối chứng; thử S1 balanced, S2
-   under-sampling ham:spam 2:1 và S3 chỉnh ngưỡng decision score. Không cộng dồn
-   ba chiến lược. Vectorizer/sampling đều nằm trong phần train của mỗi fold.
-4. **Mục 6–7:** test, FP/FN, ma trận, PR/AP, bootstrap và phân tích lỗi. Bảng bốn
-   tổ hợp và bảng bốn chiến lược có chung B4, tổng cộng **bảy** ứng viên.
-5. **Mục 8:** notebook lưu ứng viên được chọn theo CV vào bundle `.joblib`;
-   `inference/predict.py` sử dụng bundle đó.
+Trong `training_utils.py` còn các lệnh `import` chuyển tiếp tên hàm cũ của Phi sang `imbalance.py` và `evaluation.py`, để test hoặc notebook cũ không lỗi. **Đọc định nghĩa thực của hàm ở file mới**, không phải ở dòng import chuyển tiếp.
 
-S3 được chọn với CV F1 **0,7876**; C=0,3, n-gram=(1,2), ngưỡng **−0,1776**.
-Test F1 **0,7552**, Recall **0,6877**, Precision **0,8374**. Ngưỡng âm là điểm
-decision score SVM, không phải xác suất âm. Điểm lớn hơn ngưỡng → spam.
+`vector.py` là ví dụ tính BoW/TF-IDF thủ công trên ba câu mẫu để học khái niệm. Luồng huấn luyện và Notebook 02 dùng `CountVectorizer`/`TfidfVectorizer` trong `text_features.py`; không import `vector.py`.
 
-`tune_svm_threshold()` fit mỗi phần train, gom điểm dự đoán OOF của validation,
-khảo sát 199 phân vị cùng ngưỡng 0/hai biên và chọn trung bình F1 fold cao nhất;
-đồng điểm ưu tiên gần 0. Điểm CV này phục vụ lựa chọn, không phải nested CV độc
-lập. Không điều chỉnh tham số/ngưỡng từ test.
+Notebook 02: cell 11 chia train/test và tạo folds; cell 13 fit bốn cấu hình B1–B4 trên hai nhánh từ dừng; cell 15–16 so B4 với S1/S2/S3 và chọn `best` bằng CV; cell 20 đánh giá test; cell 32 gọi `joblib.dump(bundle, model_path)` để lưu `.joblib`, sau đó nạp lại và demo bằng `predict.py`. [`scripts/run_phi_pipeline.py`](../../scripts/run_phi_pipeline.py) cũng có lệnh `joblib.dump` khi chạy riêng phần Phi. `predict.py` chỉ thực hiện suy luận trên bundle được truyền vào. Phi học toàn bộ luồng này; Bảo vẫn có thể trình bày sâu về biểu đồ và lỗi.
 
-Hai file là thư viện, không có chương trình `main()` huấn luyện toàn bộ bài.
-Chạy [Notebook 02 hoặc runner](../../README.md) để dựng dữ liệu, gọi hàm theo
-đúng thứ tự và ghi kết quả. `modern/` là nhánh viBERT riêng, dùng cùng test.
+**Học bốn lớp thư viện đang dùng:** [PHI_HIEU_4_LOP_SCIKIT_LEARN.md](../../docs/team/PHI_HIEU_4_LOP_SCIKIT_LEARN.md) chỉ đường Ctrl+Click tới mã nguồn trong `.venv`, giải thích `CountVectorizer`, `TfidfVectorizer`, `MultinomialNB` và `LinearSVC` theo đúng cấu hình bài.
+
+**Cách đọc:** bắt đầu ở `split_train_test`, tiếp đến `make_vectorizer`, `make_classifier`, rồi `fit_experiment`. Bốn lớp vector hóa/phân loại đều dùng scikit-learn; các file project chỉ chọn cấu hình và ghép luồng. `make_vectorizer`, `make_classifier`, `make_pipe` chỉ tạo đối tượng chưa học; `search.fit(X,y)` trong `fit_experiment` mới chạy CV và fit lại model cuối trên train. `ParameterGrid` ở S2 chỉ liệt kê tám cặp n-gram/C để thử; không tự học dữ liệu.

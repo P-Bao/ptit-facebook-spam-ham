@@ -3,6 +3,7 @@
 | Tài liệu/thư mục | Nội dung |
 |---|---|
 | [README chạy project](../README.md) | Môi trường, Terminal, VS Code, 01/02/03 và dự đoán từ module |
+| [Tự chạy và gán nhãn](guides/HUONG_DAN_TU_CHAY_VA_GAN_NHAN.md) | Lệnh Terminal, từng cell 01–04, cài Docker/SDK Argilla, cấu hình API, duyệt và xuất nhãn |
 | [Tổng quan và luồng](guides/TONG_QUAN_PROJECT_VA_CACH_THUC_THI.md) | Folder, file, bước xử lý, đầu ra và đối chiếu đề |
 | [Chạy viBERT trên Colab](guides/HUONG_DAN_VIBERT_COLAB.md) | Truyền file, GPU, train/resume, tải kết quả và demo local |
 | [Đọc token và chỉ số](guides/DOC_TOKEN_VA_KET_QUA.md) | WordPiece/UNK, ba ngưỡng và CV/validation/test |

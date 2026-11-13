@@ -1,0 +1,174 @@
+{
+  "notebooks": {
+    "01": {
+      "success": true,
+      "seconds": 4.17,
+      "executed_code_cells": 6
+    },
+    "02": {
+      "success": true,
+      "seconds": 234.36,
+      "executed_code_cells": 19
+    },
+    "03": {
+      "success": true,
+      "seconds": 19.92,
+      "executed_code_cells": 9
+    },
+    "04": {
+      "success": true,
+      "seconds": 176.59,
+      "executed_code_cells": 6
+    }
+  },
+  "saved_joblib_matches_all_test_predictions": true,
+  "test_rows": 7474,
+  "grid_configurations": 56,
+  "selected": {
+    "Mã": "S3",
+    "Tiền xử lý": "giữ stop words",
+    "Đặc trưng": "TF-IDF",
+    "Thuật toán": "SVM",
+    "Chiến lược": "Điều chỉnh ngưỡng",
+    "CV Precision (spam)": 0.8490321906574294,
+    "CV Recall (spam)": 0.7352844318710363,
+    "CV F1 (spam)": 0.7876129035895455,
+    "Accuracy": 0.9432700026759433,
+    "Precision": 0.8373879641485276,
+    "Recall": 0.6876971608832808,
+    "F1": 0.7551963048498845,
+    "AP": 0.8116912085784026,
+    "Tham số": {
+      "clf__C": 0.3,
+      "clf__class_weight": null,
+      "vec__ngram_range": [
+        1,
+        2
+      ],
+      "threshold": -0.17762792522140153
+    }
+  },
+  "metrics": [
+    {
+      "Mã": "B1",
+      "Tiền xử lý": "giữ stop words",
+      "Đặc trưng": "BoW",
+      "Thuật toán": "Naive Bayes",
+      "Chiến lược": "Không điều chỉnh",
+      "CV Precision (spam)": 0.7582497570085808,
+      "CV Recall (spam)": 0.5153391905231706,
+      "CV F1 (spam)": 0.6077230966625763,
+      "Accuracy": 0.914102221032914,
+      "Precision": 0.7440758293838863,
+      "Recall": 0.4952681388012618,
+      "F1": 0.5946969696969697,
+      "AP": 0.7319590710784228,
+      "Tham số": "{'clf__alpha': 1.0, 'vec__ngram_range': (1, 2)}",
+      "Ngưỡng": 0.5
+    },
+    {
+      "Mã": "B2",
+      "Tiền xử lý": "giữ stop words",
+      "Đặc trưng": "BoW",
+      "Thuật toán": "SVM",
+      "Chiến lược": "Không điều chỉnh",
+      "CV Precision (spam)": 0.7290417658842057,
+      "CV Recall (spam)": 0.6901228354324707,
+      "CV F1 (spam)": 0.7086831919200965,
+      "Accuracy": 0.924137008295424,
+      "Precision": 0.710989010989011,
+      "Recall": 0.6803364879074658,
+      "F1": 0.6953250940354648,
+      "AP": 0.7492532951895208,
+      "Tham số": "{'clf__C': 1.0, 'clf__class_weight': None, 'vec__ngram_range': (1, 2)}",
+      "Ngưỡng": 0.0
+    },
+    {
+      "Mã": "B3",
+      "Tiền xử lý": "giữ stop words",
+      "Đặc trưng": "TF-IDF",
+      "Thuật toán": "Naive Bayes",
+      "Chiến lược": "Không điều chỉnh",
+      "CV Precision (spam)": 0.8262507060328638,
+      "CV Recall (spam)": 0.4722623137429164,
+      "CV F1 (spam)": 0.5959497203207185,
+      "Accuracy": 0.9257425742574258,
+      "Precision": 0.8402061855670103,
+      "Recall": 0.5141955835962145,
+      "F1": 0.6379647749510763,
+      "AP": 0.7987685994948512,
+      "Tham số": "{'clf__alpha': 0.1, 'vec__ngram_range': (1, 2)}",
+      "Ngưỡng": 0.5
+    },
+    {
+      "Mã": "B4",
+      "Tiền xử lý": "giữ stop words",
+      "Đặc trưng": "TF-IDF",
+      "Thuật toán": "SVM",
+      "Chiến lược": "Không điều chỉnh",
+      "CV Precision (spam)": 0.9001391751055159,
+      "CV Recall (spam)": 0.6805960722879792,
+      "CV F1 (spam)": 0.7735613299500151,
+      "Accuracy": 0.941932031040942,
+      "Precision": 0.8818316100443131,
+      "Recall": 0.6277602523659306,
+      "F1": 0.7334152334152334,
+      "AP": 0.8116912085784026,
+      "Tham số": "{'clf__C': 0.3, 'clf__class_weight': None, 'vec__ngram_range': (1, 2)}",
+      "Ngưỡng": 0.0
+    },
+    {
+      "Mã": "S1",
+      "Tiền xử lý": "giữ stop words",
+      "Đặc trưng": "TF-IDF",
+      "Thuật toán": "SVM",
+      "Chiến lược": "Trọng số balanced",
+      "CV Precision (spam)": 0.7232594541339219,
+      "CV Recall (spam)": 0.796404990058512,
+      "CV F1 (spam)": 0.7579663873758575,
+      "Accuracy": 0.9321648381054322,
+      "Precision": 0.7138728323699421,
+      "Recall": 0.7791798107255521,
+      "F1": 0.7450980392156863,
+      "AP": 0.812668864417224,
+      "Tham số": "{'clf__C': 0.1, 'clf__class_weight': 'balanced', 'vec__ngram_range': (1, 2)}",
+      "Ngưỡng": 0.0
+    },
+    {
+      "Mã": "S2",
+      "Tiền xử lý": "giữ stop words",
+      "Đặc trưng": "TF-IDF",
+      "Thuật toán": "SVM",
+      "Chiến lược": "Under-sampling 2:1",
+      "CV Precision (spam)": 0.803819117962337,
+      "CV Recall (spam)": 0.7276306420201674,
+      "CV F1 (spam)": 0.7629470129830992,
+      "Accuracy": 0.9393898849344394,
+      "Precision": 0.7791479820627802,
+      "Recall": 0.7308096740273397,
+      "F1": 0.7542051003798155,
+      "AP": 0.7826006465367112,
+      "Tham số": "{'clf__C': 0.1, 'clf__class_weight': None, 'vec__ngram_range': (1, 2)}",
+      "Ngưỡng": 0.0
+    },
+    {
+      "Mã": "S3",
+      "Tiền xử lý": "giữ stop words",
+      "Đặc trưng": "TF-IDF",
+      "Thuật toán": "SVM",
+      "Chiến lược": "Điều chỉnh ngưỡng",
+      "CV Precision (spam)": 0.8490321906574294,
+      "CV Recall (spam)": 0.7352844318710363,
+      "CV F1 (spam)": 0.7876129035895455,
+      "Accuracy": 0.9432700026759432,
+      "Precision": 0.8373879641485276,
+      "Recall": 0.6876971608832808,
+      "F1": 0.7551963048498845,
+      "AP": 0.8116912085784026,
+      "Tham số": "{'clf__C': 0.3, 'clf__class_weight': None, 'vec__ngram_range': (1, 2), 'threshold': -0.17762792522140153}",
+      "Ngưỡng": -0.1776279252214015
+    }
+  ],
+  "vibert_mode": "review_existing_checkpoint_not_retraining",
+  "live_facebook_argilla_llm_calls": false
+}

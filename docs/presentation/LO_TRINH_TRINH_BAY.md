@@ -36,7 +36,7 @@ Tool tổng hợp dữ liệu là tiện ích riêng, không phải mô hình ho
 | 6–6.1 / Bảo | `experiments.evaluate`; cell bảng | Test B1–B4 và B4/S1/S2/S3; tổng bảy ứng viên, so sánh Precision/Recall/F1/FP/FN |
 | 6.2–6.3 / Bảo | Cell ma trận/PR, `boot_ci` | Đọc một FP/FN; PR dùng score, đổi ngưỡng không đổi AP; khoảng bootstrap không chứng minh ưu thế thống kê |
 | 7 / Bảo | Cell dùng `best`, đặc trưng hệ số và bảng lỗi | Cấu hình phân tích là S3, không phải mô hình tùy ý; text/nhãn/prediction/score/threshold cùng mẫu |
-| 8–9 / Phi | `joblib.dump/load`, `pipeline/inference/predict.py`: `predict_spam` | S3 `.joblib` giữ pipeline/ngưỡng; nạp lại/demo; đánh đổi Precision–Recall và giới hạn |
+| 8–9 / Phi | `joblib.dump/load`, `pipeline/modeling/predict.py`: `predict_spam` | S3 `.joblib` giữ pipeline/ngưỡng; nạp lại/demo; đánh đổi Precision–Recall và giới hạn |
 
 S3: **TF-IDF+SVM, giữ từ dừng, C=0,3, ngram=(1,2), ngưỡng −0,1776**. CV F1
 0,7876, test F1 0,7552; không chọn mô hình bằng test. Score âm vẫn có thể lớn

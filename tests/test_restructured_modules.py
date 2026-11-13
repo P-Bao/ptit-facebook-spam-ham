@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 from sklearn.model_selection import StratifiedKFold
 
-from pipeline.inference.predict import predict_spam
+from pipeline.modeling.predict import predict_spam
 from pipeline.modeling.experiments import evaluate, fit_experiment, make_pipe
 from pipeline.prepare.preprocess_for_model import preprocess
 
