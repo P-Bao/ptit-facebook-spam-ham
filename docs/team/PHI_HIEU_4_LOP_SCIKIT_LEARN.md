@@ -338,3 +338,11 @@ S1/S2/S3 trong Notebook 02 là các thí nghiệm mất cân bằng trên **TF-I
 6. **Từ vựng/IDF có rò rỉ từ test?** Không: vectorizer nằm trong `Pipeline` được fit chỉ trên train từng fold; test chỉ gọi `transform`.
 
 Các đường dẫn dòng ở trên ứng với `scikit-learn 1.6.1` trong `.venv` của project; cài phiên bản khác có thể đổi số dòng. Tài liệu chỉ diễn giải nhánh cấu hình đang dùng, không mô tả mọi tùy chọn của thư viện.
+## Tài liệu mở rộng hiện hành
+
+Để học cả **GridSearchCV** cùng bốn lớp bên dưới, đọc
+[Phi 01 — Năm lớp thư viện](PHI_01_NAM_LOP_THU_VIEN_MODELING.md), rồi
+[Phi 02 — Luồng fit và tính điểm](PHI_02_LUONG_FIT_TO_HOP_VA_DIEM_CV.md),
+[Phi 03 — S1/S2/S3 theo code](PHI_03_CAN_BANG_S1_S2_S3_THEO_CODE.md).
+Ba tài liệu này có mã nguồn thư viện/project và giải thích theo luồng hiện tại.
+
